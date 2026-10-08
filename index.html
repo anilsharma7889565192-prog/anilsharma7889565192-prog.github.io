@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>KisanSevak — A crop doctor in your language</title>
+  <meta name="description" content="KisanSevak helps Indian farmers spot crop problems from a photo, ask questions by voice in 22 languages, and plan their week. Early-stage prototype, built to say 'not sure' instead of guessing.">
+  <meta name="theme-color" content="#0f2419">
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Archivo:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="#top" aria-label="KisanSevak home"><img src="assets/logo.svg" alt="" width="34" height="34">KisanSevak</a>
+      <nav class="nav" aria-label="Main">
+        <a href="#how">How it works</a>
+        <a href="#status">Status</a>
+        <a href="#languages">Languages</a>
+        <a href="#roadmap">Roadmap</a>
+        <a href="#partners">Partners</a>
+        <a class="btn" href="https://kisansevak-dusky.vercel.app" rel="noopener">Try the prototype</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <div id="top"></div>
+    <section class="hero" style="padding-bottom: clamp(64px, 9vw, 112px)">
+      <div class="wrap hero-grid">
+        <div>
+          <p class="eyebrow" style="color: var(--marigold)">AI crop doctor for Indian farmers</p>
+          <h1>A crop doctor in your pocket, <em>in your language.</em></h1>
+          <p class="hindi devanagari" lang="hi">आपकी अपनी भाषा में फसल डॉक्टर</p>
+          <p class="sub">Take a photo of a sick leaf, answer a few simple questions, and get clear next steps. Speak or type in any of 22 Indian languages. Nothing to install.</p>
+          <div class="cta-row">
+            <a class="btn" href="https://kisansevak-dusky.vercel.app" rel="noopener">Try the prototype</a>
+            <a class="btn ghost" href="#partners">Partner with us</a>
+          </div>
+          <p class="pill-note"><span class="dot" aria-hidden="true"></span>Prototype stage: we are testing accuracy with experts before making any claims.</p>
+        </div>
+        <div aria-hidden="true">
+          <div class="phone">
+            <div class="screen">
+              <div class="bar"><span>KisanSevak</span><span>EN · हिं</span></div>
+              <div class="leaf-photo"></div>
+              <div class="result">
+                <span class="tag">LOOKS LIKE A FUNGAL LEAF SPOT</span>
+                <strong>Possible early blight</strong>
+                <span>Spots with rings on older leaves. Check the underside and ask: did it start after rain?</span>
+              </div>
+              <div class="q"><span>Yes</span><span>No</span><span>Not sure</span></div>
+            </div>
+          </div>
+          <p class="caption">Illustration of the idea, not a real diagnosis.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="problem">
+      <div class="wrap">
+        <div class="section-head">
+          <p class="eyebrow">The problem</p>
+          <h2>When a crop looks wrong, help is often days away.</h2>
+        </div>
+        <p class="lead">Most farmers cannot get a trained eye on a sick plant quickly. Extension officers cover many villages, apps often speak only a few languages, and signal is patchy in the field. A wrong guess means spraying the wrong thing, or waiting until it is too late.</p>
+      </div>
+    </section>
+
+    <section id="how" class="alt">
+      <div class="wrap">
+        <div class="section-head">
+          <p class="eyebrow">How it works</p>
+          <h2>Look, ask, then act: the way an agriculture officer works.</h2>
+        </div>
+        <div class="cards">
+          <div class="card"><div class="num">1</div><h3>Photograph</h3><p>Snap the affected leaf, or describe it by voice in your own language. Pick the crop to narrow the possibilities.</p></div>
+          <div class="card"><div class="num">2</div><h3>Answer a few questions</h3><p>Where on the plant? How fast is it spreading? Short tap-to-answer questions separate look-alike problems that a photo alone cannot.</p></div>
+          <div class="card"><div class="num">3</div><h3>Get a clear next step</h3><p>See the likely cause, what to check, and options, in plain words, read aloud if you prefer. Always confirm with your local KVK before spraying.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="trust">
+      <div class="wrap">
+        <div class="section-head">
+          <p class="eyebrow">Our principles</p>
+          <h2>Built to be trusted, not just fast.</h2>
+        </div>
+        <ul class="principles">
+          <li><strong>It says "not sure" when it is not sure.</strong><span>A wrong confident answer is worse than no answer. Unclear cases point you to an expert.</span></li>
+          <li><strong>Advice from official sources, shown.</strong><span>Our goal is that every treatment tip names its government or agriculture-university source.</span></li>
+          <li><strong>No pesticide ads, no product pushing.</strong><span>Non-chemical and integrated pest-management options come first.</span></li>
+          <li><strong>Your photos stay yours.</strong><span>We share photos for improving the service only with your clear consent.</span></li>
+          <li><strong>Works for people who do not read much.</strong><span>Voice in, voice out, big icons, your language.</span></li>
+          <li><strong>Honest about what it can do.</strong><span>We publish accuracy results, including the weak ones, once we have measured them.</span></li>
+        </ul>
+        <p class="disclaimer" style="margin-top: 32px"><strong>Important:</strong> KisanSevak gives informational guidance. It is not a substitute for your local agriculture officer. Confirm any treatment, and especially any pesticide use, with your nearest Krishi Vigyan Kendra (KVK) before applying it.</p>
+      </div>
+    </section>
+
+    <section id="status" class="alt">
+      <div class="wrap">
+        <div class="section-head">
+          <p class="eyebrow">Where we are today</p>
+          <h2>An honest status report.</h2>
+          <p class="lead">The prototype is live and works end to end. Here is what is real, and what is still being built.</p>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th scope="col">Feature</th><th scope="col">Status</th></tr></thead>
+            <tbody>
+              <tr><td>Photo-based crop diagnosis (AI-assisted)</td><td><span class="chip live">Live prototype</span></td></tr>
+              <tr><td>Voice questions and chat in 22 Indian languages (spoken replies in 11 of them)</td><td><span class="chip live">Live prototype</span></td></tr>
+              <tr><td>Weekly farm plan using live weather</td><td><span class="chip soon">Almost ready</span></td></tr>
+              <tr><td>Offline mode: saved results, questions sent when signal returns</td><td><span class="chip soon">Almost ready</span></td></tr>
+              <tr><td>Follow-up questions that separate look-alike diseases</td><td><span class="chip build">Building</span></td></tr>
+              <tr><td>Our own diagnosis model, tested on real field photos</td><td><span class="chip build">Building</span></td></tr>
+              <tr><td>Treatment guidance from official sources, with citations</td><td><span class="chip plan">Planned</span></td></tr>
+              <tr><td>Pilot with Krishi Vigyan Kendras and farmer groups</td><td><span class="chip plan">Planned</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="legend">Accuracy has not yet been measured on Indian crops, so we make no accuracy claim today.</p>
+      </div>
+    </section>
+
+    <section id="languages">
+      <div class="wrap">
+        <div class="section-head">
+          <p class="eyebrow">Languages</p>
+          <h2>All 22 scheduled languages, plus English.</h2>
+          <p class="lead">Speak or type in your language. Spoken replies work today in the languages marked with a speaker; the rest answer in text while we add voices.</p>
+        </div>
+        <ul class="langs" aria-label="Supported languages">
+          <li class="voice"><span>English</span><small>spoken reply</small></li>
+          <li class="voice devanagari"><span>हिन्दी</span><small>Hindi · spoken reply</small></li>
+          <li><span>অসমীয়া</span><small>Assamese</small></li>
+          <li class="voice"><span>বাংলা</span><small>Bengali · spoken reply</small></li>
+          <li class="devanagari"><span>बड़ो</span><small>Bodo</small></li>
+          <li class="devanagari"><span>डोगरी</span><small>Dogri</small></li>
+          <li class="voice"><span>ગુજરાતી</span><small>Gujarati · spoken reply</small></li>
+          <li class="voice"><span>ಕನ್ನಡ</span><small>Kannada · spoken reply</small></li>
+          <li><span>کٲشُر</span><small>Kashmiri</small></li>
+          <li class="devanagari"><span>कोंकणी</span><small>Konkani</small></li>
+          <li class="devanagari"><span>मैथिली</span><small>Maithili</small></li>
+          <li class="voice"><span>മലയാളം</span><small>Malayalam · spoken reply</small></li>
+          <li><span>ꯃꯤꯇꯩꯂꯣꯟ</span><small>Manipuri</small></li>
+          <li class="voice devanagari"><span>मराठी</span><small>Marathi · spoken reply</small></li>
+          <li class="devanagari"><span>नेपाली</span><small>Nepali</small></li>
+          <li class="voice"><span>ଓଡ଼ିଆ</span><small>Odia · spoken reply</small></li>
+          <li class="voice"><span>ਪੰਜਾਬੀ</span><small>Punjabi · spoken reply</small></li>
+          <li class="devanagari"><span>संस्कृतम्</span><small>Sanskrit</small></li>
+          <li><span>ᱥᱟᱱᱛᱟᱲᱤ</span><small>Santali</small></li>
+          <li><span>سنڌي</span><small>Sindhi</small></li>
+          <li class="voice"><span>தமிழ்</span><small>Tamil · spoken reply</small></li>
+          <li class="voice"><span>తెలుగు</span><small>Telugu · spoken reply</small></li>
+          <li><span>اردو</span><small>Urdu</small></li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="roadmap" class="alt">
+      <div class="wrap">
+        <div class="section-head">
+          <p class="eyebrow">Roadmap</p>
+          <h2>From borrowed AI to our own model, one tested step at a time.</h2>
+          <p class="lead">We only move to the next step when the previous one passes a real test, so farmers never get worse advice along the way.</p>
+        </div>
+        <ol class="steps">
+          <li><strong>Measure the baseline</strong><span>Score today's AI on labelled field photos so we know where we stand.</span></li>
+          <li><strong>Collect licensed field photos for the major crops</strong><span>Open, properly licensed data first, then expert-verified photos from partners.</span></li>
+          <li><strong>Train and test our own model</strong><span>It must match or beat the baseline on photos it has never seen before it replaces anything.</span></li>
+          <li><strong>Build the expert answer library</strong><span>Official-source guidance for each problem, translated and reviewed by agronomists and native speakers.</span></li>
+          <li><strong>Run on the phone, pilot with KVKs</strong><span>A small model inside the browser works with poor or no signal. Pilot with partners and real farmers.</span></li>
+          <li><strong>Keep growing</strong><span>With consent, farmers' photos confirmed by experts help the model learn more crops and local diseases.</span></li>
+        </ol>
+      </div>
+    </section>
+
+    <section id="partners">
+      <div class="wrap">
+        <div class="notice">
+          <div>
+            <p class="eyebrow" style="color: var(--marigold)">Partners</p>
+            <h2>Help us get it right.</h2>
+            <p>We are looking for Krishi Vigyan Kendras, agriculture universities, FPOs and agronomists who would like to review our work, share labelled field photos, or host a small pilot.</p>
+          </div>
+          <div>
+            <ul>
+              <li>Expert review of disease labels and advice</li>
+              <li>Labelled field photos, shared with permission</li>
+              <li>Pilot sites and farmer feedback</li>
+            </ul>
+            <p style="margin-top: 18px">
+              <a class="btn" data-contact href="#">Get in touch</a>
+              <span data-contact-fallback hidden style="color: rgba(251,247,236,0.85)">Contact email coming soon. For now, please reach us through the prototype link above.</span>
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="footer-grid">
+        <div>
+          <a class="brand" href="#top"><img src="assets/logo.svg" alt="" width="34" height="34">KisanSevak</a>
+          <p style="margin-top: 14px; max-width: 38ch">An early-stage project building a trustworthy, multilingual crop-health assistant for Indian farmers.</p>
+        </div>
+        <div>
+          <h3>Explore</h3>
+          <ul>
+            <li><a href="https://kisansevak-dusky.vercel.app" rel="noopener">Try the prototype</a></li>
+            <li><a href="#status">Status</a></li>
+            <li><a href="#roadmap">Roadmap</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3>Legal</h3>
+          <ul>
+            <li><a href="privacy.html">Privacy notice</a></li>
+            <li><a data-contact href="#">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+      <p class="fine">KisanSevak is an independent project and is not affiliated with any government body. Guidance is informational only; confirm treatments with your local agriculture officer. © <span id="year">2026</span> KisanSevak.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Set this once the company mailbox exists, e.g. 'hello@yourdomain.in'. While empty, contact links are hidden.
+    var CONTACT_EMAIL = '';
+    document.getElementById('year').textContent = new Date().getFullYear();
+    document.querySelectorAll('[data-contact]').forEach(function (el) {
+      if (CONTACT_EMAIL) { el.href = 'mailto:' + CONTACT_EMAIL; if (el.classList.contains('btn') === false) el.textContent = CONTACT_EMAIL; }
+      else { el.hidden = true; var fb = el.parentElement.querySelector('[data-contact-fallback]'); if (fb) fb.hidden = false; }
+    });
+  </script>
+</body>
+</html>

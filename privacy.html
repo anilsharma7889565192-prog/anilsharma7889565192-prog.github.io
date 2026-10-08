@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Privacy notice — KisanSevak</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="./" aria-label="KisanSevak home"><img src="assets/logo.svg" alt="" width="34" height="34">KisanSevak</a>
+      <nav class="nav" aria-label="Main"><a class="btn" href="./">Back to site</a></nav>
+    </div>
+  </header>
+
+  <main class="legal">
+    <div class="wrap">
+      <h1>Privacy notice</h1>
+      <p style="color: var(--ink-soft)">For the KisanSevak prototype. Last updated: <span id="updated">October 2026</span>.</p>
+      <p class="draft"><strong>Draft:</strong> this notice describes how the prototype works today. It should be reviewed by a lawyer, including against India's data protection law, before the service is offered widely.</p>
+
+      <h2>What you give us</h2>
+      <ul>
+        <li><strong>Photos</strong> of crops that you choose to upload or take.</li>
+        <li><strong>Text and voice</strong> you type or record to describe a problem or ask a question.</li>
+        <li><strong>Your language choice,</strong> and, if you allow it, your approximate location, used only to show the weather.</li>
+      </ul>
+
+      <h2>How it is used</h2>
+      <ul>
+        <li>Your photo, text or voice is sent to our server, which forwards it to AI providers to produce an answer. Today, Google's Gemini analyses photos and text, and Sarvam AI handles speech. They process your data under their own terms, and their retention rules may differ from ours.</li>
+        <li>Our own server does not store your photos or recordings.</li>
+        <li>To show weather, your browser sends your coordinates to weather and place-name services (Open-Meteo and BigDataCloud) directly.</li>
+        <li>Results you see, and questions you ask while offline, are saved on your own device so you can read them later. You can clear them by clearing this site's data in your browser.</li>
+      </ul>
+
+      <h2>What we do not do</h2>
+      <ul>
+        <li>We do not sell your data and we do not show advertising.</li>
+        <li>We do not use advertising or tracking cookies.</li>
+        <li>We will not use your photos to train or improve a model without asking you first and getting your clear consent.</li>
+      </ul>
+
+      <h2>Your choices</h2>
+      <p>You can use the prototype without creating an account. You can stop at any time and clear saved results from your browser. To ask about your data, contact us at the address below.</p>
+
+      <h2>Contact</h2>
+      <p><a data-contact href="#">Contact us</a><span data-contact-fallback hidden>A contact email will be added here soon.</span></p>
+
+      <h2>Not professional advice</h2>
+      <p>KisanSevak gives informational guidance only. Confirm any treatment, including any pesticide use, with your local agriculture officer or Krishi Vigyan Kendra.</p>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p class="fine" style="border-top: 0; margin-top: 0; padding-top: 0">KisanSevak is an independent project and is not affiliated with any government body. © <span id="year">2026</span> KisanSevak.</p>
+    </div>
+  </footer>
+
+  <script>
+    var CONTACT_EMAIL = '';
+    document.getElementById('year').textContent = new Date().getFullYear();
+    document.querySelectorAll('[data-contact]').forEach(function (el) {
+      if (CONTACT_EMAIL) { el.href = 'mailto:' + CONTACT_EMAIL; el.textContent = CONTACT_EMAIL; }
+      else { el.hidden = true; var fb = el.parentElement.querySelector('[data-contact-fallback]'); if (fb) fb.hidden = false; }
+    });
+  </script>
+</body>
+</html>

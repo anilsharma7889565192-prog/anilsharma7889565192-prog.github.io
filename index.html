@@ -237,7 +237,7 @@
 
   <script>
     // Set this once the company mailbox exists, e.g. 'hello@yourdomain.in'. While empty, contact links are hidden.
-    var CONTACT_EMAIL = '';
+    var CONTACT_EMAIL = 'hello@kisansevak.me';
     document.getElementById('year').textContent = new Date().getFullYear();
     document.querySelectorAll('[data-contact]').forEach(function (el) {
       if (CONTACT_EMAIL) { el.href = 'mailto:' + CONTACT_EMAIL; if (el.classList.contains('btn') === false) el.textContent = CONTACT_EMAIL; }

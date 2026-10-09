@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight, ChevronRight } from "lucide-react";
 import type { ReactNode } from "react";
 import { Photo } from "./Photo";
+import { LiveScene } from "./three/LiveScene";
 import type { ImageSlot } from "@/config/images";
 import { site } from "@/config/site";
 
@@ -28,12 +29,16 @@ type PageHeroProps = {
   slot: ImageSlot;
   crumbs: { href?: string; label: string }[];
   actions?: ReactNode;
+  /** Real-time 3D version of the hero image (same shot name as the still). */
+  live?: string;
 };
 
-export function PageHero({ title, description, eyebrow, slot, crumbs, actions }: PageHeroProps) {
+export function PageHero({ title, description, eyebrow, slot, crumbs, actions, live }: PageHeroProps) {
   return (
-    <section className="relative isolate flex min-h-[26rem] items-end overflow-hidden pb-14 pt-36 md:min-h-[34rem] md:pb-20">
-      <Photo slot={slot} shade="hero" priority sizes="100vw" />
+    <section className="relative isolate flex min-h-[26rem] items-end overflow-hidden pb-14 pt-36 md:min-h-[38rem] md:pb-20">
+      <Photo slot={slot} priority sizes="100vw" />
+      {live && <LiveScene shot={live} />}
+      <div className="overlay-hero" aria-hidden="true" />
       <div className="wrap relative z-10">
         <Breadcrumbs trail={crumbs} />
         {eyebrow && <p className="eyebrow mt-8 rise">{eyebrow}</p>}
@@ -84,7 +89,8 @@ export function CtaBand({
 }) {
   return (
     <section className="relative isolate overflow-hidden py-24 md:py-36">
-      <Photo slot={slot} shade="hero" />
+      <Photo slot={slot} />
+      <div className="overlay-band" aria-hidden="true" />
       <div className="wrap relative z-10 text-center">
         <span className="rule mx-auto" />
         <h2 className="h2 mx-auto mt-8 max-w-3xl !text-[clamp(2.2rem,5.5vw,4.2rem)]">{title}</h2>
@@ -92,6 +98,29 @@ export function CtaBand({
         <div className="mt-10 flex flex-wrap justify-center gap-4">
           <Link href={primary.href} className="btn btn-gold">{primary.label}<ArrowRight size={16} aria-hidden="true" /></Link>
           {secondary && <Link href={secondary.href} className="btn btn-ghost">{secondary.label}</Link>}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/** Closing call to action with a live globe of India (home page). */
+export function GlobeCta() {
+  return (
+    <section className="relative isolate overflow-hidden bg-navy">
+      <div className="wrap grid items-center gap-6 py-20 md:py-28 lg:grid-cols-12 lg:gap-10">
+        <div className="relative z-10 lg:col-span-6">
+          <span className="rule" />
+          <h2 className="h2 mt-8 max-w-xl !text-[clamp(2.2rem,5vw,4rem)]">Tell Us Where You Need to Be.</h2>
+          <p className="lead mt-6">Share your travel requirements and let us coordinate suitable charter options with relevant aviation operators.</p>
+          <div className="mt-10 flex flex-wrap gap-4">
+            <Link href="/request-a-charter" className="btn btn-gold">Request a Charter<ArrowRight size={16} aria-hidden="true" /></Link>
+            <Link href="/contact" className="btn btn-ghost">Contact Continent Aviation</Link>
+          </div>
+        </div>
+        <div className="relative -mx-[max(1.25rem,4vw)] aspect-square max-h-[38rem] lg:col-span-6 lg:mx-0" aria-hidden="true">
+          <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_50%_50%,rgb(200_169_107/.08),transparent_62%)]" />
+          <LiveScene shot="globe" params={{ bg: "#101a2a" }} />
         </div>
       </div>
     </section>

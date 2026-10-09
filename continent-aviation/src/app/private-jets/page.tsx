@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Photo } from "@/components/Photo";
 import { Bullets, CtaBand, Disclaimer, Faq, PageHero, SectionHead, enquiryHref } from "@/components/ui";
+import { AircraftExplorer } from "@/components/three/AircraftExplorer";
 import { pageMeta } from "@/lib/metadata";
 
 export const metadata = pageMeta("/private-jets", "Private Jet Charter in India", "Explore private jet charter options for executive travel, private journeys, multi-city itineraries and special occasions, sourced through independent aviation operators.");
@@ -43,7 +44,7 @@ const faqs = [
 export default function Page() {
   return (
     <>
-      <PageHero slot="jets" crumbs={[{ label: "Private Jets" }]} eyebrow="Private Jets"
+      <PageHero slot="jets" live="jets" crumbs={[{ label: "Private Jets" }]} eyebrow="Private Jets"
         title="Private Jet Charter, Tailored to Your Journey."
         description="Explore private jet charter options for executive travel, private journeys, multi-city itineraries and special occasions."
         actions={<><Link href={cta} className="btn btn-gold">Request Private Jet Options<ArrowRight size={16} aria-hidden="true" /></Link></>} />
@@ -74,7 +75,16 @@ export default function Page() {
         </div>
       </section>
 
-      <section className="section section-navy">
+      <section className="section section-navy" aria-label="Aircraft categories">
+        <div className="wrap">
+          <SectionHead eyebrow="Aircraft categories" title="Explore the main jet categories.">
+            <p>Operators group business jets broadly by cabin size and range. Choosing a category is a starting point; the right aircraft depends on your route, passengers and the options operators confirm.</p>
+          </SectionHead>
+          <div className="mt-14"><AircraftExplorer poster={<Photo slot="group" sizes="(min-width:1024px) 60vw, 100vw" />} /></div>
+        </div>
+      </section>
+
+      <section className="section section-black">
         <div className="wrap grid gap-14 lg:grid-cols-12 lg:gap-20">
           <div className="lg:col-span-5">
             <SectionHead eyebrow="Sourcing" title="How aircraft sourcing works.">

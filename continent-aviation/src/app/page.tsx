@@ -2,7 +2,9 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Photo } from "@/components/Photo";
 import { Steps } from "@/components/Steps";
-import { Bullets, CtaBand, Disclaimer, SectionHead, enquiryHref } from "@/components/ui";
+import { Bullets, Disclaimer, GlobeCta, SectionHead, enquiryHref } from "@/components/ui";
+import { LiveScene } from "@/components/three/LiveScene";
+import { TiltLink } from "@/components/Tilt";
 import type { ImageSlot } from "@/config/images";
 import { pageMeta } from "@/lib/metadata";
 
@@ -37,7 +39,9 @@ export default function Home() {
     <>
       {/* A — Hero */}
       <section className="relative isolate flex min-h-[100svh] items-end overflow-hidden pb-20 pt-40 md:items-center md:pb-24">
-        <Photo slot="hero" shade="hero" priority sizes="100vw" />
+        <Photo slot="hero" priority sizes="100vw" />
+        <LiveScene shot="hero" />
+        <div className="overlay-hero" aria-hidden="true" />
         <div className="wrap relative z-10">
           <p className="eyebrow rise">Private Aviation <span className="mx-2 text-gold/60" aria-hidden="true">|</span> India</p>
           <h1 className="display mt-6 max-w-5xl rise rise-2">
@@ -79,7 +83,7 @@ export default function Home() {
           <SectionHead eyebrow="Our Services" title="Charter Solutions, Considered." />
           <div className="mt-16 grid gap-px md:grid-cols-3 md:gap-8">
             {services.map((s, i) => (
-              <Link key={s.title} href={s.href} className={`tile group ${i === 1 ? "md:mt-14" : ""}`}>
+              <TiltLink key={s.title} href={s.href} className={`tile group ${i === 1 ? "md:mt-14" : ""}`}>
                 <div className="relative aspect-[4/5] w-full">
                   <Photo slot={s.slot} shade="bottom" sizes="(min-width:768px) 33vw, 100vw" />
                 </div>
@@ -88,7 +92,7 @@ export default function Home() {
                   <p className="mt-4 text-[0.95rem] text-ivory/70">{s.text}</p>
                   <span className="link-arrow mt-6">{s.cta}<ArrowRight size={14} aria-hidden="true" /></span>
                 </div>
-              </Link>
+              </TiltLink>
             ))}
           </div>
           <p className="mt-14 max-w-2xl text-sm text-grey">Routes, landing locations, aircraft and services are confirmed only once the relevant operator has confirmed them.</p>
@@ -101,7 +105,7 @@ export default function Home() {
           <SectionHead eyebrow="Who We Serve" title="Designed Around Distinct Travel Needs." />
           <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-6">
             {audiences.map((a, i) => (
-              <Link key={a.title} href={a.href} className={`tile group ${i < 2 ? "lg:col-span-3" : "lg:col-span-2"}`}>
+              <TiltLink key={a.title} href={a.href} max={2.5} className={`tile group ${i < 2 ? "lg:col-span-3" : "lg:col-span-2"}`}>
                 <div className={`relative w-full ${i < 2 ? "aspect-[16/10]" : "aspect-[4/5] lg:aspect-[3/4]"}`}>
                   <Photo slot={a.slot} shade="bottom" sizes="(min-width:1024px) 40vw, 100vw" />
                   <div className="absolute inset-x-0 bottom-0 z-10 p-6 md:p-7">
@@ -110,7 +114,7 @@ export default function Home() {
                     <p className="mt-4 text-[0.92rem] text-ivory/80">{a.text}</p>
                   </div>
                 </div>
-              </Link>
+              </TiltLink>
             ))}
           </div>
         </div>
@@ -183,7 +187,7 @@ export default function Home() {
       </section>
 
       {/* I — Final CTA */}
-      <CtaBand />
+      <GlobeCta />
 
       {/* J — Disclaimer */}
       <Disclaimer />

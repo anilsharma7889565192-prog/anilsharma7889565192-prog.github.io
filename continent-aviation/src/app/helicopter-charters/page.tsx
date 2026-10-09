@@ -34,7 +34,7 @@ const faqs = [
 export default function Page() {
   return (
     <>
-      <PageHero slot="helicopter" crumbs={[{ label: "Helicopter Charters" }]} eyebrow="Helicopter Charters"
+      <PageHero slot="helicopter" live="helicopter" crumbs={[{ label: "Helicopter Charters" }]} eyebrow="Helicopter Charters"
         title="Helicopter Charter Options for Distinct Journeys."
         description="Explore helicopter charter enquiries for suitable regional travel, destination events and special requirements."
         actions={<Link href={cta} className="btn btn-gold">Enquire About Helicopter Charter<ArrowRight size={16} aria-hidden="true" /></Link>} />

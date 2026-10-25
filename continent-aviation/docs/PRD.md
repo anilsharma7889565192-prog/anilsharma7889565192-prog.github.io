@@ -144,6 +144,21 @@ A compact bar that looks and feels like the search bar on booking sites, but it 
 - **RD-4** Redesigned header, footer, forms and status components as a single design system.
 - **RD-5** WCAG 2.2 AA contrast, keyboard access and visible focus.
 
+### 7.1 Scroll-driven journey (design reference, added 2026-10-25)
+
+Reference: three short videos on 3D scroll-based sites (real-time 3D objects, a pre-rendered scroll-scrubbed fly-through, and 2.5D parallax), analysed for design ideas. Approach chosen: a **pre-rendered, scroll-scrubbed camera sequence** for the home page, with clean, readable layouts around it.
+
+- **RD-6 Hero journey:** one continuous camera path tied to scroll: dusk apron, then a pass along the wing, then through the door into the cabin. Frames are rendered with the project's own 3D engine and encoded as video (all-intra for smooth scrubbing), with a smaller version for phones and a still poster.
+- **RD-7 Headline layering:** the brand headline sits between depth layers (for example slightly behind the aircraft tail), with subtle parallax. Text always stays readable: text sits in clear negative space, or on a dark gradient or frosted panel when the scene is busy.
+- **RD-8 Smooth scrolling:** eased scroll (for example Lenis-style interpolation) with short, readable text beats at each stage of the journey.
+- **RD-9 Depth cues:** depth of field and atmosphere (fog and bloom) on the camera path; rim lighting on aircraft.
+- **RD-10 End of the journey:** motion stops at the enquiry section: a static, clean, high-contrast layout with the enquiry bar and form. No 3D distraction there.
+- **RD-11 Page weight and fallbacks:** the sequence loads after the text, header and enquiry bar; it never blocks them. Fallbacks: still poster on slow connections or data saver, static layout for reduced motion, a lighter mobile version, a pre-loader only if needed.
+- **RD-12 Keep:** the real-time aircraft explorer and the globe, where interaction helps the visitor.
+- **RD-13 Avoid:** illustrated or cartoon parallax, text over busy backgrounds, long loading screens, heavy real-time models on mobile, and effects that slow or hide the enquiry form.
+- **RD-14 Quality note:** the sequence will look like a high-quality computer render of generic aircraft. Replacing it with photography or a professionally modelled aircraft is a later option.
+- **RD-15 Measure before committing:** test the sequence's file size and smoothness on mid-range phones before it ships.
+
 ## 8. Data model (initial)
 
 - **Enquiry**: id, reference, createdAt, client (name, company, email, phone, preferred contact), journey (aircraft, trip type, from, to, dates and times, passengers, baggage, extra stops), purpose, budget, notes, consent, status, statusHistory.

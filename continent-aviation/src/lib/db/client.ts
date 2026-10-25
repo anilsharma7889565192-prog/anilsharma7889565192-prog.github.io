@@ -1,6 +1,5 @@
 import "server-only";
 import fs from "node:fs";
-import path from "node:path";
 import { SCHEMA } from "./schema";
 
 export type Row = Record<string, unknown>;
@@ -25,7 +24,7 @@ async function create(): Promise<Db> {
   } else {
     const { PGlite } = await import("@electric-sql/pglite");
     const dir = process.env.PGLITE_DIR ?? ".data/pglite";
-    if (dir !== "memory") fs.mkdirSync(path.dirname(path.resolve(dir)), { recursive: true });
+    if (dir !== "memory") fs.mkdirSync(".data", { recursive: true });
     const pg = dir === "memory" ? new PGlite() : new PGlite(dir);
     db = { query: async (q, p = []) => (await pg.query(q, p)).rows as Row[] };
   }

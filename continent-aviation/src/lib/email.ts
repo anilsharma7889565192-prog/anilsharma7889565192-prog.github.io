@@ -36,7 +36,7 @@ export async function sendMail(m: MailInput): Promise<boolean> {
   if (!RESEND_API_KEY || !ENQUIRY_FROM_EMAIL) {
     if (process.env.NODE_ENV !== "production") {
       try {
-        const dir = path.join(process.cwd(), ".data");
+        const dir = process.env.OUTBOX_DIR || path.join(process.cwd(), ".data");
         fs.mkdirSync(dir, { recursive: true });
         fs.appendFileSync(path.join(dir, "outbox.jsonl"), JSON.stringify({ at: new Date().toISOString(), ...m }) + "\n");
       } catch { /* ignore */ }

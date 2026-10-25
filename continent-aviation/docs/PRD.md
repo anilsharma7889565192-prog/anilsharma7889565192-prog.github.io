@@ -218,3 +218,20 @@ Stack suggestion: keep Next.js and Vercel; add Postgres (for example Vercel Post
 | Misleading availability claims | Wording rules in section 4; legal review |
 | Stored personal data | Minimal fields, access control, retention policy |
 | Regulatory position unclear | Take legal advice before launch |
+
+## 14. Build status (2026-10-25)
+
+Built and tested in development (embedded Postgres, emails to a local outbox):
+
+- Enquiry bar (home, Private Jets, Helicopter Charters) leading to a prefilled enquiry form; no availability or price is ever shown.
+- Enquiry storage, status machine, admin console with magic-link sign-in, approve or decline, private 48-hour quote page, accept, payment-received and confirmed steps, expiry (lazy and daily cron), emails at each step.
+- Pages: Operators and Aircraft, How We Quote, Example Quote, Pricing Explained, eight airport guides, three insight articles, route alerts with one-click unsubscribe.
+- Home: enquiry-bar hero, scroll-driven process film (pre-rendered from the project's 3D engine; static steps on phones, reduced motion and data-saver), operators section.
+
+Not done or not verifiable from the build environment:
+
+- Production Postgres and Resend paths are untested here (no database or email account available). Needs `DATABASE_URL`, `RESEND_API_KEY`, a verified sender on continentaviation.in, `SESSION_SECRET`, `CRON_SECRET`.
+- Deployment to Vercel and DNS for continentaviation.in.
+- Written confirmation from Arrow Aircraft and GMR Aviation for the aircraft list, images and logos (no logos or operator imagery are used until then).
+- Verified phone and WhatsApp numbers, legal review of Privacy Policy and Terms, owner confirmation of the airport suggestion list.
+- The light-editorial re-theme of the whole site was not applied: the existing dark-and-ivory system was kept and extended, and the new pages follow it.

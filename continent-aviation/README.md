@@ -59,7 +59,7 @@ Business model: Continent Aviation arranges charters with independent operators.
 4. The visitor accepts on the quote page and pays **the operator directly**. The admin marks the payment received and then confirmed once the operator confirms. Status goes `received, checking, quoted, accepted, paid, confirmed` (or declined, expired, cancelled), and every change is logged and emailed.
 5. Quotes expire automatically (checked on every read and by the daily job at `/api/cron/expire`, configured in `vercel.json`; set `CRON_SECRET`).
 
-Setup: provide a Postgres `DATABASE_URL` (the schema is created on first use), `ADMIN_EMAIL`, `SESSION_SECRET` (24+ characters), `CRON_SECRET`, and email (`RESEND_API_KEY`, `ENQUIRY_FROM_EMAIL`, `ENQUIRY_TO_EMAIL`). Without email configured in production, sign-in links and quotes cannot be sent, so `/admin` stays unavailable. In development, emails are printed to the server console and saved to a local outbox.
+Setup: provide a Postgres `DATABASE_URL` (the schema is created on first use), `ADMIN_EMAIL`, `SESSION_SECRET` (24+ characters), `CRON_SECRET`, and email (`RESEND_API_KEY`, `ENQUIRY_FROM_EMAIL`, `ENQUIRY_TO_EMAIL`). Without email configured in production, sign-in links and quotes cannot be delivered. In development, emails are printed to the server console and saved to a local outbox.
 
 Route alerts (`/airports`) store only an email, an optional route and the consent given, with a one-click unsubscribe link in every email.
 

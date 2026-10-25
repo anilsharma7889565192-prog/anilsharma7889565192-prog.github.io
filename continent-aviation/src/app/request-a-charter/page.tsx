@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { EnquiryForm } from "@/components/EnquiryForm";
 import { Breadcrumbs, Disclaimer } from "@/components/ui";
-import { deliveryConfigured } from "@/lib/delivery";
+import { intakeReady } from "@/lib/delivery";
 import { pageMeta } from "@/lib/metadata";
 import { site, whatsappLink } from "@/config/site";
 
@@ -23,7 +23,7 @@ export default function Page() {
         <div className="wrap wrap-narrow">
           <Suspense fallback={<p className="text-grey" role="status">Loading form…</p>}>
             <EnquiryForm
-              deliveryReady={deliveryConfigured()}
+              deliveryReady={intakeReady()}
               isProduction={process.env.NODE_ENV === "production"}
               fallback={{ email: site.contact.email, phone: site.contact.phone, whatsappUrl: whatsappLink() }}
             />

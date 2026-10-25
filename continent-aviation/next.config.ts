@@ -10,6 +10,7 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   agentRules: false,
+  serverExternalPackages: ["@electric-sql/pglite", "postgres"],
   images: { formats: ["image/avif", "image/webp"], qualities: [75, 82] },
   async headers() {
     return [{ source: "/(.*)", headers: securityHeaders }];

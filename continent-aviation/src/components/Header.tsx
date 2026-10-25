@@ -44,6 +44,8 @@ export function Header() {
     return () => { document.body.style.overflow = ""; document.removeEventListener("keydown", onKey); };
   }, [open]);
 
+  if (pathname.startsWith("/admin")) return null;
+
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + "/");
 
   return (

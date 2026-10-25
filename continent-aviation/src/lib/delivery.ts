@@ -11,6 +11,9 @@ export const deliveryConfigured = () =>
       process.env.ENQUIRY_WEBHOOK_URL,
   );
 
+/** True when an enquiry can be received safely: it is stored in the database and/or delivered by email or webhook. */
+export const intakeReady = () => deliveryConfigured() || Boolean(process.env.DATABASE_URL);
+
 export type DeliveryKind = "charter-enquiry" | "partnership-enquiry";
 
 const esc = (s: string) =>
@@ -35,7 +38,7 @@ const CLEAN = (data: Record<string, unknown>) => {
   return out;
 };
 
-export async function deliver(kind: DeliveryKind, data: Record<string, unknown>, ref: string) {
+export async function deliver(kind: DeliveryKind, data: Record<string, unknown>, ref: string, opts: { skipEmail?: boolean } = {}) {
   const fields = CLEAN(data);
   const title = kind === "charter-enquiry" ? "New charter enquiry" : "New partnership enquiry";
   const subject = `${title} — ${fields.fullName ?? fields.organisation ?? "website"} (${ref})`;
@@ -43,7 +46,7 @@ export async function deliver(kind: DeliveryKind, data: Record<string, unknown>,
 
   const { RESEND_API_KEY, ENQUIRY_FROM_EMAIL, ENQUIRY_TO_EMAIL, ENQUIRY_WEBHOOK_URL, ENQUIRY_WEBHOOK_SECRET } = process.env;
 
-  if (RESEND_API_KEY && ENQUIRY_FROM_EMAIL && ENQUIRY_TO_EMAIL) {
+  if (!opts.skipEmail && RESEND_API_KEY && ENQUIRY_FROM_EMAIL && ENQUIRY_TO_EMAIL) {
     const rows = Object.entries(fields)
       .map(([k, v]) => `<tr><td style="padding:6px 12px 6px 0;color:#666;vertical-align:top">${esc(LABELS[k])}</td><td style="padding:6px 0">${esc(v).replace(/\n/g, "<br>")}</td></tr>`)
       .join("");

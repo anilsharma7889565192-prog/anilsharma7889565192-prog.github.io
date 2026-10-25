@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { enquirySchema, toFieldErrors, BUDGETS, PURPOSES } from "@/lib/validation";
 import { Choice, ErrorSummary, Field, SectionTitle, Spinner, type Errors } from "./form-bits";
+import { PlaceInput } from "./PlaceInput";
 
 export type Fallback = { email?: string; phone?: string; whatsappUrl?: string };
 
@@ -27,6 +28,7 @@ export function EnquiryForm({ deliveryReady, isProduction, fallback }: { deliver
     return v && (list as readonly string[]).includes(v) ? v : undefined;
   };
 
+  const pre = (k: string) => params.get(k)?.slice(0, 300) ?? "";
   const [tripType, setTripType] = useState<string>(pick("tripType", TRIP_TYPES) ?? "One Way");
   const [errors, setErrors] = useState<Errors>({});
   const [status, setStatus] = useState<Status>("idle");
@@ -127,7 +129,7 @@ export function EnquiryForm({ deliveryReady, isProduction, fallback }: { deliver
         <p className="mt-6 text-sm text-grey">Reference: <span className="font-medium text-ivory">{result.reference}</span></p>
         {result.mode === "development" && (
           <p className="mt-8 border border-gold/60 p-4 text-sm text-gold">
-            Development mode: email delivery is not configured, so this enquiry was only logged to the server console and has not been sent to anyone. See the README to activate real submissions.
+            Development mode: this enquiry was saved to the local development database and its emails were written to a local outbox. Nothing was sent to anyone. See the README to activate real submissions.
           </p>
         )}
         <div className="mt-10 flex flex-wrap gap-4">
@@ -148,7 +150,7 @@ export function EnquiryForm({ deliveryReady, isProduction, fallback }: { deliver
           {isProduction ? (
             <p><strong className="font-medium text-gold">Online enquiries are not yet available.</strong> Submissions cannot be delivered until the site&apos;s enquiry service is configured. Please check back shortly.</p>
           ) : (
-            <p><strong className="font-medium text-gold">Development mode.</strong> No email provider or webhook is configured. Submissions will only be logged to the server console and not delivered. See the README section &ldquo;Activating real enquiries&rdquo;.</p>
+            <p><strong className="font-medium text-gold">Development mode.</strong> No email provider or production database is configured. Enquiries are saved to the local development database and emails are written to a local outbox instead of being sent. See the README section &ldquo;Activating real enquiries&rdquo;.</p>
           )}
         </div>
       )}
@@ -204,34 +206,34 @@ export function EnquiryForm({ deliveryReady, isProduction, fallback }: { deliver
           <div className="md:col-span-2"><Choice name="aircraft" legend="Aircraft preference" options={AIRCRAFT} defaultValue={pick("aircraft", AIRCRAFT) ?? "Not Sure"} error={errors.aircraft} /></div>
           <div className="md:col-span-2"><Choice name="tripType" legend="Trip type" options={TRIP_TYPES} defaultValue={tripType} onChange={setTripType} error={errors.tripType} /></div>
           <Field name="from" label="Departure city / airport" error={errors.from}>
-            {(p) => <input {...p} name="from" type="text" required autoComplete="off" className="input" />}
+            {(p) => <PlaceInput {...p} name="from" required defaultValue={pre("from")} className="input" />}
           </Field>
           <Field name="to" label="Destination city / airport" error={errors.to}>
-            {(p) => <input {...p} name="to" type="text" required autoComplete="off" className="input" />}
+            {(p) => <PlaceInput {...p} name="to" required defaultValue={pre("to")} className="input" />}
           </Field>
           <Field name="departDate" label="Departure date" error={errors.departDate}>
-            {(p) => <input {...p} name="departDate" type="date" required min={today || undefined} className="input" />}
+            {(p) => <input {...p} name="departDate" type="date" required min={today || undefined} defaultValue={pre("departDate")} className="input" />}
           </Field>
           <Field name="departTime" label="Preferred departure time" optional error={errors.departTime}>
-            {(p) => <input {...p} name="departTime" type="time" className="input" />}
+            {(p) => <input {...p} name="departTime" type="time" defaultValue={pre("departTime")} className="input" />}
           </Field>
           {tripType === "Return" && (
             <>
               <Field name="returnDate" label="Return date" error={errors.returnDate}>
-                {(p) => <input {...p} name="returnDate" type="date" min={today || undefined} className="input" />}
+                {(p) => <input {...p} name="returnDate" type="date" min={today || undefined} defaultValue={pre("returnDate")} className="input" />}
               </Field>
               <Field name="returnTime" label="Return time" optional error={errors.returnTime}>
-                {(p) => <input {...p} name="returnTime" type="time" className="input" />}
+                {(p) => <input {...p} name="returnTime" type="time" defaultValue={pre("returnTime")} className="input" />}
               </Field>
             </>
           )}
           <Field name="passengers" label="Number of passengers" error={errors.passengers}>
-            {(p) => <input {...p} name="passengers" type="number" inputMode="numeric" min={1} max={500} required className="input" />}
+            {(p) => <input {...p} name="passengers" type="number" inputMode="numeric" min={1} max={500} required defaultValue={/^\d{1,3}$/.test(pre("passengers")) ? pre("passengers") : ""} className="input" />}
           </Field>
           {tripType === "Multi-City" && (
             <div className="md:col-span-2">
               <Field name="additionalDestinations" label="Additional destinations" optional error={errors.additionalDestinations} hint="List each further city or airport in order, with dates if you have them.">
-                {(p) => <textarea {...p} name="additionalDestinations" rows={3} maxLength={1000} className="input" />}
+                {(p) => <textarea {...p} name="additionalDestinations" rows={3} maxLength={1000} defaultValue={pre("additionalDestinations")} className="input" />}
               </Field>
             </div>
           )}

@@ -61,7 +61,7 @@ Side exits: Declined · Expired (48 h) · Cancelled by client
 ## 6. Functional requirements
 
 ### 6.1 Public site
-- **FR-1** Home page with hero, quick enquiry (route, date, passengers), services, who we serve, how it works, trust section, weddings and corporate sections, closing call to action.
+- **FR-1** Home page with hero, enquiry bar (see 6.7), services, who we serve, how it works, trust section, weddings and corporate sections, closing call to action.
 - **FR-2** Existing pages retained: Private Jets, Helicopters, Charter Solutions, How It Works, About, Request a Charter, Contact, Partnerships, Privacy, Terms.
 - **FR-3** New pages: Cost explainer ("what drives charter pricing", no prices), Airport and route guides, Insights (articles), Empty-leg alerts sign-up.
 - **FR-4** Trust section: how operators are vetted, with no fake testimonials, logos or counts.
@@ -120,6 +120,21 @@ Excluded: Arrow's leased Bombardier Challenger 604 and Sikorsky S-76C++; the fur
 **Still needed from operators**: NSOP numbers (if they agree to publication), base airports (Arrow's are not stated), seat counts, written approval for names, logos and photos, and quote turnaround and payment-instruction preferences.
 
 Source data is kept as an unverified working record, not for publication.
+
+### 6.7 Enquiry bar (booking-style, enquiry-only) (added 2026-10-25)
+
+A compact bar that looks and feels like the search bar on booking sites, but it starts an **enquiry**, never a booking. It shows no availability and no prices.
+
+- **FR-29 Fields:** trip type (One way / Return / Multi-city); From (city or airport); To (city or airport); departure date; departure time (optional); return date and time (shown for Return only); passengers; aircraft (Private jet / Helicopter / Not sure).
+- **FR-30 Button label:** "Request a Quote" (never "Search", "Book" or "Check availability").
+- **FR-31 Behaviour:** pressing the button opens the Request a Charter form with every field already filled, so nothing is typed twice. The client then adds contact details and consent and submits.
+- **FR-32 Placement:** hero of the home page; top of the Private Jets and Helicopter pages; compact version in the header area on mobile. It is not shown on the Request a Charter page itself.
+- **FR-33 Place entry:** From and To suggest matching Indian cities and airports as the visitor types, and always allow free text (for example a hotel, venue or helipad). The suggestion list needs a verified source, to be agreed before build.
+- **FR-34 Validation:** departure date not in the past; return date not before departure; From and To not identical; passengers a whole number from 1 to 500. Inline messages; fully keyboard accessible; works on touch devices.
+- **FR-35 Wording under the bar:** "This starts an enquiry. Availability and pricing are confirmed by the operator and sent as a quote valid for 48 hours. Nothing is booked until confirmed."
+- **FR-36 Helicopter note:** when aircraft is Helicopter, show a short note that landings depend on permissions, site suitability and operator approval.
+- **FR-37 Multi-city:** adds extra legs (From, To, date) up to a sensible limit, carried through to the enquiry.
+- **FR-38 Measurement:** privacy-friendly events for bar started, bar submitted and enquiry completed; no personal data in events.
 
 ## 7. Redesign requirements
 

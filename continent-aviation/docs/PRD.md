@@ -93,6 +93,34 @@ Side exits: Declined · Expired (48 h) · Cancelled by client
 - **FR-22** Airport and route guides: static, editable content.
 - **FR-23** Insights: simple article pages with metadata, authored in files.
 
+### 6.6 Partner operators and aircraft (added 2026-10-25)
+
+Two partner operators. Only aircraft that each operator itself owns and operates are listed. Aircraft they broker, or hold under lease, are excluded.
+
+- **FR-24** An "Operators and Aircraft" section lists each partner operator and its aircraft by type: manufacturer and model, category, seats, and "operated by [operator]".
+- **FR-25** Wording on every listing: indicative only; availability, aircraft and pricing are confirmed by the operator for each request. Aircraft are never described as Continent Aviation's fleet.
+- **FR-26** Do not publish aircraft registrations, staff names or phone numbers, pilgrimage prices, or the operators' own claims (for example flight counts or approvals) as Continent Aviation's.
+- **FR-27** Operator photos and logos are used only where the operator has approved them in writing. Until then the site keeps its generic renders. Photos showing identifiable people, manufacturer renders and named-client testimonial portraits are excluded unless cleared.
+- **FR-28** Where an operator's own pages conflict (see below), publish only the version the operator confirms. Until confirmed, show the category only.
+
+**Initial listing (from public pages, viewed 2026-10-25; to be confirmed with each operator)**
+
+| Operator | Aircraft | Category | Seats | Note |
+|---|---|---|---|---|
+| Arrow Aircraft | Airbus H125 (2) | Helicopter | up to 6 | On its NSOP per fleet page |
+| Arrow Aircraft | Bell 407 (1) | Helicopter | up to 6 | |
+| Arrow Aircraft | Leonardo AW169 (1) | Helicopter | up to 6 (VVIP) | |
+| Arrow Aircraft | Embraer Legacy 650 (1) | Large jet | up to 13 | Operator's pages disagree on range class |
+| Arrow Aircraft | Beechcraft King Air (1) | Turboprop | up to 8 | Model conflict: B200GT (fleet page) vs 250 (charters page) |
+| GMR Aviation | Dassault Falcon 2000LX (1) | Large jet | 9 | Operator's pages say both "2000LX" and "2000EX" |
+| GMR Aviation | Embraer Legacy 600 (1) | Large jet | 13 | Category and altitude figures inconsistent on its pages |
+
+Excluded: Arrow's leased Bombardier Challenger 604 and Sikorsky S-76C++; the further types on Arrow's charters page (for example Phenom, Citation, Hawker, Learjet, G150, Falcon, Lineage, Agusta) unless Arrow confirms it operates them; any GMR helicopter (not confirmed).
+
+**Still needed from operators**: NSOP numbers (if they agree to publication), base airports (Arrow's are not stated), seat counts, written approval for names, logos and photos, and quote turnaround and payment-instruction preferences.
+
+Source data is kept as an unverified working record, not for publication.
+
 ## 7. Redesign requirements
 
 - **RD-1** Direction (recommended, to confirm): **light editorial**. Ivory and white lead; midnight navy for the hero and key bands; champagne gold as a restrained accent; Cormorant Garamond and Inter retained.

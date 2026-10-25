@@ -47,7 +47,25 @@ Behaviour when nothing is configured:
 If any delivery channel succeeds the enquirer sees success; if all fail they see an error and their entries are preserved.
 
 Rate limiting is in-memory per server instance, which is only a first line of defence on serverless hosting. For stricter protection add Vercel Firewall rate limiting or Upstash Redis.
-No database is used. Enquiries live in your email inbox or CRM, so apply that system's retention and access controls.
+Enquiries are also stored in the database (below) when one is available, so the admin console can track them.
+
+## Enquiry, quote and admin workflow
+
+Business model: Continent Aviation arranges charters with independent operators. It does not own aircraft and takes no payment on the site.
+
+1. A visitor sends an enquiry (the booking-style bar or the full form). It is stored and emailed to the team, and the visitor gets an acknowledgement that says nothing is booked.
+2. The admin signs in at `/admin` with a **magic link** sent only to `ADMIN_EMAIL` (single-use, 15 minutes). The admin checks with the operator, then approves or declines.
+3. On approval the admin records the operator, aircraft, price lines and terms. The visitor receives a **private quote link** (`/quote/<token>`), valid for `QUOTE_VALID_HOURS` (default 48). Tokens are stored hashed.
+4. The visitor accepts on the quote page and pays **the operator directly**. The admin marks the payment received and then confirmed once the operator confirms. Status goes `received, checking, quoted, accepted, paid, confirmed` (or declined, expired, cancelled), and every change is logged and emailed.
+5. Quotes expire automatically (checked on every read and by the daily job at `/api/cron/expire`, configured in `vercel.json`; set `CRON_SECRET`).
+
+Setup: provide a Postgres `DATABASE_URL` (the schema is created on first use), `ADMIN_EMAIL`, `SESSION_SECRET` (24+ characters), `CRON_SECRET`, and email (`RESEND_API_KEY`, `ENQUIRY_FROM_EMAIL`, `ENQUIRY_TO_EMAIL`). Without email configured in production, sign-in links and quotes cannot be sent, so `/admin` stays unavailable. In development, emails are printed to the server console and saved to a local outbox.
+
+Route alerts (`/airports`) store only an email, an optional route and the consent given, with a one-click unsubscribe link in every email.
+
+## Home-page scroll journey
+
+The film on the home page is pre-rendered from the project's own 3D engine (`npm run dev`, then `node scripts/render-journey.mjs`, which needs playwright-core, Chromium and ffmpeg). It is purely visual: the four steps are real text, and phones, reduced-motion users and data-saver connections get the static steps instead.
 
 ## Deployment
 

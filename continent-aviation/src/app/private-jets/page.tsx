@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { Photo } from "@/components/Photo";
 import { Bullets, CtaBand, Disclaimer, Faq, PageHero, SectionHead, enquiryHref } from "@/components/ui";
 import { AircraftExplorer } from "@/components/three/AircraftExplorer";
+import { EnquiryBar } from "@/components/EnquiryBar";
 import { pageMeta } from "@/lib/metadata";
 
 export const metadata = pageMeta("/private-jets", "Private Jet Charter in India", "Explore private jet charter options for executive travel, private journeys, multi-city itineraries and special occasions, sourced through independent aviation operators.");
@@ -48,6 +49,8 @@ export default function Page() {
         title="Private Jet Charter, Tailored to Your Journey."
         description="Explore private jet charter options for executive travel, private journeys, multi-city itineraries and special occasions."
         actions={<><Link href={cta} className="btn btn-gold">Request Private Jet Options<ArrowRight size={16} aria-hidden="true" /></Link></>} />
+
+      <section className="bg-midnight pb-14 pt-2"><div className="wrap -mt-10 relative z-10"><EnquiryBar initialAircraft="Private Jet" /></div></section>
 
       <section className="section section-ivory">
         <div className="wrap grid gap-14 lg:grid-cols-12 lg:gap-20">

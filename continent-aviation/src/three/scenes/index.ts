@@ -2,7 +2,7 @@ import type { SceneFactory } from "../core/stage";
 
 /** Every renderable shot: which scene builds it. Scenes are code-split and loaded on demand. */
 export const SHOTS = {
-  hero: "apron", jets: "apron", corporate: "apron", bespoke: "apron", vip: "apron", group: "apron", apron: "apron",
+  hero: "apron", journey: "apron", jets: "apron", corporate: "apron", bespoke: "apron", vip: "apron", group: "apron", apron: "apron",
   about: "aloft", cta: "aloft", helicopter: "scenic", wedding: "palace", interior: "cabin", private: "cabin",
   globe: "globe", viewer: "viewer",
 } as const satisfies Record<string, string>;

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
-declare global { interface Window { __capture?: (q?: number) => string; __ready?: boolean; __error?: string } }
+declare global { interface Window { __capture?: (q?: number) => string; __frame?: (p: number, q?: number) => string; __ready?: boolean; __error?: string } }
 
 export function StudioClient() {
   const ref = useRef<HTMLCanvasElement>(null);
@@ -20,6 +20,7 @@ export function StudioClient() {
         stage = new Stage(c, { quality: q.get("live") ? "live" : "still", pixelRatio: 1, samples: 4, fixedTime: Number(q.get("t") ?? 12) });
         await stage.load(await loadShot(shot), Object.fromEntries(q));
         window.__capture = (quality = 0.9) => stage!.capture("image/jpeg", quality);
+        window.__frame = (p, quality = 0.9) => { stage!.setup.api?.setProgress?.(String(p)); return stage!.capture("image/jpeg", quality); };
         stage.renderFrame(1 / 30);
         window.__ready = true;
         setInfo(`${shot} ${w}x${h}`);

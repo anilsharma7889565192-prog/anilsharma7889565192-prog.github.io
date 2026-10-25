@@ -35,7 +35,7 @@ export default function Page() {
                   <p className="mt-5 text-grey-deep">{o.summary}</p>
                   <p className="mt-4 text-sm text-grey-deep"><strong className="font-medium text-midnight">Base:</strong> {o.base}</p>
                 </div>
-                <div className="lg:col-span-8">
+                <div className="min-w-0 lg:col-span-8">
                   <div className="overflow-x-auto">
                     <table className="w-full min-w-[32rem] text-left text-[0.95rem]">
                       <caption className="sr-only">Aircraft operated by {o.name}</caption>

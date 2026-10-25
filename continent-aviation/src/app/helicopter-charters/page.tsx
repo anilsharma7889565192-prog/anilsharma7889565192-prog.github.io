@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { CtaBand, Disclaimer, Faq, PageHero, SectionHead, enquiryHref } from "@/components/ui";
+import { EnquiryBar } from "@/components/EnquiryBar";
 import { pageMeta } from "@/lib/metadata";
 
 export const metadata = pageMeta("/helicopter-charters", "Helicopter Charter Enquiries in India", "Explore helicopter charter enquiries for suitable regional travel, destination events and special requirements, subject to permissions, site suitability and operator approval.");
@@ -38,6 +39,8 @@ export default function Page() {
         title="Helicopter Charter Options for Distinct Journeys."
         description="Explore helicopter charter enquiries for suitable regional travel, destination events and special requirements."
         actions={<Link href={cta} className="btn btn-gold">Enquire About Helicopter Charter<ArrowRight size={16} aria-hidden="true" /></Link>} />
+
+      <section className="bg-midnight pb-14 pt-2"><div className="wrap -mt-10 relative z-10"><EnquiryBar initialAircraft="Helicopter" /></div></section>
 
       <section className="section section-ivory">
         <div className="wrap">

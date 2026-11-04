@@ -55,17 +55,41 @@ const easeOut = k => 1 - Math.pow(1 - k, 3);
 let S = 1;
 const prFor = cap => Math.min(cap, Math.max(1, (window.devicePixelRatio || 1) * S));
 
-/* =================== build pages + menu =================== */
-const slidesEl = $('#slides');
-PAGES.forEach((p, i) => {
-  if (i === 0) return;
-  const s = document.createElement('section');
-  s.className = 'slide'; s.id = 's' + (i + 1);
-  s.setAttribute('aria-label', `Slide ${i + 1}: ${p.t}`);
-  s.innerHTML = `<div class="ph"><div class="num">Page ${String(i + 1).padStart(2, '0')} · Part ${['I', 'II', 'III'][p.m - 1]}</div><h2>${p.t}</h2><p>${p.h}</p><div class="wip">Design in review: we build this page next</div></div>`;
-  slidesEl.appendChild(s);
-});
-const slides = $$('.slide', slidesEl);
+/* =================== build file sheets (slides 2-15) + menu =================== */
+const PART = m => ['I', 'II', 'III'][m - 1];
+const two = n => String(n).padStart(2, '0');
+const SHEET_HEAD = i => `<i class="hole l"></i><i class="hole r"></i><div class="sheet-head"><span>Case file AD/1945</span><span>Sheet ${two(i + 1)}</span><span>Part ${PART(PAGES[i].m)}</span></div><span class="stamp-s">Confidential</span>`;
+const SHEETS = {
+  1: `${SHEET_HEAD(1)}
+    <p class="subj">Subject: Ajit Kumar Doval · present position</p>
+    <h2 class="big" data-type>The man India turns to|in a crisis</h2>
+    <h3 class="sec" style="top:212px">1. What a National Security Advisor does</h3>
+    <ol class="duties">
+      <li><b>Chief adviser to the Prime Minister</b> on national security and foreign policy.</li>
+      <li><b>Brings together intelligence</b> from the IB, R&amp;AW and the armed forces, and briefs the PM.</li>
+      <li><b>Represents India in security talks</b> with other countries. Heads the National Security Council Secretariat.</li>
+    </ol>
+    <h3 class="sec" style="top:420px">2. Record in office</h3>
+    <div class="form">
+      <div class="cell"><small>Position</small><b class="hw">5th</b><em class="hw">National Security Advisor</em></div>
+      <div class="cell"><small>In office since</small><b class="hw">2014</b><em class="hw">30 May 2014</em></div>
+      <div class="cell"><small>Terms</small><b class="hw">3</b><em class="hw">2014 · 2019 · 2024</em></div>
+      <div class="cell"><small>Years in office</small><b class="hw">12+</b><em class="hw">longest in India’s history</em></div>
+      <div class="cell"><small>Rank</small><b class="hw">1st</b><em class="hw">NSA with Cabinet rank</em></div>
+      <div class="cell"><small>Age</small><b class="hw">81</b><em class="hw">and still on duty</em></div>
+    </div>
+    <svg class="redpen" viewBox="0 0 646 700" aria-hidden="true"><path class="draw" d="M50 592 C 46 564, 92 553, 122 555 C 160 557, 174 574, 168 594 C 162 616, 112 622, 84 618 C 58 614, 42 604, 58 576"/><path class="draw" d="M60 631 C 110 636, 170 635, 232 629"/></svg>
+    <p class="also"><b>3. Also:</b> chairs the Strategic Policy Group, and is India’s Special Representative for border talks with China (24th round: August 2025).</p>`
+};
+const pagesEl = $('#pages');
+pagesEl.innerHTML = PAGES.map((p, i) => i === 0 ? '' :
+  `<div class="page" data-i="${i}" style="--z:${(PAGES.length - i) * 0.7}" role="group" aria-label="Slide ${i + 1}: ${p.t}"><div class="pf">${SHEETS[i] || `${SHEET_HEAD(i)}
+    <p class="subj">Subject: Ajit Kumar Doval · ${p.t.toLowerCase()}</p>
+    <h2 class="big" data-type>${p.h}</h2>
+    <p class="ph-note">This sheet is next in our design review.<small>Content is approved; the page design comes after your OK on the sheet before it.</small></p>`}</div><div class="pb"></div></div>`).join('');
+const pageEls = $$('.page', pagesEl);
+const pageFor = i => pageEls.find(p => +p.dataset.i === i);
+$('#index-list').innerHTML = PAGES.map((p, i) => `<li data-i="${i}"><span>${two(i + 1)} · ${p.t}</span><i>${p.done || i === 1 ? '✓' : ''}</i></li>`).join('');
 $('#menu-grid').innerHTML = PAGES.map((p, i) =>
   `<button data-to="${i}" class="${p.done ? 'done' : ''}"><span class="n">Page ${String(i + 1).padStart(2, '0')} · Part ${['I', 'II', 'III'][p.m - 1]}</span><span class="t">${p.t}</span><span class="st">${p.done ? 'designed' : 'in review'}</span></button>`).join('');
 
@@ -83,7 +107,7 @@ function noiseCanvas(size, lo, hi, fibers) {
 }
 const paperTex = noiseCanvas(256, 222, 255, 260);
 const paperURL = paperTex.toDataURL();
-$$('.sheet').forEach(s => {
+$$('.sheet,.pf,.pb,.face,.f-back,.f-tab,.ex-sheet').forEach(s => {
   const cs = getComputedStyle(s);
   if (cs.backgroundImage && cs.backgroundImage !== 'none') {
     s.style.backgroundImage = cs.backgroundImage + `,url(${paperURL})`;
@@ -126,6 +150,34 @@ function drawCork() {
     x.globalAlpha = .22; x.fillStyle = '#f3d6a3'; x.beginPath(); x.arc(hx - 1.2, hy - 1.2, 1.3, 0, 6.283); x.fill();
   }
   x.globalAlpha = 1;
+}
+
+function drawDesk() {
+  const cv = $('#desk'), W = 1600, H = 900, pr = prFor(1.6);
+  cv.width = Math.round(W * pr); cv.height = Math.round(H * pr);
+  const x = cv.getContext('2d'); x.setTransform(pr, 0, 0, pr, 0, 0);
+  seed = 2014;
+  const base = x.createLinearGradient(0, 0, 0, H); base.addColorStop(0, '#2a170c'); base.addColorStop(.5, '#3a2213'); base.addColorStop(1, '#24140a');
+  x.fillStyle = base; x.fillRect(0, 0, W, H);
+  // planks
+  const plank = 225;
+  for (let p = 0; p * plank < H + plank; p++) {
+    const y0 = p * plank - 40, tint = rnd();
+    x.fillStyle = `rgba(${tint < .5 ? '20,10,4' : '90,55,28'},${.08 + rnd() * .12})`; x.fillRect(0, y0, W, plank);
+    for (let i = 0; i < 150; i++) {
+      const yy = y0 + rnd() * plank, amp = 1 + rnd() * 5, ph = rnd() * 6.28, f = .002 + rnd() * .004;
+      x.strokeStyle = ['#1a0d05', '#4e2f17', '#5f3b1d', '#2e1a0c', '#6b4423'][(rnd() * 5) | 0];
+      x.globalAlpha = .12 + rnd() * .3; x.lineWidth = .4 + rnd() * 1.8;
+      x.beginPath();
+      for (let xx = -10; xx <= W + 10; xx += 16) { const yv = yy + Math.sin(xx * f + ph) * amp + Math.sin(xx * .013 + ph * 2) * amp * .3; xx < 0 ? x.moveTo(xx, yv) : x.lineTo(xx, yv); }
+      x.stroke();
+    }
+    x.globalAlpha = .55; x.fillStyle = '#0c0603'; x.fillRect(0, y0 + plank - 2, W, 2);
+    x.globalAlpha = .12; x.fillStyle = '#d9a46a'; x.fillRect(0, y0 + plank, W, 1);
+  }
+  x.globalAlpha = 1;
+  const sheen = x.createLinearGradient(0, 0, W, H); sheen.addColorStop(0, 'rgba(255,220,170,0)'); sheen.addColorStop(.45, 'rgba(255,220,170,.07)'); sheen.addColorStop(.6, 'rgba(255,220,170,0)');
+  x.fillStyle = sheen; x.fillRect(0, 0, W, H);
 }
 
 /* =================== pins + string =================== */
@@ -304,9 +356,9 @@ function showSketch(data, animate) {
   for (let i = 0; i < N; i++) { d[i * 4] = 46; d[i * 4 + 1] = 48; d[i * 4 + 2] = 54; }
   cancelAnimationFrame(skAnim);
   const paint = p => { for (let i = 0; i < N; i++) d[i * 4 + 3] = data.alpha[i] * 240 * clamp((p - data.when[i]) / .12, 0, 1); skX.putImageData(skImg, 0, 0); };
-  if (!animate || REDUCE) { paint(2); return; }
+  if (!animate || REDUCE) { paint(2); syncExhibitSketch(); return; }
   const t0 = performance.now(), D = 2800;
-  const step = now => { const k = (now - t0) / D; paint(k * 1.15); if (k < 1) skAnim = requestAnimationFrame(step); };
+  const step = now => { const k = (now - t0) / D; paint(k * 1.15); if (k < 1) skAnim = requestAnimationFrame(step); else syncExhibitSketch(); };
   skAnim = requestAnimationFrame(step);
 }
 function loadPhoto(url, credit, animate) {
@@ -335,6 +387,14 @@ function takeFile(file) {
 const photoInput = $('#photo-input');
 skC.addEventListener('click', () => photoInput.click());
 photoInput.addEventListener('change', () => { takeFile(photoInput.files[0]); photoInput.value = ''; });
+function syncExhibitSketch() {
+  const c = $('#sk2'), x = c.getContext('2d');
+  x.clearRect(0, 0, c.width, c.height);
+  const r = Math.max(c.width / SK_W, c.height / SK_H), w = SK_W * r, h = SK_H * r;
+  x.drawImage(skC, (c.width - w) / 2, (c.height - h) * .3, w, h);
+  document.body.classList.toggle('has-photo-all', $('#p-portrait').classList.contains('has-photo'));
+}
+$('#sk2').addEventListener('click', () => photoInput.click());
 stage.addEventListener('dragover', e => { if (cur === 0) e.preventDefault(); });
 stage.addEventListener('drop', e => { if (cur !== 0) return; e.preventDefault(); takeFile(e.dataTransfer.files[0]); });
 
@@ -388,22 +448,106 @@ function updateChrome() {
   $('#notes-p').textContent = NOTES[cur];
 }
 const fade = $('#fade');
-function dip(mid) {
-  if (REDUCE) { mid(); return; }
-  fade.style.transition = 'opacity .32s ease'; fade.style.opacity = 1;
-  setTimeout(() => { mid(); fade.style.transition = 'opacity .55s ease'; fade.style.opacity = 0; }, 340);
+const sceneBoard = $('#scene-board'), sceneFile = $('#scene-file');
+const wrap = $('#folder-wrap'), cover = $('#cover');
+const later = (ms, fn) => setTimeout(fn, REDUCE ? 0 : ms);
+function fadeTo(v, ms) { fade.style.transition = REDUCE ? 'none' : `opacity ${ms}ms ease`; fade.style.opacity = v; }
+
+/* typewriter: split a heading into slightly uneven characters, then strike them one by one */
+function prepType(el) {
+  if (el.dataset.ready) return;
+  const txt = el.textContent; el.textContent = '';
+  for (const ch of txt) {
+    if (ch === '|') { el.appendChild(document.createElement('br')); continue; }
+    const s = document.createElement('span'); s.className = 'ch'; s.textContent = ch;
+    s.style.setProperty('--o', (.78 + Math.random() * .22).toFixed(2));
+    s.style.transform = `translateY(${((Math.random() - .5) * 1.4).toFixed(2)}px) rotate(${((Math.random() - .5) * 1.2).toFixed(2)}deg)`;
+    el.appendChild(s);
+  }
+  el.dataset.ready = 1;
+}
+let typeTimers = [];
+function playType(el) {
+  prepType(el);
+  const chs = $$('.ch', el);
+  if (REDUCE) { el.classList.add('static'); return; }
+  chs.forEach(c => c.classList.remove('on'));
+  chs.forEach((c, i) => typeTimers.push(setTimeout(() => c.classList.add('on'), 150 + i * 34)));
+}
+function measureDraws(root) { $$('.draw', root).forEach(p => { if (!p.style.getPropertyValue('--len')) p.style.setProperty('--len', Math.ceil(p.getTotalLength() + 2)); }); }
+
+function enterPage(i) {
+  const pg = pageFor(i); if (!pg) return;
+  $$('[data-type]', pg).forEach(playType);
+  measureDraws(pg);
+  $$('.hw', pg).forEach((h, k) => { h.style.transitionDelay = (REDUCE ? 0 : 1300 + k * 160) + 'ms'; });
+  $$('.draw', pg).forEach((d, k) => { d.style.transitionDelay = (REDUCE ? 0 : 2300 + k * 350) + 'ms'; });
+  requestAnimationFrame(() => pg.classList.add('play'));
+  const ex = $('.exhibits[data-for="1"]');
+  if (i === 1) { syncExhibitSketch(); measureDraws(ex); $$('.draw', ex).forEach((d, k) => { d.style.transitionDelay = (REDUCE ? 0 : 600 + k * 180) + 'ms'; }); requestAnimationFrame(() => ex.classList.add('play')); }
+}
+function leavePage(i) {
+  typeTimers.forEach(clearTimeout); typeTimers = [];
+  const pg = pageFor(i); if (pg) pg.classList.remove('play');
+  $('.exhibits[data-for="1"]').classList.remove('play');
+}
+function showExhibits(i) {
+  $$('.exhibits').forEach(e => e.classList.toggle('on', i === 1 ? e.dataset.for === '1' : e.dataset.for === 'index'));
+  $$('#index-list li').forEach(li => li.classList.toggle('cur', +li.dataset.i === i));
+}
+function setPages(i, instant) {
+  if (instant) pagesEl.classList.add('notrans');
+  pageEls.forEach(p => {
+    const k = +p.dataset.i, gone = k < i;
+    p.style.transitionDelay = instant ? '0ms' : (Math.abs(k - cur) * 70) + 'ms';
+    p.classList.toggle('gone', gone);
+  });
+  if (instant) { void pagesEl.offsetWidth; pagesEl.classList.remove('notrans'); }
+}
+function openFile(n) {
+  busy = true;
+  leavePage(cur);
+  fadeTo(1, 420);
+  later(440, () => {
+    stage.classList.add('infile');
+    sceneBoard.classList.remove('on'); sceneFile.classList.add('on');
+    wrap.classList.add('notrans'); cover.classList.add('notrans');
+    wrap.classList.remove('in', 'opened'); cover.classList.remove('open');
+    void wrap.offsetWidth; wrap.classList.remove('notrans'); cover.classList.remove('notrans');
+    cur = n; updateChrome(); setPages(n, true); showExhibits(n);
+    fadeTo(0, 520);
+    later(120, () => wrap.classList.add('in'));
+    later(1150, () => { wrap.classList.add('opened', 'opening'); cover.classList.add('open'); });
+    later(2400, () => { wrap.classList.remove('opening'); enterPage(n); busy = false; });
+  });
+}
+function closeFile() {
+  busy = true;
+  leavePage(cur);
+  wrap.classList.add('closing'); cover.classList.remove('open'); wrap.classList.remove('opened');
+  later(1250, () => { wrap.classList.remove('in', 'closing'); });
+  later(1700, () => {
+    fadeTo(1, 380);
+    later(400, () => {
+      stage.classList.remove('infile');
+      sceneFile.classList.remove('on'); sceneBoard.classList.add('on');
+      cur = 0; updateChrome();
+      fadeTo(0, 600);
+      busy = false;
+    });
+  });
 }
 function go(n) {
   if (n === 'next') n = cur + 1; else if (n === 'prev') n = cur - 1;
   n = clamp(n, 0, N - 1);
   if (n === cur || busy) return;
+  if (cur === 0) { openFile(n); return; }
+  if (n === 0) { closeFile(); return; }
   busy = true;
-  dip(() => {
-    slides[cur].classList.remove('active'); cur = n; slides[cur].classList.add('active');
-    stage.classList.toggle('away', cur !== 0);
-    updateChrome();
-    setTimeout(() => { busy = false; }, 450);
-  });
+  leavePage(cur);
+  setPages(n, false);
+  cur = n; updateChrome(); showExhibits(n);
+  later(950, () => { enterPage(n); busy = false; });
 }
 $('#open-file').addEventListener('click', () => go(1));
 $$('[data-go]').forEach(b => b.addEventListener('click', () => go(b.dataset.go)));
@@ -452,6 +596,7 @@ addEventListener('resize', fit);
 fit();
 updateChrome();
 drawCork();
+drawDesk();
 buildPins();
 buildStrings();
 const fontsReady = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();

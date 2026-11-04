@@ -1,5 +1,4 @@
-/* The finale: the closing sheet burns away (WebGL), leaving an ash-covered page.
-   Rubbing the ash (or pressing next) reveals the closing poster underneath.
+/* The finale: the closing sheet burns away (WebGL) and the closing poster shows through.
    Exposes window.DovalBurn. Drawn at 1600 x 900 stage pixels. */
 (function () {
 'use strict';
@@ -136,25 +135,6 @@ function drawPoster(cv, img, fonts) {
 }
 function spaced(x, t, px, py, sp) { let cx = px; for (const ch of t) { x.fillText(ch, cx, py); cx += x.measureText(ch).width + sp; } }
 
-function drawAsh(cv) {
-  const pr = cv.width / W, x = cv.getContext('2d'); x.setTransform(pr, 0, 0, pr, 0, 0);
-  const N = makeNoise(88);
-  x.globalCompositeOperation = 'source-over'; x.globalAlpha = 1;
-  x.fillStyle = '#57534e'; x.fillRect(0, 0, W, H);
-  const lw = 400, lh = 225, sc = document.createElement('canvas'); sc.width = lw; sc.height = lh; const s = sc.getContext('2d'), sd = s.createImageData(lw, lh);
-  for (let j = 0; j < lh; j++) for (let i = 0; i < lw; i++) { const v = 88 + N.fbm(i / 22, j / 22, 6) * 95 + N.fbm(i / 4, j / 4, 2) * 30 + (Math.random() - .5) * 34; const k = (j * lw + i) * 4; sd.data[k] = v; sd.data[k + 1] = v * .96; sd.data[k + 2] = v * .9; sd.data[k + 3] = 255; }
-  s.putImageData(sd, 0, 0); x.drawImage(sc, 0, 0, W, H);
-  for (let i = 0; i < 46; i++) { const gx = N.rnd() * W, gy = N.rnd() * H, r = 50 + N.rnd() * 160, g = x.createRadialGradient(gx, gy, 0, gx, gy, r); const dark = N.rnd() < .55; g.addColorStop(0, dark ? 'rgba(20,17,15,.38)' : 'rgba(190,184,174,.22)'); g.addColorStop(1, 'rgba(0,0,0,0)'); x.fillStyle = g; x.fillRect(gx - r, gy - r, r * 2, r * 2); }
-  for (let i = 0; i < 60; i++) { // charred paper fragments
-    const cx = N.rnd() * W, cy = N.rnd() * H, r = 4 + N.rnd() * 16; x.beginPath();
-    for (let a = 0; a < 6.283; a += .7) { const rr = r * (.55 + N.rnd() * .6); a ? x.lineTo(cx + Math.cos(a) * rr, cy + Math.sin(a) * rr) : x.moveTo(cx + rr, cy); }
-    x.closePath(); const sh = 10 + N.rnd() * 22; x.fillStyle = `rgba(${sh},${sh * .9},${sh * .82},.8)`; x.fill(); x.strokeStyle = 'rgba(96,62,36,.45)'; x.lineWidth = .8; x.stroke();
-  }
-  x.fillStyle = '#d2ccc1'; for (let i = 0; i < 9000; i++) { x.globalAlpha = .08 + N.rnd() * .3; x.fillRect(N.rnd() * W, N.rnd() * H, .6 + N.rnd() * 1.8, .5 + N.rnd() * 1.2); }
-  x.fillStyle = '#1b1816'; for (let i = 0; i < 7000; i++) { x.globalAlpha = .1 + N.rnd() * .35; x.fillRect(N.rnd() * W, N.rnd() * H, .6 + N.rnd() * 1.6, .5 + N.rnd() * 1.2); }
-  x.globalAlpha = 1;
-}
-
 /* ---------- WebGL fire ---------- */
 const VERT = `
 uniform sampler2D uBurn; uniform float uT; varying vec2 vUv; varying float vLift;
@@ -226,21 +206,25 @@ function start(opts) {
   const T = window.THREE, root = opts.root;
   const fonts = opts.fonts, sfx = opts.sfx || {}, reduce = !!opts.reduce;
   const pr = Math.min(2, Math.max(1, (window.devicePixelRatio || 1) * (opts.scale || 1)));
-  const poster = root.querySelector('#poster'), ash = root.querySelector('#ash'), fire = root.querySelector('#fire'), dust = root.querySelector('#dustfx'), hint = root.querySelector('#rub-hint');
-  [poster, ash, dust].forEach(cv => { cv.width = Math.round(W * pr); cv.height = Math.round(H * pr); });
+  const poster = root.querySelector('#poster'), fire = root.querySelector('#fire');
+  poster.width = Math.round(W * pr); poster.height = Math.round(H * pr);
   drawPoster(poster, opts.portrait, fonts);
-  drawAsh(ash);
-  ash.style.opacity = 1; poster.classList.remove('lit'); hint.classList.remove('on');
-  root.classList.remove('done', 'rubbing');
-  const st = { stop: false, phase: 'burn', cleared: 0 };
+  poster.classList.remove('lit');
+  root.classList.remove('done');
+  const st = { stop: false, phase: 'burn' };
   state = st;
 
-  const finishBurn = () => { if (st.stop) return; st.phase = 'ash'; fire.style.opacity = 0; setTimeout(() => { if (st.phase === 'ash') hint.classList.add('on'); }, 600); };
+  const finishBurn = () => {
+    if (st.stop || st.phase !== 'burn') return;
+    st.phase = 'done'; fire.style.opacity = 0;
+    poster.classList.add('lit'); root.classList.add('done');
+    if (sfx.reveal) sfx.reveal();
+  };
 
-  if (!T || reduce) { fire.style.opacity = 0; finishBurn(); setupRub(st, root, ash, dust, poster, sfx); return st; }
+  if (!T || reduce) { fire.style.opacity = 0; finishBurn(); return st; }
   let renderer;
   try { renderer = new T.WebGLRenderer({ canvas: fire, alpha: true, antialias: true, premultipliedAlpha: false }); }
-  catch (e) { fire.style.opacity = 0; finishBurn(); setupRub(st, root, ash, dust, poster, sfx); return st; }
+  catch (e) { fire.style.opacity = 0; finishBurn(); return st; }
   fire.style.opacity = 1;
   renderer.setPixelRatio(pr); renderer.setSize(W, H, false); renderer.setClearColor(0x000000, 0);
   const scene = new T.Scene();
@@ -286,68 +270,12 @@ function start(opts) {
     if (k < 1.6 || opts.fixedT !== undefined) requestAnimationFrame(loop); else { renderer.dispose(); }
   };
   requestAnimationFrame(loop);
-  setupRub(st, root, ash, dust, poster, sfx);
   return st;
-}
-
-/* ---------- rubbing the ash away ---------- */
-function setupRub(st, root, ash, dust, poster, sfx) {
-  const ax = ash.getContext('2d'), dx = dust.getContext('2d'), pr = ash.width / W;
-  const brush = document.createElement('canvas'); brush.width = brush.height = 180; const b = brush.getContext('2d');
-  const bg = b.createRadialGradient(90, 90, 0, 90, 90, 90); bg.addColorStop(0, 'rgba(0,0,0,1)'); bg.addColorStop(.55, 'rgba(0,0,0,.75)'); bg.addColorStop(1, 'rgba(0,0,0,0)'); b.fillStyle = bg; b.fillRect(0, 0, 180, 180);
-  b.globalCompositeOperation = 'destination-out'; for (let i = 0; i < 260; i++) { b.globalAlpha = Math.random() * .7; b.fillRect(Math.random() * 180, Math.random() * 180, 3, 3); }
-  const motes = [];
-  let last = null, checkT = 0, done = false;
-  const toLocal = e => { const r = ash.getBoundingClientRect(); return [(e.clientX - r.left) / r.width * W, (e.clientY - r.top) / r.height * H]; };
-  const rubAt = (x, y) => {
-    ax.save(); ax.setTransform(pr, 0, 0, pr, 0, 0); ax.globalCompositeOperation = 'destination-out';
-    ax.translate(x, y); ax.rotate(Math.random() * 6.28); ax.drawImage(brush, -64, -64, 128, 128); ax.restore();
-    for (let i = 0; i < 3; i++) motes.push({ x, y, vx: (Math.random() - .5) * 2.4, vy: -Math.random() * 1.6 - .3, a: .7, r: .8 + Math.random() * 2.2 });
-    if (sfx.rub) sfx.rub();
-  };
-  const stroke = (x, y) => {
-    if (!last) { rubAt(x, y); last = [x, y]; return; }
-    const dxl = x - last[0], dyl = y - last[1], dist = Math.hypot(dxl, dyl), steps = Math.max(1, Math.floor(dist / 14));
-    for (let i = 1; i <= steps; i++) rubAt(last[0] + dxl * i / steps, last[1] + dyl * i / steps);
-    last = [x, y];
-  };
-  const measure = () => {
-    const s = document.createElement('canvas'); s.width = 80; s.height = 45; const sx = s.getContext('2d'); sx.drawImage(ash, 0, 0, 80, 45);
-    const d = sx.getImageData(0, 0, 80, 45).data; let clear = 0; for (let i = 3; i < d.length; i += 4) if (d[i] < 60) clear++;
-    return clear / (80 * 45);
-  };
-  const reveal = () => {
-    if (done) return; done = true; st.phase = 'done';
-    ash.style.transition = 'opacity 1.4s ease'; ash.style.opacity = 0; root.classList.add('done'); poster.classList.add('lit');
-    root.querySelector('#rub-hint').classList.remove('on');
-    if (sfx.reveal) sfx.reveal();
-  };
-  const onMove = e => {
-    if (st.phase !== 'ash' || done) return;
-    if (e.pointerType === 'mouse' && e.buttons === 0) { last = null; return; }
-    const [x, y] = toLocal(e); stroke(x, y); root.classList.add('rubbing');
-    const now = performance.now(); if (now > checkT) { checkT = now + 350; if (measure() > .5) reveal(); }
-  };
-  root.onpointermove = onMove; root.onpointerdown = onMove; root.onpointerleave = () => { last = null; };
-  st.autoRub = () => {
-    if (st.phase !== 'ash' || done) return;
-    let t = 0; const path = [];
-    for (let row = 0; row < 7; row++) { const y = 90 + row * 120; for (let i = 0; i <= 26; i++) { const x = row % 2 ? 1560 - i * 58 : 40 + i * 58; path.push([x, y + Math.sin(i * .9) * 26]); } }
-    const step = () => { if (done || st.stop) return; for (let i = 0; i < 4 && t < path.length; i++, t++) stroke(path[t][0], path[t][1]); if (t < path.length) requestAnimationFrame(step); else reveal(); };
-    last = null; requestAnimationFrame(step);
-  };
-  const dustLoop = () => {
-    if (st.stop) return;
-    dx.setTransform(pr, 0, 0, pr, 0, 0); dx.clearRect(0, 0, W, H);
-    for (let i = motes.length - 1; i >= 0; i--) { const m = motes[i]; m.x += m.vx; m.y += m.vy; m.vy += .02; m.a -= .012; if (m.a <= 0) { motes.splice(i, 1); continue; } dx.globalAlpha = m.a; dx.fillStyle = '#9d968b'; dx.fillRect(m.x, m.y, m.r, m.r); }
-    requestAnimationFrame(dustLoop);
-  };
-  requestAnimationFrame(dustLoop);
 }
 
 window.DovalBurn = {
   start,
-  next() { if (state && state.phase === 'ash' && state.autoRub) { state.autoRub(); return true; } return false; },
+  next() { return false; },
   phase() { return state ? state.phase : null; },
   stop() { if (state) state.stop = true; state = null; }
 };

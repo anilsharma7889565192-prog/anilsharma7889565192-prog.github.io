@@ -18,7 +18,7 @@ FONTS = ("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@
 css = (SRC / "deck.css").read_text()
 body = (SRC / "deck.body.html").read_text()
 data = (ROOT / "mapdata.js").read_text()
-app = (SRC / "deck.js").read_text()
+app = (SRC / "sheets.js").read_text() + "\n" + (SRC / "deck.js").read_text()
 
 head = (
     "<title>Operation Quiet Guardian</title>\n"

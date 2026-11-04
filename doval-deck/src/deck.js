@@ -94,6 +94,8 @@ const SHEETS = {
     <div class="sticky"><i class="tape"></i><h4 class="hw">Full circle · 1950 → 2026</h4><p class="hw">At 5, a teacher in Pune told him about Lokmanya Tilak. 76 years later, on 1 Aug 2026, he came back to Pune to receive the Lokmanya Tilak National Award.</p></div>
     <div class="lesson"><span class="st">Lesson</span><p class="hw">Discipline built early becomes strength later.</p></div>`
 };
+Object.keys(window.DOVAL_SHEETS || {}).forEach(k => { SHEETS[k] = window.DOVAL_SHEETS[k].replace('{{HEAD}}', SHEET_HEAD(+k)); });
+PAGES.forEach(p => { p.done = true; });
 const pagesEl = $('#pages');
 pagesEl.innerHTML = PAGES.map((p, i) => i === 0 ? '' :
   `<div class="page" data-i="${i}" style="--z:${(PAGES.length - i) * 0.7}" role="group" aria-label="Slide ${i + 1}: ${p.t}"><div class="pf">${SHEETS[i] || `${SHEET_HEAD(i)}
@@ -101,6 +103,13 @@ pagesEl.innerHTML = PAGES.map((p, i) => i === 0 ? '' :
     <h2 class="big" data-type>${p.h}</h2>
     <p class="ph-note">This sheet is next in our design review.<small>Content is approved; the page design comes after your OK on the sheet before it.</small></p>`}</div><div class="pb"></div></div>`).join('');
 const pageEls = $$('.page', pagesEl);
+(() => {
+  const idx = $('.exhibits[data-for="index"]');
+  Object.keys(window.DOVAL_EXHIBITS || {}).forEach(k => {
+    const d = document.createElement('div'); d.className = 'exhibits'; d.dataset.for = k;
+    d.innerHTML = window.DOVAL_EXHIBITS[k]; idx.parentNode.insertBefore(d, idx);
+  });
+})();
 const pageFor = i => pageEls.find(p => +p.dataset.i === i);
 $('#index-list').innerHTML = PAGES.map((p, i) => `<li data-i="${i}"><span>${two(i + 1)} · ${p.t}</span><i>${p.done ? '✓' : ''}</i></li>`).join('');
 $('#menu-grid').innerHTML = PAGES.map((p, i) =>
@@ -120,7 +129,7 @@ function noiseCanvas(size, lo, hi, fibers) {
 }
 const paperTex = noiseCanvas(256, 222, 255, 260);
 const paperURL = paperTex.toDataURL();
-$$('.sheet,.pf,.pb,.face,.f-back,.f-tab,.ex-sheet').forEach(s => {
+$$('.sheet,.pf,.pb,.face,.f-back,.f-tab,.ex-sheet,.ex-card:not(.box-case):not(.tray)').forEach(s => {
   const cs = getComputedStyle(s);
   if (cs.backgroundImage && cs.backgroundImage !== 'none') {
     s.style.backgroundImage = cs.backgroundImage + `,url(${paperURL})`;
@@ -332,6 +341,28 @@ function drawRouteMap() {
   $('#route-ink').innerHTML = svg;
   const lab = { 1: [16, -16], 2: [-16, -4], 3: [-16, -10], 4: [16, 2], 5: [16, -8] };
   $('#route-labels').innerHTML = P.map(p => `<span class="rl ${p.side === 'l' ? 'l' : ''}" style="left:${(p.x + lab[p.n][0]).toFixed(0)}px;top:${(p.y + 30 + lab[p.n][1]).toFixed(0)}px">${p.t}<small>${p.s}</small></span>`).join('');
+}
+/* small regional maps on exhibit sheets (official India outline, neighbours as stipple) */
+function drawMini(id, b, pts) {
+  const cv = $('#' + id); if (!cv) return;
+  const W = cv.width / 2, H = cv.height / 2, x = cv.getContext('2d'); x.setTransform(2, 0, 0, 2, 0, 0);
+  const merc = lat => Math.log(Math.tan(Math.PI / 4 + lat * Math.PI / 360)) * 180 / Math.PI;
+  const sc = Math.min(W / (b.lon1 - b.lon0), H / (merc(b.lat1) - merc(b.lat0)));
+  const ox = (W - (b.lon1 - b.lon0) * sc) / 2, oy = (H - (merc(b.lat1) - merc(b.lat0)) * sc) / 2;
+  const X = lon => ox + (lon - b.lon0) * sc, Y = lat => oy + (merc(b.lat1) - merc(lat)) * sc;
+  x.strokeStyle = 'rgba(70,105,130,.13)'; x.lineWidth = .7;
+  for (let y = 0; y < H; y += 4) { x.beginPath(); x.moveTo(0, y); x.lineTo(W, y); x.stroke(); }
+  x.fillStyle = 'rgba(120,96,62,.45)';
+  for (let gy = 0; gy < G.h; gy++) for (let gx = 0; gx < G.w; gx++) {
+    const lon = G.lon0 + (gx + .5) * G.step, lat = G.lat1 - (gy + .5) * G.step;
+    if (lon < b.lon0 - .3 || lon > b.lon1 + .3 || lat < b.lat0 - .3 || lat > b.lat1 + .3) continue;
+    const i = gy * G.w + gx; if (((GRAW.charCodeAt(i >> 2) >> ((i & 3) * 2)) & 3) !== 1) continue;
+    x.fillRect(X(lon), Y(lat), 1.3, 1.3);
+  }
+  MAPDATA.rings.forEach(r => { x.beginPath(); r.forEach(([lo, la], i) => i ? x.lineTo(X(lo), Y(la)) : x.moveTo(X(lo), Y(la))); x.closePath(); x.fillStyle = 'rgba(222,204,160,.92)'; x.fill(); x.strokeStyle = '#4e3b27'; x.lineWidth = 1.3; x.stroke(); });
+  if (b.sea) { x.font = 'italic 400 12px "Special Elite", monospace'; x.fillStyle = 'rgba(50,70,90,.8)'; x.textAlign = 'center'; x.fillText(b.sea[0], X(b.sea[1]), Y(b.sea[2])); }
+  $('#' + id + '-ink').innerHTML = pts.map((p, k) => `<g class="pt" style="transition-delay:${REDUCE ? 0 : 500 + k * 300}ms"><circle cx="${X(p.lon).toFixed(1)}" cy="${Y(p.lat).toFixed(1)}" r="7"/></g>`).join('');
+  $('#' + id + '-lab').innerHTML = pts.map(p => `<span class="rl ${p.l ? 'l' : ''}" style="left:${(X(p.lon) + (p.l ? -14 : 14)).toFixed(0)}px;top:${(Y(p.lat) - 10).toFixed(0)}px">${p.t}<small>${p.s}</small></span>`).join('');
 }
 const G = MAPDATA.grid, GRAW = atob(G.b64);
 function inIndia(lon, lat) { const gx = Math.floor((lon - G.lon0) / G.step), gy = Math.floor((G.lat1 - lat) / G.step); if (gx < 0 || gy < 0 || gx >= G.w || gy >= G.h) return false; const i = gy * G.w + gx; return ((GRAW.charCodeAt(i >> 2) >> ((i & 3) * 2)) & 3) === 2; }
@@ -671,6 +702,12 @@ fontsReady.then(() => Promise.all(['700 17px Kalam', '400 16px Kalam', '11px "Sp
   drawMapScrap();
   drawHills();
   drawRouteMap();
+  drawMini('mini-kerala', { lon0: 74.4, lon1: 77.8, lat0: 8.1, lat1: 12.8, sea: ['Arabian Sea', 74.95, 9.6] }, [
+    { lon: 75.49, lat: 11.75, t: 'Thalassery', s: 'the riot, 1972' },
+    { lon: 76.52, lat: 9.59, t: 'Kottayam', s: 'first posting, 1968' }]);
+  drawMini('mini-ne', { lon0: 87.9, lon1: 97.4, lat0: 21.7, lat1: 29.4 }, [
+    { lon: 92.72, lat: 23.73, t: 'Aizawl', s: 'IB unit, 1972–77', l: true },
+    { lon: 88.61, lat: 27.33, t: 'Sikkim', s: 'joins India, 1975' }]);
   const stored = savedPhoto();
   if (EMBED_PHOTO) loadPhoto(EMBED_PHOTO, EMBED_CREDIT, true);
   else if (stored) setTimeout(() => loadPhoto(stored, '', true), REDUCE ? 0 : 1300);

@@ -4,6 +4,7 @@ const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 const REDUCE = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 const stage = $('#stage'), cam = $('#cam');
+document.documentElement.classList.add('js');
 
 /* A photo can be embedded here as a data: URL once we have a licensed file.
    Until then the presenter adds one by clicking the sketch; it is kept in this browser. */
@@ -45,6 +46,33 @@ const NOTES = [
   'So why did we choose Ajit Doval? Because his life shows every side of leadership: the police officer who calmed a riot, the spy who lived among the enemy, the negotiator who talked down hijackers, and the advisor who guides the nation today. As a person, he offers courage, calm, patience and humility. He rarely gives interviews and almost never seeks credit. And for us as students of communication, the biggest lesson is this: many of his greatest victories came from listening, showing up in person, keeping promises and explaining clearly, not from force. As he told young Indians this year: put the nation’s interest above your own.',
   'That was the story of Ajit Doval, the Quiet Guardian of India. Thank you for listening. We’re happy to take your questions.'
 ];
+
+/* =================== sound (synthesised, no files) =================== */
+const SFX = (() => {
+  let ctx = null, on = true, master = null, drone = null, NB = null;
+  try { on = localStorage.getItem('aqg-sound') !== 'off'; } catch (e) { /* default on */ }
+  const ensure = () => {
+    if (!ctx) { try { ctx = new (window.AudioContext || window.webkitAudioContext)(); master = ctx.createGain(); master.gain.value = .55; master.connect(ctx.destination); } catch (e) { ctx = null; } }
+    if (ctx && ctx.state === 'suspended') ctx.resume();
+    return ctx;
+  };
+  const noise = () => { if (NB) return NB; NB = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate); const d = NB.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; return NB; };
+  const burst = (dur, f, q, gain) => { const t = ctx.currentTime, s = ctx.createBufferSource(), bp = ctx.createBiquadFilter(), g = ctx.createGain(); s.buffer = noise(); bp.type = 'bandpass'; bp.frequency.value = f; bp.Q.value = q; g.gain.setValueAtTime(gain, t); g.gain.exponentialRampToValueAtTime(.0001, t + dur); s.connect(bp).connect(g).connect(master); s.start(t, Math.random() * .5); s.stop(t + dur + .02); };
+  const tone = (f, dur, gain, type, f2) => { const t = ctx.currentTime, o = ctx.createOscillator(), g = ctx.createGain(); o.type = type || 'sine'; o.frequency.setValueAtTime(f, t); if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + dur); g.gain.setValueAtTime(gain, t); g.gain.exponentialRampToValueAtTime(.0001, t + dur); o.connect(g).connect(master); o.start(t); o.stop(t + dur + .02); };
+  const ok = () => on && !REDUCE && ensure();
+  return {
+    get on() { return on; },
+    toggle() { on = !on; try { localStorage.setItem('aqg-sound', on ? 'on' : 'off'); } catch (e) { /* ignore */ } if (!on) this.droneOff(); return on; },
+    unlock() { if (on) ensure(); },
+    key() { if (!ok()) return; burst(.035, 2400 + Math.random() * 1400, 1.3, .32); burst(.018, 850, 2, .16); },
+    bell() { if (!ok()) return; tone(2093, 1.1, .1); tone(4186, .5, .035); },
+    thud() { if (!ok()) return; tone(150, .3, .85, 'sine', 42); burst(.14, 380, .8, .45); },
+    swish() { if (!ok()) return; const t = ctx.currentTime, s = ctx.createBufferSource(), bp = ctx.createBiquadFilter(), g = ctx.createGain(); s.buffer = noise(); bp.type = 'bandpass'; bp.Q.value = .7; bp.frequency.setValueAtTime(500, t); bp.frequency.exponentialRampToValueAtTime(3000, t + .35); g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.32, t + .12); g.gain.exponentialRampToValueAtTime(.0001, t + .5); s.connect(bp).connect(g).connect(master); s.start(t); s.stop(t + .55); },
+    hit() { if (!ok()) return; tone(72, 1.8, .65, 'sine', 30); burst(.9, 160, .6, .22); },
+    droneOn() { if (!ok() || drone) return; const t = ctx.currentTime, g = ctx.createGain(), lp = ctx.createBiquadFilter(), o1 = ctx.createOscillator(), o2 = ctx.createOscillator(); g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.1, t + 2.5); lp.type = 'lowpass'; lp.frequency.value = 380; o1.type = o2.type = 'sawtooth'; o1.frequency.value = 55; o2.frequency.value = 55.7; o1.connect(lp); o2.connect(lp); lp.connect(g).connect(master); o1.start(); o2.start(); drone = { g, o1, o2 }; },
+    droneOff() { if (!drone || !ctx) return; const d = drone, t = ctx.currentTime; drone = null; d.g.gain.cancelScheduledValues(t); d.g.gain.setValueAtTime(Math.max(.0001, d.g.gain.value), t); d.g.gain.exponentialRampToValueAtTime(.0001, t + 1.5); setTimeout(() => { try { d.o1.stop(); d.o2.stop(); } catch (e) { /* already stopped */ } }, 1700); }
+  };
+})();
 
 /* =================== helpers =================== */
 let seed = 1945;
@@ -563,7 +591,8 @@ function playType(el) {
   const chs = $$('.ch', el);
   if (REDUCE) { el.classList.add('static'); return; }
   chs.forEach(c => c.classList.remove('on'));
-  chs.forEach((c, i) => typeTimers.push(setTimeout(() => c.classList.add('on'), 150 + i * 34)));
+  chs.forEach((c, i) => typeTimers.push(setTimeout(() => { c.classList.add('on'); if (c.textContent.trim()) SFX.key(); }, 150 + i * 34)));
+  typeTimers.push(setTimeout(() => SFX.bell(), 250 + chs.length * 34));
 }
 function measureDraws(root) { $$('.draw', root).forEach(p => { if (!p.style.getPropertyValue('--len')) p.style.setProperty('--len', Math.ceil(p.getTotalLength() + 2)); }); }
 
@@ -574,6 +603,12 @@ function enterPage(i) {
   $$('.hw', pg).forEach((h, k) => { h.style.transitionDelay = (REDUCE ? 0 : 1300 + k * 160) + 'ms'; });
   $$('.draw', pg).forEach((d, k) => { d.style.transitionDelay = (REDUCE ? 0 : 2300 + k * 350) + 'ms'; });
   requestAnimationFrame(() => pg.classList.add('play'));
+  if (!REDUCE) {
+    sceneFile.classList.remove('kb'); void sceneFile.offsetWidth; sceneFile.classList.add('kb');
+    typeTimers.push(setTimeout(() => { SFX.thud(); jolt(); }, 1350));
+    if ($('.lesson', pg)) typeTimers.push(setTimeout(() => { SFX.thud(); jolt(); }, 2900));
+  }
+  stage.classList.toggle('alert', i === 11);
   if (i === 1) syncExhibitSketch();
   const ex = $(`.exhibits[data-for="${i}"]`);
   if (ex) {
@@ -583,8 +618,10 @@ function enterPage(i) {
     requestAnimationFrame(() => ex.classList.add('play'));
   }
 }
+function jolt() { stage.classList.remove('thud'); void stage.offsetWidth; stage.classList.add('thud'); }
 function leavePage(i) {
   typeTimers.forEach(clearTimeout); typeTimers = [];
+  stage.classList.remove('alert');
   const pg = pageFor(i); if (pg) pg.classList.remove('play');
   $$('.exhibits').forEach(e => e.classList.remove('play'));
 }
@@ -614,10 +651,72 @@ function openFile(n) {
     void wrap.offsetWidth; wrap.classList.remove('notrans'); cover.classList.remove('notrans');
     cur = n; updateChrome(); setPages(n, true); showExhibits(n);
     fadeTo(0, 520);
-    later(120, () => wrap.classList.add('in'));
-    later(1150, () => { wrap.classList.add('opened', 'opening'); cover.classList.add('open'); });
+    later(120, () => { wrap.classList.add('in'); SFX.swish(); });
+    later(1150, () => { wrap.classList.add('opened', 'opening'); cover.classList.add('open'); SFX.swish(); });
+    later(2350, () => { SFX.thud(); });
     later(2400, () => { wrap.classList.remove('opening'); enterPage(n); busy = false; });
   });
+}
+
+/* documentary chapter cards between pages */
+const CH = {
+  1: ['Present day', 'Who he is today', 'New Delhi · 2026'],
+  2: ['Chapter 1', 'Roots', 'Pauri Garhwal · 1945'],
+  3: ['Chapter 2', 'The young officer', 'Thalassery, Kerala · 1972'],
+  4: ['Chapter 3', 'Into the shadows', 'Aizawl, Mizoram · 1972–1977'],
+  5: ['Chapter 4', 'Behind enemy lines', 'Pakistan · 1983–1987'],
+  6: ['Chapter 5', 'Operation Black Thunder', 'Amritsar · May 1988'],
+  7: ['Chapter 6', 'The negotiator', 'Kandahar · December 1999'],
+  8: ['Chapter 7', 'At the top', 'Intelligence Bureau · 2004'],
+  9: ['Chapter 8', 'The Doval Doctrine', 'February 2014'],
+  10: ['Chapter 9', 'The NSA years', '2014–2020'],
+  11: ['Chapter 10', 'Operation Sindoor', '7 May 2025 · about 1 am'],
+  12: ['Chapter 11', 'Honours', '1974–2026'],
+  13: ['Our verdict', 'Why we chose him', 'A communication project'],
+  14: ['The end', 'Closing the file', 'Case file AD/1945']
+};
+const PHOTO_FOR = { 1: 's02', 2: 's03b', 3: 's04', 4: 's05', 5: 's06', 6: 's07', 7: 's08', 8: 's09', 9: 's10', 10: 's11', 11: 's12', 12: 's13', 13: 'portrait', 14: 's14' };
+let chapOn = true;
+try { chapOn = localStorage.getItem('aqg-chapters') !== 'off'; } catch (e) { /* default on */ }
+let chTimers = [];
+function photoSrc(key) {
+  const img = $(`.photo-print[data-photo="${key}"] img`), s = img && img.getAttribute('src');
+  return s || (window.DOVAL_PHOTOS || {})[key] || null;
+}
+function chapterCard(i, mid) {
+  const c = CH[i];
+  if (!chapOn || REDUCE || !c) { mid(); return; }
+  const el = $('#chapter'), p = $('.ch-p', el);
+  $('.ch-n', el).textContent = c[0]; $('.ch-t', el).textContent = c[1]; p.textContent = '';
+  const src = photoSrc(PHOTO_FOR[i]); $('.ch-bg', el).style.backgroundImage = src ? `url("${src}")` : 'none';
+  el.classList.remove('on'); void el.offsetWidth; el.classList.add('on'); SFX.hit();
+  chTimers.forEach(clearTimeout); chTimers = [];
+  [...c[2]].forEach((ch, k) => chTimers.push(setTimeout(() => { p.textContent += ch; if (ch.trim()) SFX.key(); }, 650 + k * 32)));
+  const hold = 650 + c[2].length * 32 + 700;
+  chTimers.push(setTimeout(() => { mid(); chTimers.push(setTimeout(() => el.classList.remove('on'), 140)); }, hold));
+}
+function chapterSkip() { chTimers.forEach(clearTimeout); chTimers = []; $('#chapter').classList.remove('on'); }
+
+/* the finale: the file shuts, the case is closed */
+let inFinale = false;
+function finale() {
+  busy = true; inFinale = true;
+  leavePage(cur); SFX.swish();
+  wrap.classList.add('closing'); cover.classList.remove('open'); wrap.classList.remove('opened');
+  later(1250, () => { SFX.thud(); jolt(); });
+  later(1700, () => {
+    const f = $('#finale'), src = photoSrc('portrait');
+    $('.fin-bg', f).style.backgroundImage = src ? `url("${src}")` : 'none';
+    f.hidden = false; void f.offsetWidth; f.classList.add('on'); SFX.droneOn();
+    later(2050, () => { SFX.thud(); jolt(); });
+    later(2400, () => { busy = false; });
+  });
+}
+function leaveFinale() {
+  busy = true; inFinale = false;
+  const f = $('#finale'); f.classList.remove('on'); SFX.droneOff();
+  later(900, () => { f.hidden = true; wrap.classList.remove('closing'); wrap.classList.add('opened'); cover.classList.add('open'); });
+  later(2200, () => { enterPage(cur); busy = false; });
 }
 function closeFile() {
   busy = true;
@@ -635,17 +734,24 @@ function closeFile() {
     });
   });
 }
-function go(n) {
-  if (n === 'next') n = cur + 1; else if (n === 'prev') n = cur - 1;
-  n = clamp(n, 0, N - 1);
-  if (n === cur || busy) return;
-  if (cur === 0) { openFile(n); return; }
-  if (n === 0) { closeFile(); return; }
+function flip(n) {
   busy = true;
-  leavePage(cur);
+  leavePage(cur); SFX.swish();
   setPages(n, false);
   cur = n; updateChrome(); showExhibits(n);
   later(950, () => { enterPage(n); busy = false; });
+}
+function go(n) {
+  if (busy) return;
+  if (inFinale) { if (n === 'prev' || (typeof n === 'number' && n < N)) leaveFinale(); return; }
+  if (n === 'next' && cur === N - 1) { finale(); return; }
+  if (n === 'next') n = cur + 1; else if (n === 'prev') n = cur - 1;
+  n = clamp(n, 0, N - 1);
+  if (n === cur) return;
+  if (cur === 0) { busy = true; chapterCard(n, () => openFile(n)); return; }
+  if (n === 0) { closeFile(); return; }
+  if (n === cur + 1) { busy = true; chapterCard(n, () => flip(n)); return; }
+  flip(n);
 }
 $('#open-file').addEventListener('click', () => go(1));
 $$('[data-go]').forEach(b => b.addEventListener('click', () => go(b.dataset.go)));
@@ -666,6 +772,9 @@ $('#btn-fs').addEventListener('click', fullscreen);
 addEventListener('keydown', e => {
   if (e.altKey || e.ctrlKey || e.metaKey) return;
   const k = e.key, onBtn = e.target.closest && e.target.closest('button');
+  if (coldState !== 2) { if (['ArrowRight', 'PageDown', ' ', 'Enter'].includes(k)) { e.preventDefault(); coldStart(); } else if (k === 'f' || k === 'F') fullscreen(); return; }
+  if (k === 's' || k === 'S') { toggleSound(); return; }
+  if (k === 'c' || k === 'C') { chapOn = !chapOn; try { localStorage.setItem('aqg-chapters', chapOn ? 'on' : 'off'); } catch (err) { /* ignore */ } return; }
   if (k === 'ArrowRight' || k === 'PageDown' || ((k === ' ' || k === 'Enter') && !onBtn)) { e.preventDefault(); go('next'); }
   else if (k === 'ArrowLeft' || k === 'PageUp') { e.preventDefault(); go('prev'); }
   else if (k === 'Home') go(0);
@@ -713,11 +822,51 @@ slotInput.addEventListener('change', () => {
   fr.readAsDataURL(f);
 });
 
+/* =================== sound toggle =================== */
+const sndBtn = $('#btn-snd');
+function toggleSound() { const on = SFX.toggle(); sndBtn.classList.toggle('off', !on); }
+sndBtn.classList.toggle('off', !SFX.on);
+sndBtn.addEventListener('click', toggleSound);
+
+/* =================== cold open =================== */
+let coldState = 0, coTimers = [];
+const CO = [['co-1', 'New Delhi · 2026'], ['co-2', 'For twelve years, one man has stood beside India’s Prime Minister in every crisis.'], ['co-3', 'Few have heard him speak. This is his file.']];
+$('#co-grain').style.backgroundImage = $('#grain').style.backgroundImage;
+function coldStart() {
+  if (coldState === 1) { coldEnd(); return; }
+  if (coldState === 2) return;
+  coldState = 1; SFX.unlock(); SFX.droneOn();
+  $('#co-hint').textContent = '';
+  if (REDUCE) { CO.forEach(([id, t]) => { $('#' + id).textContent = t; }); coTimers.push(setTimeout(coldEnd, 1500)); return; }
+  let t = 300;
+  CO.forEach(([id, txt], li) => {
+    const el = $('#' + id);
+    [...txt].forEach((ch, k) => coTimers.push(setTimeout(() => { el.textContent = txt.slice(0, k + 1); if (ch.trim()) SFX.key(); }, t + k * (li === 2 ? 55 : 38))));
+    t += txt.length * (li === 2 ? 55 : 38) + (li === 0 ? 500 : 900);
+  });
+  coTimers.push(setTimeout(() => { SFX.hit(); }, t - 600));
+  coTimers.push(setTimeout(coldEnd, t + 1200));
+}
+function coldEnd() {
+  if (coldState === 2) return;
+  coldState = 2; coTimers.forEach(clearTimeout); coTimers = [];
+  const co = $('#coldopen'); SFX.droneOff();
+  co.style.transition = 'opacity .8s ease'; co.style.opacity = 0;
+  setTimeout(() => { co.hidden = true; }, 850);
+  intro();
+}
+$('#coldopen').addEventListener('click', coldStart);
+
 /* =================== intro =================== */
+let sketchReady = null;
 function intro() {
   const lamp = $('#lamp');
   const title = $('#s1');
+  camT0 = performance.now();
+  if (sketchReady) sketchReady.then(start => setTimeout(start, REDUCE ? 0 : 1300));
   if (REDUCE) { lamp.style.opacity = 0; cam.classList.remove('pre'); title.classList.add('shown'); drawStrings(0); return; }
+  SFX.swish();
+  setTimeout(() => { SFX.thud(); }, 1400);
   $$('.prop').forEach((p, i) => { p.style.transitionDelay = (700 + i * 110) + 'ms'; });
   lamp.animate([{ opacity: 1 }, { opacity: .55, offset: .18 }, { opacity: .92, offset: .3 }, { opacity: .3, offset: .5 }, { opacity: .6, offset: .62 }, { opacity: 0 }], { duration: 1500, easing: 'linear', fill: 'forwards' });
   setTimeout(() => cam.classList.remove('pre'), 60);
@@ -745,11 +894,12 @@ fontsReady.then(() => Promise.all(['700 17px Kalam', '400 16px Kalam', '11px "Sp
   drawMini('mini-ne', { lon0: 87.9, lon1: 97.4, lat0: 21.7, lat1: 29.4 }, [
     { lon: 92.72, lat: 23.73, t: 'Aizawl', s: 'IB unit, 1972–77', l: true },
     { lon: 88.61, lat: 27.33, t: 'Sikkim', s: 'joins India, 1975' }]);
-  const stored = savedPhoto();
-  if (stored) setTimeout(() => loadPhoto(stored, '', true), REDUCE ? 0 : 1300);
-  else if (EMBED_PHOTO) setTimeout(() => loadPhoto(EMBED_PHOTO, EMBED_CREDIT, true), REDUCE ? 0 : 1300);
-  else setTimeout(() => showSketch(blankSketch(), true), REDUCE ? 0 : 1300);
 });
-intro();
+sketchReady = fontsReady.then(() => {
+  const stored = savedPhoto();
+  if (stored) return () => loadPhoto(stored, '', true);
+  if (EMBED_PHOTO) return () => loadPhoto(EMBED_PHOTO, EMBED_CREDIT, true);
+  return () => showSketch(blankSketch(), true);
+});
 requestAnimationFrame(frame);
 })();

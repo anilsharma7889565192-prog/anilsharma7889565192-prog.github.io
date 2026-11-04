@@ -69,6 +69,10 @@ const SFX = (() => {
     thud() { if (!ok()) return; tone(150, .3, .85, 'sine', 42); burst(.14, 380, .8, .45); },
     swish() { if (!ok()) return; const t = ctx.currentTime, s = ctx.createBufferSource(), bp = ctx.createBiquadFilter(), g = ctx.createGain(); s.buffer = noise(); bp.type = 'bandpass'; bp.Q.value = .7; bp.frequency.setValueAtTime(500, t); bp.frequency.exponentialRampToValueAtTime(3000, t + .35); g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.32, t + .12); g.gain.exponentialRampToValueAtTime(.0001, t + .5); s.connect(bp).connect(g).connect(master); s.start(t); s.stop(t + .55); },
     hit() { if (!ok()) return; tone(72, 1.8, .65, 'sine', 30); burst(.9, 160, .6, .22); },
+    crackle() { if (!ok()) return; burst(.012 + Math.random() * .03, 1800 + Math.random() * 3500, 2.5, .08 + Math.random() * .22); if (Math.random() < .25) burst(.06, 260, 1.2, .18); },
+    whoosh() { if (!ok()) return; const t = ctx.currentTime, s = ctx.createBufferSource(), lp = ctx.createBiquadFilter(), g = ctx.createGain(); s.buffer = noise(); s.loop = true; lp.type = 'lowpass'; lp.frequency.setValueAtTime(180, t); lp.frequency.exponentialRampToValueAtTime(1400, t + 1.1); lp.frequency.exponentialRampToValueAtTime(500, t + 7); g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.4, t + .9); g.gain.exponentialRampToValueAtTime(.18, t + 3); g.gain.exponentialRampToValueAtTime(.0001, t + 8); s.connect(lp).connect(g).connect(master); s.start(t); s.stop(t + 8.2); },
+    rub() { if (!ok()) return; const n = performance.now(); if (n - (this._r || 0) < 45) return; this._r = n; burst(.07, 700 + Math.random() * 500, .7, .06); },
+    reveal() { if (!ok()) return; tone(58, 2.6, .8, 'sine', 28); burst(1.2, 120, .5, .3); tone(1046, 1.4, .05); },
     droneOn() { if (!ok() || drone) return; const t = ctx.currentTime, g = ctx.createGain(), lp = ctx.createBiquadFilter(), o1 = ctx.createOscillator(), o2 = ctx.createOscillator(); g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.1, t + 2.5); lp.type = 'lowpass'; lp.frequency.value = 380; o1.type = o2.type = 'sawtooth'; o1.frequency.value = 55; o2.frequency.value = 55.7; o1.connect(lp); o2.connect(lp); lp.connect(g).connect(master); o1.start(); o2.start(); drone = { g, o1, o2 }; },
     droneOff() { if (!drone || !ctx) return; const d = drone, t = ctx.currentTime; drone = null; d.g.gain.cancelScheduledValues(t); d.g.gain.setValueAtTime(Math.max(.0001, d.g.gain.value), t); d.g.gain.exponentialRampToValueAtTime(.0001, t + 1.5); setTimeout(() => { try { d.o1.stop(); d.o2.stop(); } catch (e) { /* already stopped */ } }, 1700); }
   };
@@ -697,28 +701,30 @@ function chapterCard(i, mid) {
 }
 function chapterSkip() { chTimers.forEach(clearTimeout); chTimers = []; $('#chapter').classList.remove('on'); }
 
-/* the finale: the file shuts, the case is closed */
+/* the finale: the closing sheet burns, the ash hides the last poster */
 let inFinale = false;
+const FONTS = { type: '"Special Elite","Courier New",monospace', hand: '"Kalam","Segoe Print",cursive', poster: '"Teko","Big Shoulders Display",Impact,sans-serif', title: '"Cormorant Garamond",Georgia,serif' };
 function finale() {
   busy = true; inFinale = true;
-  leavePage(cur); SFX.swish();
-  wrap.classList.add('closing'); cover.classList.remove('open'); wrap.classList.remove('opened');
-  later(1250, () => { SFX.thud(); jolt(); });
-  later(1700, () => {
-    const f = $('#finale'), src = photoSrc('portrait');
-    $('.fin-bg', f).style.backgroundImage = src ? `url("${src}")` : 'none';
-    f.hidden = false; void f.offsetWidth; f.classList.add('on'); SFX.droneOn();
-    later(2050, () => { SFX.thud(); jolt(); });
-    later(2400, () => { busy = false; });
+  leavePage(cur);
+  fadeTo(1, 380);
+  const fontsP = document.fonts && document.fonts.load ? Promise.all([document.fonts.load('700 140px Teko', 'धुरंधर DHURANDHAR'), document.fonts.load('600 70px Teko'), document.fonts.load('400 30px "Special Elite"'), document.fonts.load('700 40px Kalam')]).catch(() => {}) : Promise.resolve();
+  const imgP = new Promise(res => { const src = photoSrc('portrait'); if (!src) return res(null); const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = src; });
+  Promise.all([fontsP, imgP, new Promise(r => setTimeout(r, REDUCE ? 0 : 420))]).then(([, img]) => {
+    const root = $('#burn'); root.hidden = false;
+    const m = /burn-t=([\d.]+)/.exec(location.hash);
+    window.DovalBurn.start({ root, fonts: FONTS, portrait: img, scale: S, reduce: REDUCE, sfx: SFX, fixedT: m ? +m[1] : undefined });
+    fadeTo(0, 500);
+    SFX.droneOn();
+    later(900, () => { busy = false; });
   });
 }
-function playAgain() { try { location.reload(); } catch (e) { /* reload blocked: fall back to the first slide */ leaveFinale(); } }
+function playAgain() { try { location.reload(); } catch (e) { /* reload blocked: fall back to the last page */ leaveFinale(); } }
 $('#play-again').addEventListener('click', playAgain);
 function leaveFinale() {
   busy = true; inFinale = false;
-  const f = $('#finale'); f.classList.remove('on'); SFX.droneOff();
-  later(900, () => { f.hidden = true; wrap.classList.remove('closing'); wrap.classList.add('opened'); cover.classList.add('open'); });
-  later(2200, () => { enterPage(cur); busy = false; });
+  fadeTo(1, 380); SFX.droneOff();
+  later(400, () => { window.DovalBurn.stop(); $('#burn').hidden = true; fadeTo(0, 500); enterPage(cur); busy = false; });
 }
 function closeFile() {
   busy = true;
@@ -745,7 +751,7 @@ function flip(n) {
 }
 function go(n) {
   if (busy) return;
-  if (inFinale) { if (n === 'prev' || (typeof n === 'number' && n < N)) leaveFinale(); return; }
+  if (inFinale) { if (n === 'next') { window.DovalBurn.next(); return; } if (n === 'prev' || (typeof n === 'number' && n < N)) leaveFinale(); return; }
   if (n === 'next' && cur === N - 1) { finale(); return; }
   if (n === 'next') n = cur + 1; else if (n === 'prev') n = cur - 1;
   n = clamp(n, 0, N - 1);

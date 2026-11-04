@@ -13,12 +13,13 @@ DIST.mkdir(exist_ok=True)
 
 FONTS = ("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,500;1,600"
          "&family=Special+Elite&family=Kalam:wght@400;700&family=IBM+Plex+Sans:wght@400;500;600"
-         "&family=IBM+Plex+Mono:wght@500;600&display=swap")
+         "&family=IBM+Plex+Mono:wght@500;600&family=Teko:wght@500;600;700&display=swap")
+THREE = "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"
 
 css = (SRC / "deck.css").read_text()
 body = (SRC / "deck.body.html").read_text()
 data = (ROOT / "mapdata.js").read_text()
-app = (SRC / "sheets.js").read_text() + "\n" + (SRC / "deck.js").read_text()
+app = (SRC / "burn.js").read_text() + "\n" + (SRC / "sheets.js").read_text() + "\n" + (SRC / "deck.js").read_text()
 
 head = (
     "<title>Operation Quiet Guardian</title>\n"
@@ -35,6 +36,7 @@ for f in sorted((ROOT / "photos").glob("*.jpg")):
 photo_js = "window.DOVAL_PHOTOS=" + json.dumps(photos) + ";\n"
 
 scripts = (
+    f'<script src="{THREE}"></script>\n'
     f"<script>\n{photo_js}</script>\n"
     f"<script>\n{data}</script>\n"
     f"<script>\n{app}</script>\n"

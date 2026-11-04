@@ -4,216 +4,235 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Operation Quiet Guardian</title>
-<meta name="description" content="Ajit Doval, the Quiet Guardian of India: a declassified-file presentation over a live 3D night map of India.">
+<meta name="description" content="Ajit Doval, the Quiet Guardian of India: a documentary-style case-board presentation.">
 <meta name="theme-color" content="#05070B">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Big+Shoulders+Stencil+Display:wght@800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@500;600&family=Manrope:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,500;1,600&family=Special+Elite&family=Kalam:wght@400;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap">
 <style>
-/* Operation Quiet Guardian: a declassified file laid over a night map of India.
-   Layout: fixed 1600x900 stage scaled to the screen; dossier on the left, live 3D map on the right. */
+/* Operation Quiet Guardian, documentary edition.
+   Layout: fixed 1600x900 stage scaled to the screen. A cork case board lit by one desk lamp fills the frame;
+   the documentary title card sits on the dark left third, the evidence (sketch, cards, map, file) on the right. */
 :root{
-  --night:#05070B; --night-2:#0A0F16; --night-3:#111923;
-  --ink:#EEF1EE; --ink-2:#B4BDC2; --ink-3:#7D8992;
-  --amber:#F4B443; --amber-hot:#FFD786; --amber-deep:#B97A16;
-  --teal:#4FD1C5; --stamp:#E3474B;
-  --saffron:#FF9933; --flag-white:#FFFFFF; --flag-green:#138808;
-  --f-display:"Big Shoulders Display","Oswald","Arial Narrow",Impact,sans-serif;
-  --f-stencil:"Big Shoulders Stencil Display","Big Shoulders Display",Impact,sans-serif;
-  --f-serif:"Instrument Serif","Times New Roman",Georgia,serif;
-  --f-body:"Manrope","Segoe UI",system-ui,sans-serif;
-  --f-mono:"JetBrains Mono",ui-monospace,"Cascadia Mono",Consolas,monospace;
+  --wall:#0D0906; --cork:#A67A49; --paper:#EFE8D8; --paper-2:#E4DAC4; --card:#FBF9F3;
+  --ink:#F3ECDD; --ink-2:#CFC4AE; --ink-3:#9C907A;
+  --graphite:#34363B; --type:#22201C; --red:#B3171D; --red-2:#8F1116; --gold:#D7B26A;
+  --f-title:"Cormorant Garamond","Cormorant",Georgia,"Times New Roman",serif;
+  --f-type:"Special Elite","Courier Prime","Courier New",monospace;
+  --f-hand:"Kalam","Segoe Print","Bradley Hand",cursive;
+  --f-body:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
   color-scheme:dark;
 }
 html,body{height:100%}
-body{margin:0;background:var(--night);color:var(--ink);font-family:var(--f-body);overflow:hidden;-webkit-font-smoothing:antialiased}
+body{margin:0;background:#000;color:var(--ink);font-family:var(--f-body);overflow:hidden;-webkit-font-smoothing:antialiased}
 button{font:inherit;color:inherit}
-:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
 
-#viewport{position:fixed;inset:0;overflow:hidden;background:var(--night)}
-#stage{position:absolute;left:50%;top:50%;width:1600px;height:900px;transform-origin:50% 50%;transform:translate(-50%,-50%);overflow:hidden;background:radial-gradient(120% 90% at 70% 45%,#0B121B 0%,var(--night) 62%)}
-#gl{position:absolute;inset:0;width:1600px;height:900px;display:block}
-#stage.shake{animation:shake .32s cubic-bezier(.36,.07,.19,.97)}
-@keyframes shake{10%,90%{translate:-1px 1px}20%,80%{translate:3px -1px}30%,50%,70%{translate:-4px 2px}40%,60%{translate:4px -2px}}
+#viewport{position:fixed;inset:0;overflow:hidden;background:#000}
+#stage{position:absolute;left:50%;top:50%;width:1600px;height:900px;transform-origin:50% 50%;transform:translate(-50%,-50%);overflow:hidden;background:var(--wall)}
 
-/* atmosphere */
+/* ---------- the board (camera layer) ---------- */
+#cam{position:absolute;left:-40px;top:-40px;width:1680px;height:980px;transform-origin:62% 40%;will-change:transform}
+#cork{position:absolute;inset:0;width:1680px;height:980px;display:block}
+.layer{position:absolute;inset:0;will-change:transform}
+
+/* lighting over the board: one warm lamp, falloff to near black */
+.light{position:absolute;inset:0;pointer-events:none}
+.light-warm{background:radial-gradient(52% 64% at 61% 38%,rgba(255,206,140,.20) 0%,rgba(255,190,120,.07) 38%,transparent 62%);mix-blend-mode:screen}
+.light-fall{background:radial-gradient(72% 92% at 61% 40%,transparent 32%,rgba(8,5,3,.55) 70%,rgba(4,3,2,.9) 100%)}
+.light-left{background:linear-gradient(90deg,rgba(6,4,3,.94) 0%,rgba(6,4,3,.88) 27%,rgba(6,4,3,.4) 36%,transparent 44%),linear-gradient(180deg,rgba(6,4,3,.6) 0%,transparent 13%)}
+#lamp{position:absolute;inset:0;pointer-events:none;background:#000;opacity:1}
+#dust{position:absolute;inset:0;width:1600px;height:900px;pointer-events:none;mix-blend-mode:screen}
+
+/* ---------- paper props ---------- */
+.prop{position:absolute;transform-origin:50% 8%;transform:rotate(var(--r,0deg));transition:transform 1s cubic-bezier(.2,.8,.2,1),opacity .8s}
+.pre .prop{opacity:0;transform:translateY(-14px) rotate(var(--r0,0deg)) scale(1.02)}
+.sheet{position:absolute;inset:0;background-color:var(--paper);background-blend-mode:multiply;border-radius:2px;
+  box-shadow:0 1px 1px rgba(0,0,0,.45),0 4px 8px -2px rgba(0,0,0,.45),0 18px 26px -10px rgba(0,0,0,.65)}
+.sheet::after{content:"";position:absolute;inset:0;border-radius:2px;pointer-events:none;
+  background:linear-gradient(180deg,rgba(255,255,255,.06),transparent 18%,transparent 80%,rgba(0,0,0,.10)),
+             radial-gradient(120% 60% at 100% 100%,rgba(0,0,0,.14),transparent 45%),
+             radial-gradient(120% 60% at 0% 100%,rgba(0,0,0,.10),transparent 40%)}
+
+/* portrait */
+#p-portrait{left:846px;top:152px;width:372px;height:486px;--r:-2.2deg;--r0:-3deg}
+#p-portrait .sheet{background-color:#F1EBDD}
+#sketch{position:absolute;left:22px;top:24px;width:328px;height:436px;display:block;cursor:pointer;mix-blend-mode:multiply;pointer-events:auto}
+#p-portrait .credit{position:absolute;right:20px;bottom:7px;font:400 13px/1 var(--f-hand);color:rgba(52,54,59,.75);transform:rotate(-1deg)}
+#p-portrait .hint{position:absolute;left:22px;right:22px;top:44%;text-align:center;font:700 22px/1.2 var(--f-hand);color:rgba(143,17,22,.9);transform:rotate(-2deg);pointer-events:none}
+#p-portrait .hint small{display:block;font:400 16px/1.3 var(--f-hand);color:rgba(52,54,59,.85)}
+#p-portrait.has-photo .hint{display:none}
+
+/* caption strip under the portrait, held with tape */
+#p-caption{left:886px;top:662px;width:296px;height:70px;--r:1.4deg;--r0:3deg}
+#p-caption .sheet{background-color:var(--card);display:flex;flex-direction:column;justify-content:center;padding:0 22px}
+#p-caption b{font:400 23px/1 var(--f-type);color:var(--type);letter-spacing:.04em}
+#p-caption span{margin-top:7px;font:400 15px/1 var(--f-type);color:#5a5348;letter-spacing:.04em}
+.tape{position:absolute;width:74px;height:26px;background:linear-gradient(180deg,rgba(236,224,190,.8),rgba(222,206,164,.74));box-shadow:0 1px 2px rgba(0,0,0,.25);clip-path:polygon(3% 8%,10% 0,22% 6%,35% 0,50% 5%,63% 0,78% 6%,90% 0,100% 7%,97% 50%,100% 93%,88% 100%,75% 94%,60% 100%,45% 95%,30% 100%,16% 94%,4% 100%,0 92%,3% 50%)}
+#p-caption .tape.l{left:-40px;top:20px;transform:rotate(-78deg)}
+#p-caption .tape.r{right:-40px;top:22px;transform:rotate(84deg)}
+
+/* index cards */
+.card .sheet{background-color:var(--card);padding:16px 18px 14px;
+  background-image:linear-gradient(transparent 37px,rgba(201,64,64,.55) 37px,rgba(201,64,64,.55) 39px,transparent 39px),
+                   repeating-linear-gradient(transparent 0 66px,rgba(143,179,217,.55) 66px 67px,transparent 67px 92px);
+  background-size:100% 100%,100% 92px;background-position:0 0,0 -40px}
+.card small{display:block;font:400 15px/1 var(--f-type);letter-spacing:.12em;text-transform:uppercase;color:#4a443a}
+.card b{display:block;margin-top:18px;font:700 25px/1.12 var(--f-hand);color:#1d2a52}
+#c-born{left:626px;top:190px;width:222px;height:142px;--r:-4deg;--r0:-7deg}
+#c-ips{left:640px;top:412px;width:222px;height:142px;--r:3deg;--r0:6deg}
+#c-nsa{left:650px;top:636px;width:236px;height:142px;--r:-2deg;--r0:-5deg}
+#c-kc{left:1268px;top:484px;width:250px;height:156px;--r:2.5deg;--r0:5deg}
+
+/* torn map scrap */
+#p-map{left:1278px;top:132px;width:300px;height:318px;--r:3.5deg;--r0:6deg}
+#mapc{position:absolute;left:0;top:0;width:300px;height:318px;filter:drop-shadow(0 1px 1px rgba(0,0,0,.4)) drop-shadow(0 14px 14px rgba(0,0,0,.5))}
+
+/* typed file, clipped */
+#p-file{left:1262px;top:662px;width:356px;height:300px;--r:-3deg;--r0:-6deg}
+#p-file .sheet{background-color:var(--paper);padding:62px 22px 0}
+#p-file pre{margin:0;font:400 14px/1.6 var(--f-type);color:var(--type);white-space:pre}
+#p-file .confid{position:absolute;right:18px;top:14px;padding:5px 10px 3px;border:3px solid var(--red);border-radius:4px;color:var(--red);font:400 19px/1 var(--f-type);letter-spacing:.12em;transform:rotate(-8deg);opacity:.75;mix-blend-mode:multiply}
+#p-file .ring{position:absolute;left:170px;top:140px;width:118px;height:118px;border-radius:50%;box-shadow:inset 0 0 0 5px rgba(120,80,30,.11),inset 0 0 0 9px rgba(120,80,30,.05);pointer-events:none}
+.clip{position:absolute;left:34px;top:-22px;width:30px;height:84px;filter:drop-shadow(1px 3px 2px rgba(0,0,0,.5))}
+
+/* push pins and string */
+.pin{position:absolute;width:36px;height:40px;margin:-22px 0 0 -14px;pointer-events:none;transition:transform .35s cubic-bezier(.3,1.6,.5,1),opacity .3s}
+.pre .pin{opacity:0;transform:translate(-6px,-12px) scale(1.4)}
+#strings{position:absolute;left:0;top:0;width:1680px;height:980px;pointer-events:none;overflow:visible}
+#strings .s{fill:none;stroke:var(--red);stroke-width:2.6;stroke-linecap:round}
+#strings .h{fill:none;stroke:rgba(255,130,120,.5);stroke-width:.9;stroke-dasharray:2 4;stroke-linecap:round}
+#strings .sh{fill:none;stroke:rgba(0,0,0,.55);stroke-width:3;filter:url(#blur3)}
+
+/* ---------- film finish ---------- */
 .fx{position:absolute;inset:0;pointer-events:none}
-.fx-vignette{background:radial-gradient(130% 100% at 60% 50%,transparent 55%,rgba(0,0,0,.72) 100%)}
-.fx-scan{background:repeating-linear-gradient(0deg,rgba(255,255,255,.022) 0 1px,transparent 1px 3px);mix-blend-mode:screen}
-.fx-grain{opacity:.07;background-size:220px 220px;animation:grain 1.2s steps(6) infinite}
-@keyframes grain{0%{background-position:0 0}20%{background-position:-60px 40px}40%{background-position:80px -30px}60%{background-position:-30px -70px}80%{background-position:50px 60px}100%{background-position:0 0}}
-.fx-left{background:linear-gradient(90deg,rgba(5,7,11,.94) 0%,rgba(5,7,11,.82) 30%,rgba(5,7,11,0) 52%)}
+.fx-grain{opacity:.1;background-size:256px 256px;animation:grain .9s steps(5) infinite;mix-blend-mode:overlay}
+@keyframes grain{0%{background-position:0 0}25%{background-position:-70px 40px}50%{background-position:90px -50px}75%{background-position:-30px -80px}100%{background-position:0 0}}
+.fx-vig{background:radial-gradient(140% 110% at 55% 45%,transparent 60%,rgba(0,0,0,.6) 100%)}
 
-/* ticker */
-#ticker{position:absolute;left:0;right:0;top:0;height:34px;border-bottom:1px solid rgba(244,180,67,.18);background:rgba(5,7,11,.72);overflow:hidden;font:500 13px/34px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);white-space:nowrap;z-index:5}
-#ticker .run{display:inline-block;padding-left:100%;animation:tick 90s linear infinite}
-#ticker .run span{margin-right:44px}
-#ticker b{color:var(--amber);font-weight:600;margin-right:10px}
-@keyframes tick{to{transform:translateX(-100%)}}
-
-/* chrome */
-.top{position:absolute;left:64px;right:64px;top:50px;height:40px;display:flex;align-items:center;justify-content:space-between;z-index:6}
-.brand{display:flex;align-items:center;gap:12px;font:600 14px/1 var(--f-mono);letter-spacing:.2em;text-transform:uppercase;color:var(--ink)}
-.brand .rec{width:10px;height:10px;border-radius:50%;background:var(--stamp);box-shadow:0 0 12px var(--stamp);animation:blink 1.6s steps(2) infinite}
-.brand .sep{color:var(--ink-3)}
-.brand .part{color:var(--amber)}
-@keyframes blink{50%{opacity:.25}}
-.top .right{display:flex;align-items:center;gap:10px}
-.secname{font:500 14px/1 var(--f-mono);letter-spacing:.2em;text-transform:uppercase;color:var(--ink-2);margin-right:8px}
-.ibtn{width:40px;height:40px;display:grid;place-items:center;border-radius:10px;border:1px solid rgba(238,241,238,.16);background:rgba(10,15,22,.6);cursor:pointer;transition:border-color .2s,background .2s}
-.ibtn:hover{border-color:var(--amber);background:rgba(244,180,67,.08)}
-.ibtn svg{width:18px;height:18px}
-
-.bottom{position:absolute;left:64px;right:64px;bottom:22px;height:40px;display:flex;align-items:center;gap:24px;z-index:6}
-.count{font:600 14px/1 var(--f-mono);letter-spacing:.18em;color:var(--ink-2);white-space:nowrap}
-.count b{color:var(--ink);font-weight:600}
-.tape{flex:1;height:8px;position:relative;border-radius:2px;background:rgba(238,241,238,.08);overflow:hidden}
-.tape i{position:absolute;inset:0 auto 0 0;width:0;background:repeating-linear-gradient(-45deg,var(--amber) 0 7px,#1a1306 7px 12px);transition:width .7s cubic-bezier(.65,0,.35,1)}
-.tape .ticks{position:absolute;inset:0;display:flex}
-.tape .ticks span{flex:1;border-right:2px solid var(--night)}
-.navbtns{display:flex;gap:10px}
-
-/* slides */
-#slides{position:absolute;inset:0;z-index:4}
-.slide{position:absolute;inset:0;visibility:hidden;opacity:0;transition:opacity .4s,visibility 0s .4s}
-.slide.active{visibility:visible;opacity:1;transition:opacity .4s}
-
-/* ---------- slide 1 · dossier ---------- */
-.s1 .dossier{position:absolute;left:80px;top:116px;width:660px}
-.eyebrow{display:flex;align-items:center;gap:14px;margin:0;font:600 15px/1 var(--f-mono);letter-spacing:.24em;text-transform:uppercase;color:var(--amber)}
-.eyebrow::before{content:"";width:34px;height:2px;background:var(--amber)}
-.subject{margin:14px 0 0;display:flex;gap:22px;font:500 14px/1 var(--f-mono);letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3)}
-.subject b{color:var(--ink-2);font-weight:600;margin-left:8px}
-.name{margin:12px 0 0;font:900 140px/.8 var(--f-display);letter-spacing:.01em;text-transform:uppercase;color:var(--ink)}
-.name .rd{position:relative;display:block;width:max-content;overflow:hidden;padding:4px 10px 0 0}
-.name .rd + .rd{margin-top:4px}
-.name .l2{color:transparent;background:linear-gradient(180deg,var(--amber-hot) 0%,var(--amber) 55%,var(--amber-deep) 100%);-webkit-background-clip:text;background-clip:text}
-.rd .bar{position:absolute;inset:6px -4px 2px -4px;background:#000;border-radius:2px;box-shadow:inset 0 0 0 1px rgba(244,180,67,.14);transform-origin:right center;transform:scaleX(0);pointer-events:none}
-.pre .rd .bar{transform:scaleX(1)}
-.rd .bar::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,rgba(255,255,255,.035) 0 2px,transparent 2px 9px)}
-.reveal .rd .bar{animation:unredact .9s cubic-bezier(.77,0,.18,1) forwards}
-.reveal .rd + .rd .bar{animation-delay:.22s}
-@keyframes unredact{0%{transform:scaleX(1)}100%{transform:scaleX(0)}}
-
-.tagline{margin:20px 0 0;font:400 50px/1 var(--f-serif);color:var(--ink);letter-spacing:-.005em}
-.tagline em{color:var(--amber);font-style:italic}
-.lead{margin:12px 0 0;max-width:640px;font:500 21px/1.42 var(--f-body);color:var(--ink-2);text-wrap:pretty}
-.tags{list-style:none;margin:18px 0 0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:12px;width:640px}
-.tags li{position:relative;padding:10px 16px 11px 18px;border:1px solid rgba(238,241,238,.14);border-radius:4px 12px 12px 12px;background:linear-gradient(180deg,rgba(17,25,35,.86),rgba(10,15,22,.86))}
-.tags li::before{content:"";position:absolute;left:-1px;top:-7px;width:72px;height:7px;border:1px solid rgba(238,241,238,.14);border-bottom:0;border-radius:6px 6px 0 0;background:rgba(17,25,35,.95)}
-.tags small{display:block;font:600 13px/1 var(--f-mono);letter-spacing:.18em;text-transform:uppercase;color:var(--amber)}
-.tags b{display:block;margin-top:6px;font:600 19px/1.25 var(--f-body);color:var(--ink)}
-.cta{margin-top:18px;display:flex;align-items:center;gap:22px}
-.btn-open{display:inline-flex;align-items:center;gap:14px;height:54px;padding:0 26px;border:0;border-radius:6px;background:var(--amber);color:#1A1204;font:700 16px/1 var(--f-mono);letter-spacing:.18em;text-transform:uppercase;cursor:pointer;box-shadow:0 0 0 1px var(--amber-hot) inset,0 10px 30px -8px rgba(244,180,67,.55);transition:transform .2s,box-shadow .2s}
-.btn-open:hover{transform:translateY(-2px);box-shadow:0 0 0 1px var(--amber-hot) inset,0 16px 40px -8px rgba(244,180,67,.7)}
-.btn-open svg{width:20px;height:20px}
-.keys{font:500 13px/1.4 var(--f-mono);letter-spacing:.1em;color:var(--ink-3);text-transform:uppercase}
-
-/* stamps */
-.stamp{position:absolute;padding:10px 18px 8px;border:5px double currentColor;border-radius:8px;font:800 50px/1 var(--f-stencil);letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;pointer-events:none;opacity:0;mix-blend-mode:screen}
-.stamp::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 30% 40%,transparent 0 40%,rgba(5,7,11,.35) 41% 43%,transparent 44%),radial-gradient(circle at 75% 70%,transparent 0 30%,rgba(5,7,11,.4) 31% 32%,transparent 33%);mix-blend-mode:multiply}
-#st-secret{left:352px;top:196px;color:var(--stamp);transform:rotate(-9deg);font-size:44px}
-#st-declass{left:452px;top:318px;color:var(--amber);transform:rotate(6deg);font-size:40px}
-.stamp.on{animation:slam .42s cubic-bezier(.2,1.6,.4,1) forwards}
-#st-declass.on{animation-name:slam2}
-@keyframes slam{0%{opacity:0;transform:rotate(-16deg) scale(2.3)}70%{opacity:.95}100%{opacity:.9;transform:rotate(-9deg) scale(1)}}
-@keyframes slam2{0%{opacity:0;transform:rotate(12deg) scale(2.3)}70%{opacity:1}100%{opacity:.95;transform:rotate(6deg) scale(1)}}
-#st-secret .strike{position:absolute;left:-8px;right:-8px;top:50%;height:5px;background:var(--stamp);transform:scaleX(0);transform-origin:left;transition:transform .35s cubic-bezier(.7,0,.3,1)}
-#st-secret.struck .strike{transform:scaleX(1)}
-#st-secret.struck{opacity:.45 !important;transition:opacity .4s}
-
-/* staged entrance */
-[data-in]{opacity:0;transform:translateY(14px);transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1)}
+/* ---------- title card (documentary) ---------- */
+#slides{position:absolute;inset:0;z-index:4;pointer-events:none}
+.slide{position:absolute;inset:0;visibility:hidden;opacity:0;transition:opacity .5s,visibility 0s .5s}
+.slide.active{visibility:visible;opacity:1;transition:opacity .5s}
+.title-card{position:absolute;left:84px;top:150px;width:520px;pointer-events:auto}
+.eyebrow{margin:0;font:500 14px/1 var(--f-mono);letter-spacing:.32em;text-transform:uppercase;color:var(--gold)}
+.eyebrow::after{content:"";display:block;width:56px;height:1px;margin-top:20px;background:var(--gold);opacity:.7}
+.name{margin:22px 0 0;font:700 148px/.84 var(--f-title);letter-spacing:.015em;text-transform:uppercase;color:var(--ink);text-shadow:0 2px 30px rgba(0,0,0,.6)}
+.name span{display:block}
+.tagline{margin:22px 0 0;font:italic 500 44px/1.05 var(--f-title);color:var(--gold)}
+.lead{margin:18px 0 0;max-width:470px;font:400 20px/1.55 var(--f-body);color:var(--ink-2);text-wrap:pretty}
+.cta{margin-top:34px;display:flex;align-items:center;gap:22px}
+.btn-open{display:inline-flex;align-items:center;gap:12px;white-space:nowrap;padding:14px 22px 13px;border:1px solid rgba(215,178,106,.6);border-radius:3px;background:rgba(20,14,8,.55);font:400 18px/1 var(--f-type);letter-spacing:.06em;color:var(--ink);cursor:pointer;transition:background .25s,border-color .25s}
+.btn-open:hover{background:rgba(215,178,106,.14);border-color:var(--gold)}
+.btn-open svg{width:18px;height:18px}
+.keys{font:500 12px/1.6 var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+[data-in]{opacity:0;transform:translateY(10px);transition:opacity 1.1s ease,transform 1.1s cubic-bezier(.2,.7,.2,1),letter-spacing 1.8s cubic-bezier(.2,.7,.2,1)}
 .shown [data-in]{opacity:1;transform:none}
-.nojs [data-in]{opacity:1;transform:none}
+.name[data-in]{letter-spacing:.14em}
+.shown .name[data-in]{letter-spacing:.015em}
 
-/* map HUD */
-#hud{position:absolute;inset:0;pointer-events:none;z-index:3}
-.livechip{position:absolute;right:64px;top:108px;display:flex;align-items:center;gap:10px;padding:9px 14px;border:1px solid rgba(79,209,197,.28);border-radius:999px;background:rgba(5,7,11,.6);font:600 13px/1 var(--f-mono);letter-spacing:.16em;text-transform:uppercase;color:var(--teal)}
-.livechip i{width:8px;height:8px;border-radius:50%;background:var(--teal);box-shadow:0 0 10px var(--teal);animation:blink 1.2s steps(2) infinite}
-.readout{position:absolute;right:64px;bottom:84px;text-align:right;font:500 14px/1.6 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2)}
-.readout b{color:var(--teal);font-weight:600}
-.readout .where{color:var(--amber)}
-.scalebar{position:absolute;right:64px;bottom:136px;display:flex;align-items:center;gap:10px;font:500 12px/1 var(--f-mono);letter-spacing:.14em;color:var(--ink-3)}
-.scalebar span{display:block;height:6px;border:1.5px solid var(--ink-3);border-top:0}
-#cross{position:absolute;width:54px;height:54px;margin:-27px 0 0 -27px;opacity:0;transition:opacity .25s}
-#cross.on{opacity:1}
-#cross::before,#cross::after{content:"";position:absolute;background:var(--teal)}
-#cross::before{left:26px;top:0;width:2px;height:54px;clip-path:polygon(0 0,100% 0,100% 38%,0 38%,0 62%,100% 62%,100% 100%,0 100%)}
-#cross::after{top:26px;left:0;height:2px;width:54px;clip-path:polygon(0 0,38% 0,38% 100%,0 100%,0 0,62% 0,100% 0,100% 100%,62% 100%)}
-#cross span{position:absolute;inset:12px;border:1.5px solid rgba(79,209,197,.7);border-radius:50%}
+/* placeholder pages */
+.ph{position:absolute;left:84px;top:170px;width:620px;pointer-events:auto}
+.ph .num{font:400 18px/1 var(--f-type);letter-spacing:.14em;color:var(--gold)}
+.ph h2{margin:18px 0 0;font:700 96px/.9 var(--f-title);text-transform:uppercase}
+.ph p{margin:18px 0 0;font:italic 500 38px/1.1 var(--f-title);color:var(--ink-2)}
+.ph .wip{margin-top:28px;display:inline-block;font:400 22px/1.3 var(--f-hand);color:var(--gold);transform:rotate(-1.5deg)}
 
-#labels{position:absolute;inset:0;pointer-events:none;z-index:2}
-.mlabel{position:absolute;left:0;top:0;white-space:nowrap;opacity:0;transition:opacity .8s}
-.mlabel.on{opacity:1}
-.mlabel.off{opacity:0 !important}
-.mlabel .t{display:block;font:700 14px/1 var(--f-mono);letter-spacing:.18em;text-transform:uppercase;color:var(--ink)}
-.mlabel .s{display:block;margin-top:6px;font:500 13px/1 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--amber)}
-.mlabel .ln{position:absolute;height:1px;background:linear-gradient(90deg,rgba(244,180,67,.9),rgba(244,180,67,.15));transform-origin:0 0}
-.mlabel.sea .t{font:400 italic 20px/1 var(--f-serif);letter-spacing:.2em;color:rgba(180,189,194,.5);text-transform:uppercase}
-.mlabel.teal .s{color:var(--teal)}
+/* ---------- chrome ---------- */
+.top{position:absolute;left:64px;right:64px;top:40px;height:38px;display:flex;align-items:center;justify-content:space-between;z-index:6}
+.brand{font:500 13px/1 var(--f-mono);letter-spacing:.28em;text-transform:uppercase;color:var(--ink-3)}
+.brand b{color:var(--ink-2);font-weight:500}
+.brand .part{color:var(--gold)}
+.top .right{display:flex;align-items:center;gap:8px}
+.secname{font:500 13px/1 var(--f-mono);letter-spacing:.24em;text-transform:uppercase;color:var(--ink-3);margin-right:10px}
+.ibtn{width:38px;height:38px;display:grid;place-items:center;border-radius:50%;border:1px solid rgba(243,236,221,.18);background:rgba(10,7,5,.55);cursor:pointer;transition:border-color .2s,background .2s}
+.ibtn:hover{border-color:var(--gold);background:rgba(215,178,106,.12)}
+.ibtn svg{width:16px;height:16px}
+.bottom{position:absolute;left:64px;right:64px;bottom:24px;height:38px;display:flex;align-items:center;gap:22px;z-index:6}
+.count{font:500 13px/1 var(--f-mono);letter-spacing:.2em;color:var(--ink-3);white-space:nowrap}
+.count b{color:var(--ink);font-weight:500}
+.prog{flex:1;height:1px;background:rgba(243,236,221,.16);position:relative}
+.prog i{position:absolute;left:0;top:-1px;height:3px;width:0;background:var(--gold);transition:width .8s cubic-bezier(.65,0,.35,1)}
+.navbtns{display:flex;gap:8px}
 
-/* placeholder pages (to be designed in review) */
-.ph{position:absolute;left:80px;top:150px;width:760px}
-.ph .num{font:900 150px/.8 var(--f-display);color:rgba(244,180,67,.16)}
-.ph h2{margin:20px 0 0;font:800 72px/.95 var(--f-display);text-transform:uppercase;letter-spacing:.01em}
-.ph p{margin:18px 0 0;font:400 34px/1.15 var(--f-serif);color:var(--ink-2)}
-.ph .wip{margin-top:30px;display:inline-flex;gap:10px;align-items:center;padding:10px 16px;border:1px dashed rgba(244,180,67,.45);border-radius:6px;font:600 13px/1 var(--f-mono);letter-spacing:.16em;text-transform:uppercase;color:var(--amber)}
+#fade{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none;z-index:9}
 
-/* dawn light on declassify */
-#dawn{position:absolute;inset:0;pointer-events:none;z-index:7;opacity:0;background:linear-gradient(100deg,transparent 0%,rgba(255,153,51,.0) 30%,rgba(255,153,51,.22) 42%,rgba(255,255,255,.18) 50%,rgba(19,136,8,.22) 58%,transparent 72%);background-size:260% 100%;background-position:120% 0;mix-blend-mode:screen}
-#dawn.go{animation:dawn 1.7s cubic-bezier(.45,0,.2,1) forwards}
-@keyframes dawn{0%{opacity:0;background-position:130% 0}15%{opacity:1}85%{opacity:1}100%{opacity:0;background-position:-30% 0}}
+/* overlays */
+#notes{position:absolute;left:64px;right:64px;bottom:80px;z-index:8;padding:22px 26px 24px;border-radius:4px;background:var(--paper);color:var(--type);box-shadow:0 30px 70px -10px rgba(0,0,0,.8)}
+#notes h3{margin:0;font:400 15px/1 var(--f-type);letter-spacing:.12em;text-transform:uppercase;color:var(--red-2)}
+#notes p{margin:12px 0 0;font:400 21px/1.55 var(--f-body);max-width:1320px}
+#menu{position:absolute;inset:0;z-index:8;background:rgba(8,6,4,.96);padding:104px 64px 60px}
+#menu h2{margin:0 0 26px;font:700 60px/1 var(--f-title);text-transform:uppercase;color:var(--ink)}
+#menu .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px}
+#menu button{text-align:left;padding:14px 16px 16px;border:0;border-radius:2px;background:var(--card);color:var(--type);cursor:pointer;min-height:122px;display:flex;flex-direction:column;gap:8px;box-shadow:0 8px 18px -8px #000;transition:transform .2s}
+#menu button:nth-child(odd){transform:rotate(-1deg)}
+#menu button:nth-child(even){transform:rotate(1deg)}
+#menu button:hover{transform:rotate(0) translateY(-3px)}
+#menu .n{font:400 14px/1 var(--f-type);letter-spacing:.1em;color:#6a6255}
+#menu .t{font:700 24px/1.05 var(--f-title);text-transform:uppercase}
+#menu .st{margin-top:auto;font:400 16px/1 var(--f-hand);color:#6a6255}
+#menu .done .st{color:var(--red-2)}
+#menu .close{position:absolute;right:64px;top:44px}
+#photo-input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
 
-#iris{position:absolute;inset:0;width:1600px;height:900px;pointer-events:none;z-index:9}
-
-/* notes + menu overlays */
-#notes{position:absolute;left:64px;right:64px;bottom:78px;z-index:8;padding:22px 26px;border:1px solid rgba(244,180,67,.35);border-radius:12px;background:rgba(7,10,15,.94);box-shadow:0 30px 80px -20px #000}
-#notes h3{margin:0;font:600 13px/1 var(--f-mono);letter-spacing:.2em;text-transform:uppercase;color:var(--amber)}
-#notes p{margin:12px 0 0;font:500 21px/1.5 var(--f-body);color:var(--ink);max-width:1300px}
-#menu{position:absolute;inset:0;z-index:8;background:rgba(5,7,11,.96);padding:110px 64px 60px}
-#menu h2{margin:0 0 26px;font:800 56px/1 var(--f-display);text-transform:uppercase}
-#menu .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
-#menu button{text-align:left;padding:16px 16px 18px;border:1px solid rgba(238,241,238,.14);border-radius:10px;background:var(--night-2);cursor:pointer;min-height:118px;display:flex;flex-direction:column;gap:8px}
-#menu button:hover{border-color:var(--amber)}
-#menu button .n{font:600 13px/1 var(--f-mono);letter-spacing:.16em;color:var(--amber)}
-#menu button .t{font:700 22px/1.1 var(--f-display);text-transform:uppercase;letter-spacing:.02em}
-#menu button .st{margin-top:auto;font:500 12px/1 var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
-#menu button.done .st{color:var(--teal)}
-#menu .close{position:absolute;right:64px;top:50px}
-
-#rotate-hint{display:none;position:fixed;inset:auto 16px 16px;padding:12px 16px;border-radius:10px;background:var(--night-3);font:500 14px/1.3 var(--f-body);color:var(--ink);text-align:center;z-index:20}
+#rotate-hint{display:none;position:fixed;inset:auto 16px 16px;padding:12px 16px;border-radius:10px;background:#1b140d;font:500 14px/1.3 var(--f-body);color:var(--ink);text-align:center;z-index:20}
 @media (orientation:portrait) and (max-width:700px){#rotate-hint{display:block}}
 
-#nogl{position:absolute;right:64px;top:160px;width:420px;font:500 14px/1.5 var(--f-mono);color:var(--ink-3)}
-
 @media (prefers-reduced-motion:reduce){
-  #ticker .run{animation:none}
   .fx-grain{animation:none}
-  [data-in]{transition:none}
+  [data-in],.prop,.pin{transition:none}
 }
+#cam{transition:filter .9s ease}
+#stage.away #cam{filter:blur(4px) brightness(.42)}
+#stage.away .light-left{background:linear-gradient(90deg,rgba(6,4,3,.95) 0%,rgba(6,4,3,.85) 45%,rgba(6,4,3,.3) 70%,transparent 85%)}
+.light-left{transition:background .9s}
 </style>
 </head>
 <body>
-<div id="viewport" class="nojs">
+<div id="viewport">
 <div id="stage">
-  <canvas id="gl" aria-hidden="true"></canvas>
-  <div id="labels" aria-hidden="true"></div>
-  <div class="fx fx-left"></div>
-  <div class="fx fx-vignette"></div>
-  <div class="fx fx-scan"></div>
-  <div class="fx fx-grain" id="grain"></div>
-
-  <div id="hud" aria-hidden="true">
-    <div class="livechip"><i></i>Night map · India</div>
-    <div class="scalebar"><span id="scale-line" style="width:90px"></span><em id="scale-txt">500 km</em></div>
-    <div class="readout"><div>Lat <b id="ro-lat">28.61° N</b> · Lon <b id="ro-lon">77.21° E</b></div><div class="where" id="ro-where">New Delhi · seat of the NSA</div></div>
-    <div id="cross"><span></span></div>
+  <!-- the case board: everything inside #cam moves with the documentary camera -->
+  <div id="cam" class="pre" aria-hidden="true">
+    <canvas id="cork"></canvas>
+    <div class="layer" id="props">
+      <div class="prop" id="p-file"><div class="sheet"><span class="ring"></span><pre>FILE NO.  AD/1945
+SUBJECT   AJIT KUMAR DOVAL
+BORN      20 JAN 1945
+          PAURI GARHWAL
+SERVICE   I.P.S. 1968 (KERALA)
+          INTELLIGENCE BUREAU
+          1972 - 2005
+PRESENT   NATIONAL SECURITY
+          ADVISOR, SINCE
+          30 MAY 2014</pre><span class="confid">CONFIDENTIAL</span></div>
+        <svg class="clip" viewBox="0 0 30 84"><defs><linearGradient id="steel" x1="0" x2="1"><stop offset="0" stop-color="#7d838a"/><stop offset=".45" stop-color="#e9edf0"/><stop offset=".7" stop-color="#9aa1a8"/><stop offset="1" stop-color="#5d636a"/></linearGradient></defs><path d="M8 66V14a7 7 0 0 1 14 0v58a10 10 0 0 1-20 0V22" fill="none" stroke="url(#steel)" stroke-width="3" stroke-linecap="round"/></svg>
+      </div>
+      <div class="prop" id="p-map"><canvas id="mapc"></canvas></div>
+      <div class="prop card" id="c-kc"><div class="sheet"><small>Kirti Chakra · 1989</small><b>First police officer ever to win it</b></div></div>
+      <div class="prop card" id="c-born"><div class="sheet"><small>Born · 1945</small><b>Ghiri Banelsyun, Garhwal</b></div></div>
+      <div class="prop card" id="c-ips"><div class="sheet"><small>IPS officer · 1968</small><b>Kerala cadre, at 23</b></div></div>
+      <div class="prop card" id="c-nsa"><div class="sheet"><small>NSA · since 2014</small><b>Now in his 3rd term</b></div></div>
+      <div class="prop" id="p-portrait"><div class="sheet"></div>
+        <canvas id="sketch" title="Click to add or change the photo"></canvas>
+        <p class="hint">Click here to add his photo<small>it will be sketched in pencil</small></p>
+        <span class="credit" id="credit"></span>
+      </div>
+      <div class="prop" id="p-caption"><div class="sheet"><b>AJIT KUMAR DOVAL</b><span>b. 20 January 1945</span></div><i class="tape l"></i><i class="tape r"></i></div>
+    </div>
+    <svg id="strings" viewBox="0 0 1680 980"><defs><filter id="blur3" x="-5%" y="-5%" width="110%" height="110%"><feGaussianBlur stdDeviation="2.2"/></filter></defs><g id="str-sh"></g><g id="str"></g></svg>
+    <div class="layer" id="pins"></div>
   </div>
 
-  <div id="ticker" aria-hidden="true"><div class="run" id="ticker-run"></div></div>
+  <div class="light light-warm"></div>
+  <div class="light light-fall"></div>
+  <div class="light light-left"></div>
+  <canvas id="dust" aria-hidden="true"></canvas>
+  <div class="fx fx-vig"></div>
+  <div class="fx fx-grain" id="grain"></div>
+  <div id="lamp"></div>
 
   <header class="top">
-    <div class="brand"><i class="rec"></i>File no. AD-1945<span class="sep">·</span><span class="part" id="part">Part I</span></div>
+    <div class="brand">Case file <b>AD/1945</b> · <span class="part" id="part">Part I</span></div>
     <div class="right">
       <span class="secname" id="secname">Introduction</span>
       <button class="ibtn" id="btn-notes" aria-label="Speaker notes (N)" title="Speaker notes (N)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 6h14M5 11h14M5 16h9"/></svg></button>
@@ -223,35 +242,23 @@ button{font:inherit;color:inherit}
   </header>
 
   <main id="slides">
-    <!-- 1 · INTRODUCTION -->
-    <section class="slide s1 active" id="s1" data-title="Introduction" aria-label="Slide 1: Introduction">
-      <div class="dossier">
-        <p class="eyebrow" data-in>Communication project · Leader study</p>
-        <p class="subject" data-in><span>Subject<b>001</b></span><span>Office<b>National Security Advisor</b></span></p>
-        <h1 class="name"><span class="rd"><span>Ajit</span><i class="bar"></i></span><span class="rd l2"><span>Doval</span><i class="bar"></i></span></h1>
-        <p class="tagline" data-in>The Quiet <em>Guardian</em> of India</p>
+    <section class="slide active" id="s1" aria-label="Slide 1: Introduction">
+      <div class="title-card">
+        <p class="eyebrow" data-in>A communication project · Leader study</p>
+        <h1 class="name" data-in><span>Ajit</span><span>Doval</span></h1>
+        <p class="tagline" data-in>The Quiet Guardian of India</p>
         <p class="lead" data-in>India’s National Security Advisor since 2014: a former police officer, undercover intelligence officer and chief of the Intelligence Bureau.</p>
-        <ul class="tags">
-          <li data-in><small>Born</small><b>1945 · Garhwal, Uttarakhand</b></li>
-          <li data-in><small>Indian Police Service</small><b>IPS officer · 1968</b></li>
-          <li data-in><small>National Security Advisor</small><b>Since 2014 · 3rd term</b></li>
-          <li data-in><small>Kirti Chakra</small><b>First police officer to win it</b></li>
-        </ul>
         <div class="cta" data-in>
-          <button class="btn-open" id="open-file">Open the file<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+          <button class="btn-open" id="open-file">Open the case file<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
           <span class="keys">← → move · F full screen<br>N speaker notes</span>
         </div>
       </div>
-      <div class="stamp" id="st-secret">Top secret<i class="strike"></i></div>
-      <div class="stamp" id="st-declass">Declassified</div>
     </section>
   </main>
 
-  <div id="dawn"></div>
-
   <footer class="bottom">
-    <span class="count" id="count">Page <b>01</b> / 15</span>
-    <span class="tape"><i id="tape"></i><span class="ticks" id="ticks"></span></span>
+    <span class="count" id="count"><b>01</b> / 15</span>
+    <span class="prog"><i id="prog"></i></span>
     <span class="navbtns">
       <button class="ibtn" data-go="prev" aria-label="Previous slide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
       <button class="ibtn" data-go="next" aria-label="Next slide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
@@ -264,11 +271,11 @@ button{font:inherit;color:inherit}
     <h2>All 15 pages</h2>
     <div class="grid" id="menu-grid"></div>
   </div>
-  <canvas id="iris" aria-hidden="true"></canvas>
+  <input type="file" id="photo-input" accept="image/*" aria-label="Choose a photo to sketch">
+  <div id="fade"></div>
 </div>
 </div>
 <div id="rotate-hint">Turn your phone sideways to see the full slide.</div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 const MAPDATA={"grid":{"lon0":60.0,"lat1":40.0,"step":0.18,"w":222,"h":200,"b64":"VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVWqVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVWlqqpVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVqqqqqlVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVamqqqpqVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVWlqqqqqmpVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVlaqqqqqqalVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVWpqqqqqqpWVVWqVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVZWqqqqqqlaVqmpVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVpaqqqqqqlqqqalZVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVWlqqqqqqqqqqpqVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVamqqqqqqqqqqlZVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVqqqqqqqqqqpaVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVamqqqqqqqqqqlVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVWlqqqqqqqqqqpWVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVpaqqqqqqqqqqWlVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVWqqqqqqqqqqmpVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVlaqqqqqqqqqqVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVWpqqqqqqqqalVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVlaqqqqqqqqpaVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVWpqqqqqqqqqlVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVlaqqqqqqqqpWVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVWpqqqqqqqqqlZVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVaqqqqqqqqqqVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVqqqqqqqqqlpVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVWpqqqqqqqqVlVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVlaqqqqqqpVpVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVqaqqqmpVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVZWqqqqqWlVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVWlqqqqqqpVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVlaqqqqqqWlVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVWpqqqqqqpWVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVlaqqqqqqmlVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVWqqqqqqqpqVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVlaqqqqqqqlpVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVWqqqqqqqqqalVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVqaqqqqqqqqpaVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVamqqqqqqqqqqlpVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVWVqqqqqqqqqqqqWlVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVamqqqqqqqqqqqpWVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVWqqqqqqqqqqqqqVlVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVpaqqqqqqqqqqqlpVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVWqqqqqqqqqqqpqVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVqaqqqqqqqqqqqlZVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVaWqqqqqqqqqqqpqVVVVVVVVVVVVVVVVVVVVVVVVVWVValVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVqqqqqqqqqqqqqlVVVVVVVVVVVVVVVVVVVVVVVVWlqqpaVVVVVVVVVVVVVVVVVVVVVVVVVVVVVaqqqqqqqqqqqqpWVVVVVVVVVVVVVVVVVVVVVVVVlaqqqlZVVVVVVVVVVVVVVVVVVVVVVVVVVVWqqqqqqqqqqqqqqlZVVVVVVVVVVVVVVVVVVVVVVZWqqqqqVVVVVVVVVVVVVVVVVVVVVVVVVVVVpaqqqqqqqqqqqqqqVlVVVVVVVVVVVVVVVVVVVVWlqqqqqlpVVVVVVVVVVVVVVVVVVVVVVVVVVZWqqqqqqqqqqqqqqqpaVVVVVVVVVVVVVVVVVVVVVaqqqqqqVlVVVVVVVVVVVVVVVVVVVVVVVVVVqqqqqqqqqqqqqqqqqlZVVVVVVVVVVVVVVVVVVZWqqqqqqqpaVVVVVVVVVVVVVVVVVVVVVVVpVaWqqqqqqqqqqqqqqqqqVlVVVVVVVVVVqVVVVVVVpaqqqqqqqlVVVVVVVVVVVVVVVVVVVVVVpVaqqqqqqqqqqqqqqqqqqqpaVVVVVVVVVaVaVVVVVaqqqqqqqqpWVVVVVVVVVVVVVVVVVVVVVVWqqqqqqqqqqqqqqqqqqqqqqlpVVVVVVVVVqlVVVZWqqqqqqqqqVlVVVVVVVVVVVVVVVVVVVVVVqaqqqqqqqqqqqqqqqqqqqqqqaqZWVVVVVaVaVVVVpaqqqqqqqmpVVVVVVVVVVVVVVVVVVVVVVaWqqqqqqqqqqqqqqqqqqqqqqqqqqlZVVVWVqlZVVVWlqqqqqqpqWlVVVVVVVVVVVVVVVVVVVVWVqqqqqqqqqqqqqqqqqqqqqqqqqqpqVVVVValaVVVVVaqqqqqqWpVVVVVVVVVVVVVVVVVVVVVVVamqqqqqqqqqqqqqqqqqqqqqqqqqqmpVVVVVqlZVVVWlqqqqqmpVVVVVVVVVVVVVVVVVVVVVVVWVqqqqqqqqqqqqqqqqqqqqqqqqqqqqqlZVVaWqaqqqqqqqqqpqVVVVVVVVVVVVVVVVVVVVVVVVVWWqqqqqqqqqqqqqqqqqqqqqqqqqqqqqalVVqqqqqqqqqqqqalVVVVVVVVVVVVVVVVVVVVVVVVVVpaqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpqqqqqqqqqqpWVVVVVVVVVVVVVVVVVVVVVVVVVVWqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqWqWqqqqqqqqqalVVVVVVVVVVVVVVVVVVVVVVVVVVpaqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqmpVmqqqqqqqqqpWVVVVVVVVVVVVVVVVVVVVVVVVVVWqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqVVWpqqqqqqqqalVVVVVVVVVVVVVVVVVVVVVVVVVVlaqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpVVaqqqqqqqqpVVVVVVVVVVVVVVVVVVVVVVVVVVVWVqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqlWlqqqqqqqqVlVVVVVVVQVUVVVVAVAFAEBVVVVVVamqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpqlaqqqqqqqlpVVVVVVVVVAEAUAAAAAAAAVFVVVVVVqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqWlVVVaWlqqqqVlVVVVVVVQUAAAAAAAAAAEBVVVVVVaWqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpVVVVVVaWqqmpVVVVVVVVVAAAAAAAAAAAAAFVVVVVVqaqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqVVVVVVWVqqqqVVVVVVVVVQUAAAAAAAAAAABQVVVVVZWqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqlpVVVVVVamqqlpVVVVVVVVVAAAAAAAAAAAAAFVVVVVlqaqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqVlVVVVWpqqpqVVVVVVVVVQUAAAAAAAAAAABQVaWqpaqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpaVVVVpaqqqlZVVVVVVVVVAAAAAAAAAAAAAFRVqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqlVVVaWqqqpaVVVVVVVVVQUAAAAAAAAAAAAAUaqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpWVVWVqqpqlVVVVVVVVVVVAAAAAAAAAAAAAACoqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqalVVVamaqlpVVVVVVVVVVQUAAAAAAAAAAAAAAKiqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpaVVWVqqmqVVVVVVVVVVVVAAAAAAAAAAAAAACAqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqlVVVaVWqlZVVVVVVVVVVQUAAAAAAAAAAAAAAKCqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpqVVVVaaVqVVVVVVVVVVVVAAAAAAAAAAAAAAAAqKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqlZVUZVVqlVVVVVVVVVVVQUAAAAAAAAAAAAAAACggKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpqVVVUVKVaVVVVVVVVVVVVAAAAAAAAAAAAAAAAAACqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqlZVEVFVqlVVVVVVVVVVVQUAAAAAAAAAAAAAAAACqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpqVVURUJVaVVVVVVVVVVVVAAAAAAAAAAAAAAAAqKqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqlZVFQFUqVVVVVVVVVVVVQUAAAAAAAAAAAAAAACqqqqqiqqqqqqqqqqqqqqqqqqqqqqqqqqqqqpqVVUBQJVWVVVVVVVVVVVVAAAAAAAAAAAAAAAAgKqqqqqoqqqqqqqqqqqqqqqqqqqqqqqqqqqqqlZBAABUVVVVVVVVVVVVVQUAAAAAAAAAAAAAAACgqqqqiqqqqqqqqqqqqqqqqqqqqqqqqqqqqqKqAQAAAFVVVVVVVVVVVVVVAAAAAAAAAAAAAAAAAKCqqqqgqqqqqqqqqqqqqqqqqqqqqqqqqioAAAAAAABQVVVVVVVVVVVVVQUAAAAAAAAAAAAAAAAAqKqqCqqqqqqqqqqqqqqqqqqqqqqqqqqqAAAAAAAAAFVVVVVVVVVVVVVVAAAAAAAAAAAAAAAAAICqqiqgqqqqqqqqqqqqqqqqqqqqqqqqqgIAAAAAAABQVVVVVVVVVVVVVQUAAAAAAAAAAAAAAAAAgKoqAKqqqqqqqqqqqqqqqqqqqqqqqqoqAAAAAAAAAFRVVVVVVVVVVVVVAAAAAAAAAAAAAAAAAACgKgCAqqqqqqqqqqqqqqqqqqqqqqqqqgoAAAAAAABAVVVVVVVVVVVVVQUAAAAAAAAAAAAAAAAAAAAAAKiqqqqqqqqqqqqqqqqqqqqqqqqqAAAAAAAAAFBVVVVVVVVVVVVVAAAAAAAAAAAAAAAAAAAAAACAqqqqqqqqqqqqqqqqqqqqqqqqqgIAAAAAAAAAVFVVVVVVVVVVVQUAAAAAAAAAAAAAAAAAAAAAAKiqqqqqqqqqqqqqqqqqqqqqqqoKAAAAAAAAAABVVVVVVVVVVVVVAAAAAAAAAAAAAAAAAAAAAACgqqqqqqqqqqqqqqqqqqqqqqqqKgAAAAAAAAAAQFVVVVVVVVVVVQUAAAAAAAAAAAAAAAAAAAAAAKqqqqqqqqqqqqqqqqqqqqqqqqoAAAAAAAAAAABAVVVVVVVVVVVVAAAAAAAAAAAAAAAAAAAAAACgqqqqqqqqqqqqqqqqqqqqqqoqAAAAAAAAAAAAAEBVVVVVVVVVVQUAAAAAAAAAAAAAAAAAAAAAAKqqqqqqqqqqqqqqqqqqqqqqKgAAAAAAAAAAAAAAUFVVVVVVVVVVAAAAAAAAAAAAAAAAAAAAAACAqqqqqqqqqqqqqqqqqqqqqioAAAAAAAAAAAAAAFBVVVVVVVVVVQUAAAAAAAAAAAAAAAAAAAAAAKiqqqqqqqqqqqqqqqqqqqqqAAAAAAAAAAAAAAAAVVVVVVVVVVVVAAAAAAAAAAAAAAAAAAAAAACAqqqqqqqqqqqqqqqqqqqqqgIAAAAAAAAAAAAAAEBVVVVVVVVVVQUAAAAAAAAAAAAAAAAAAAAAAKCqqqqqqqqqqqqqqqqqqqoqAAAAAAAAAAAAAAAAQVVVVVVVVVVVAAAAAAAAAAAAAAAAAAAAAACAqqqqqqqqqqqqqqqqqqqqqgAAAAAAAAAAAAAAAABQVVVVVVVVVQUAAAAAAAAAAAAAAAAAAAAAAKiqqqqqqqqqqqqqqqqqqqoCAAAAAAAAAAAAAAAAAFVVVVVVVVVVAAAAAAAAAAAAAAAAAAAAAAAAqqqqqqqqqqqqqqqqqqqqCgAAAAAAAAAAAAAAAABAVVVVVVVVVQUAAAAAAAAAAAAAAAAAAAAAAKCqqqqqqqqqqqqqqqqqqgoAAAAAAAAAAAAAAAAAAFRVVVVVVVVVAAAAAAAAAAAAAAAAAAAAAAAAqqqqqqqqqqqqqqqqqqoqAAAAAAAAAAAAAAAAAABAVVVVVVVVVQUAAAAAAAAAAAAAAAAAAAAAAICqqqqqqqqqqqqqqqqqqgAAAAAAAAAAAAAAAAAAAFBVVVVVVVVVAAAAAAAAAAAAAAAAAAAAAAAAqKqqqqqqqqqqqqqqqqoCAAAAAAAAAAAAAAAAAAAAVVVVVVVVVQUAAAAAAAAAAAAAAAAAAAAAAICqqqqqqqqqqqqqqqqqAgAAAAAAAAAAAAAAAAAAAFBVVVVVVVVVAAAAAAAAAAAAAAAAAAAAAAAAqKqqqqqqqqqqqqqqqgIAAAAAAAAAAAAAAAAAAAAAVVVVUVVVVQUAAAAAAAAAAAAAAAAAAAAAAICqqqqqqqqqqqqqqqoKAAAAAAAAAAAAAAAAAAAAAFRVVRVVVVVVAAAAAAAAAAAAAAAAAAAAAAAAoKqqqqqqqqqqqqqqqgAAAAAAAAAAAAAAAAAAAABAVVVVQVVVVQUAAAAAAAAAAAAAAAAAAAAAAACqqqqqqqqqqqqqqqoKAAAAAAAAAAAAAAAAAAAAAFRVVQVUVVVVAAAAAAAAAAAAAAAAAAAAAAAAoKqqqqqqqqqqqqqqKgAAAAAAAAAAAAAAAAAAAABQVVUFAFVVVQUAAAAAAAAAAAAAAAAAAAAAAACqqqqqqqqqqqqqqiIAAAAAAAAAAAAAAAAAAAAAAFVVBQBQVVVVAAAAAAAAAAAAAAAAAAAAAAAAoKqqqqqqqqqqqqoKAAAAAAAAAAAAAAAAAAAAAAAQVQUAAFRVVQUAAAAAAAAAAAAAAAAAAAAAAACoqqqqqqqqqqqqKgAAAAAAAAAAAAAAAAAAAAAAABRVAABAVVVVAAAAAAAAAAAAAAAAAAAAAAAAAKqqqqqqqqqqqoICAAAAAAAAAAAAAAAAAAAAAAAAAAEAAFRVVQUAAAAAAAAAAAAAAAAAAAAAAACgqqqqqqqqqqoKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAVVVVAAAAAAAAAAAAAAAAAAAAAAAAAKqqqqqqqqqqqgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFBVVQUAAAAAAAAAAAAAAAAAAAAAAACAqqqqqqqqqqoKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAVVVVAAAAAAAAAAAAAAAAAAAAAAAAAKiqqqqqqqqqKgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFBVVQUAAAAAAAAAAAAAAAAAAAAAAAAAqqqqqqqqqqoKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAVVVVAAAAAAAAAAAAAAAAAAAAAAAAAICqqqqqqqqqqgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFBVVQUAAAAAAAAAAAAAAAAAAAAAAAAAqKqqqqqqqqoKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAVFVVAAAAAAAAAAAAAAAAAAAAAAAAAACqqqqqqqqqqgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEBVVQUAAAAAAAAAAAAAAAAAAAAAAAAAoKqqqqqqqqoKAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAVFVVAAAAAAAAAAAAAAAAAAAAAAAAAACqqqqqqqqqqgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEBVVQUAAAAAAAAAAAAAAAAAAAAAAAAAgKqqqqqqqqoqAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAVFVVAAAAAAAAAAAAAAAAAAAAAAAAAACoqqqqqqqqqgIAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAABUVQUAAAAAAAAAAAAAAAAAAAAAAAAAgKqqqqqqqqoqAAAAAAAAAAAAAAAAAAAAAAAKAAIAAAAAQFVVAAAAAAAAAAAAAAAAAAAAAAAAAACgqqqqqqqqqgIAAAAAAAAAAAAAAAAAAAAAoAAAAAAAAABQVQUAAAAAAAAAAAAAAAAAAAAAAAAAAKqqqqqqqqoqAAAAAAAAAAAAAAAAAAAAAIAKAAAAAAAAEFVVAAAAAAAAAAAAAAAAAAAAAAAAAACgqqqqqqqqqgIAAAAAAAAAAAAAAAAAAAAAKAAAAAAAAABQVQUAAAAAAAAAAAAAAAAAAAAAAAAAAKqqqqqqqqoKAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAFRVAAAAAAAAAAAAAAAAAAAAAAAAAACAqqqqqqqqqgAAAAAAAAAAAAAAAAAAAAAAKAAAAAAAAABEVQUAAAAAAAAAAAAAAAAAAAAAAAAAAKiqqqqqqqoKAAAAAAAAAAAAAAAAAAAAAIACAAAAAAAAAFRVAAAAAAAAAAAAAAAAAAAAAAAAAAAAqqqqqqqqKgAAAAAAAAAAAAAAAAAAAAAAqAAAAAAAAEBAVQUAAAAAAAAAAAAAAAAAAAAAAAAAAKCqqqqqqqoAAAAAAAAAAAAAAAAAAAAAAIAIAAAAAAAAQFRVAAAAAAAAAAAAAAAAAAAAAAAAAAAAqKqqqqqqCgAAAAAAAAAAAAAAAAAAAAAAigAAAAAAAABUVQEAAAAAAAAAAAAAAAAAAAAACAAAAACqqqqqqqoAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAVFQVAAAAAAAAAAAAAAAAAAAAAAAAAAAAgKqqqqqqCgAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAABAVQAAAAAAAAAAAAAAAAAAAAAAAAAAAACoqqqqqqoAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAFQFAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKqqqqqqCgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAVQAAAAAAAAAAAAAAAAAAAAAAAAAAAACgqqqqqqoAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAABFUBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKqqqqqqCgAAAAAAAAAAAAAAAAAAAABAAgAAAAAAAABRFQAAAAAAAAAAAAAAAAAAAAAAAAAAAACAqqqqqqoAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAFUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKiqqqqqCgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABQBQAAAAAAAAAAAAAAAAAAAAAAAAAAAACAqqqqqgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKCqqqoqAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABRBQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAqqqqqgAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKCqqqoCUAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABQBQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAqqqqKgBUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQFUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAICqqqoqABUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABUBQEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAqKqqAkBUBQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAUFVVAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACqqgIAQFUBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABUVQUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoKoqAABUVQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAUFVVAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACoqgIAUFUFAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABVVQUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKoKAABVVQEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAUFVVAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAKgAAVFUVAAAAAAAAAAAAAAAAAAAAAAIAAAAAAABAVQUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEBVVQEAAAAAAAAAAAAAAAAAAACAAgAAAAAAAFBVAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAUFVVAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAVAUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABVVQUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABVAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAUFVVAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAUAUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABVVVUAAAAAAAAAAAAAAAAAAAAACQAAAAAAAABUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAUFVVBQAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABVVRUAAAAAAAAAAAAAAAAAAAAAKAAAAAAAAABQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAUFVVAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABUVRUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQFVVAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABUVQEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABUAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQFUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABQVVUVAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFVVVQUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAVVVVAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFBVVRUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAVFVVBQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABVVVUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQFVVFQAA"},"rings":[[[77.52,35.49],[77.69,35.45],[77.81,35.52],[77.91,35.46],[77.94,35.56],[78.04,35.59],[78.09,35.53],[78.16,35.55],[78.24,35.73],[78.54,35.76],[78.67,35.85],[78.8,35.87],[78.86,35.97],[79.03,35.91],[79.08,35.95],[79.27,35.93],[79.34,35.99],[79.44,35.97],[79.49,35.85],[79.57,35.9],[79.57,35.81],[79.64,35.78],[79.7,35.64],[79.82,35.63],[79.85,35.57],[79.95,35.63],[80.0,35.6],[79.97,35.55],[80.05,35.42],[80.18,35.51],[80.21,35.58],[80.41,35.48],[80.41,35.43],[80.29,35.35],[80.28,35.2],[80.19,35.12],[80.23,34.99],[80.19,34.95],[80.21,34.89],[80.14,34.87],[80.07,34.71],[79.9,34.7],[79.79,34.63],[79.79,34.48],[79.51,34.45],[79.61,34.24],[79.49,34.19],[79.4,34.0],[79.19,34.03],[79.1,33.99],[79.0,34.04],[78.89,33.97],[79.03,33.75],[79.01,33.69],[79.09,33.64],[78.91,33.62],[78.94,33.38],[79.11,33.2],[79.15,33.18],[79.22,33.24],[79.41,33.19],[79.33,33.0],[79.56,32.76],[79.55,32.68],[79.41,32.52],[79.28,32.56],[79.13,32.48],[79.1,32.37],[79.01,32.38],[78.97,32.34],[78.78,32.48],[78.74,32.7],[78.63,32.65],[78.63,32.61],[78.52,32.61],[78.4,32.53],[78.47,32.44],[78.49,32.28],[78.78,31.99],[78.7,31.81],[78.75,31.68],[78.85,31.61],[78.72,31.51],[78.8,31.44],[78.75,31.37],[78.78,31.31],[78.9,31.29],[78.94,31.37],[79.02,31.35],[79.02,31.43],[79.1,31.45],[79.24,31.33],[79.23,31.26],[79.3,31.22],[79.31,31.15],[79.41,31.11],[79.43,31.02],[79.51,31.03],[79.6,30.94],[79.75,31.01],[79.87,30.97],[79.93,30.88],[80.24,30.76],[80.19,30.67],[80.22,30.58],[80.54,30.45],[80.61,30.47],[80.8,30.32],[81.03,30.25],[81.04,30.21],[81.0,30.19],[80.93,30.18],[80.91,30.22],[80.88,30.13],[80.75,30.01],[80.6,29.96],[80.49,29.8],[80.43,29.81],[80.37,29.75],[80.41,29.6],[80.3,29.45],[80.24,29.44],[80.32,29.31],[80.3,29.21],[80.25,29.22],[80.27,29.14],[80.14,29.1],[80.14,29.01],[80.06,28.92],[80.08,28.82],[80.25,28.76],[80.36,28.63],[80.45,28.63],[80.52,28.55],[80.5,28.66],[80.57,28.69],[80.79,28.52],[81.02,28.45],[81.03,28.4],[81.21,28.36],[81.32,28.13],[81.37,28.18],[81.45,28.16],[81.48,28.08],[81.88,27.86],[81.97,27.93],[82.07,27.92],[82.45,27.68],[82.71,27.72],[82.76,27.59],[82.74,27.5],[83.19,27.45],[83.32,27.33],[83.41,27.41],[83.39,27.48],[83.61,27.47],[83.86,27.35],[83.85,27.45],[84.02,27.43],[84.15,27.52],[84.29,27.39],[84.62,27.34],[84.69,27.22],[84.64,27.05],[84.96,26.96],[84.97,26.92],[85.05,26.89],[85.02,26.85],[85.19,26.87],[85.21,26.76],[85.33,26.74],[85.63,26.87],[85.73,26.81],[85.73,26.65],[85.85,26.61],[85.85,26.57],[86.03,26.67],[86.22,26.59],[86.33,26.62],[86.73,26.42],[86.89,26.46],[87.07,26.59],[87.09,26.45],[87.34,26.35],[87.37,26.41],[87.47,26.44],[87.6,26.38],[87.68,26.44],[87.77,26.41],[87.79,26.47],[87.85,26.44],[87.89,26.49],[88.01,26.36],[88.09,26.43],[88.19,26.74],[88.14,26.99],[87.99,27.12],[88.07,27.34],[88.04,27.5],[88.2,27.79],[88.2,27.85],[88.12,27.92],[88.14,27.97],[88.41,27.98],[88.64,28.12],[88.84,28.02],[88.89,27.86],[88.85,27.67],[88.76,27.57],[88.81,27.41],[88.91,27.29],[88.8,27.25],[88.75,27.14],[88.87,27.11],[88.88,26.94],[88.92,26.99],[88.95,26.93],[89.1,26.89],[89.13,26.81],[89.38,26.86],[89.65,26.78],[89.63,26.72],[89.86,26.7],[89.86,26.74],[90.19,26.77],[90.23,26.86],[90.3,26.85],[90.36,26.9],[90.72,26.77],[91.05,26.78],[91.1,26.82],[91.34,26.78],[91.41,26.84],[91.5,26.79],[91.69,26.81],[91.89,26.92],[92.06,26.85],[92.1,26.87],[92.12,26.96],[92.03,27.08],[92.07,27.23],[92.04,27.26],[92.12,27.29],[92.06,27.33],[92.02,27.48],[91.65,27.48],[91.56,27.63],[91.64,27.76],[91.85,27.76],[91.92,27.72],[92.24,27.89],[92.32,27.8],[92.42,27.83],[92.46,27.79],[92.73,27.98],[92.73,28.05],[92.66,28.08],[92.68,28.15],[92.92,28.2],[92.95,28.26],[93.15,28.37],[93.19,28.49],[93.43,28.66],[93.71,28.66],[93.79,28.74],[93.91,28.74],[93.97,28.82],[94.02,28.79],[94.03,28.85],[94.18,28.94],[94.26,28.93],[94.37,29.03],[94.28,29.09],[94.29,29.15],[94.54,29.22],[94.63,29.3],[94.7,29.32],[94.81,29.16],[95.02,29.13],[94.99,29.17],[95.1,29.14],[95.1,29.1],[95.26,29.07],[95.3,29.14],[95.41,29.13],[95.43,29.19],[95.5,29.13],[95.5,29.19],[95.6,29.19],[95.61,29.24],[95.71,29.2],[95.74,29.3],[95.81,29.35],[95.88,29.31],[96.05,29.38],[96.3,29.19],[96.19,29.04],[96.33,29.11],[96.45,28.94],[96.52,28.94],[96.52,28.86],[96.63,28.73],[96.64,28.68],[96.54,28.69],[96.51,28.58],[96.41,28.51],[96.47,28.5],[96.5,28.43],[96.49,28.54],[96.61,28.62],[96.71,28.61],[96.76,28.52],[96.86,28.48],[96.93,28.35],[97.0,28.33],[97.13,28.36],[97.36,28.2],[97.31,28.06],[97.4,28.01],[97.37,27.88],[97.25,27.9],[96.89,27.61],[96.94,27.51],[96.9,27.45],[97.16,27.14],[97.14,27.09],[96.87,27.18],[96.88,27.26],[96.7,27.37],[96.61,27.37],[96.52,27.29],[96.23,27.28],[96.02,27.18],[95.95,27.05],[95.8,27.02],[95.72,26.88],[95.67,26.9],[95.61,26.81],[95.52,26.82],[95.43,26.7],[95.3,26.65],[95.23,26.68],[95.15,26.62],[95.06,26.45],[95.13,26.38],[95.12,26.1],[95.19,26.07],[95.01,25.9],[95.05,25.76],[94.94,25.67],[94.9,25.57],[94.68,25.47],[94.63,25.4],[94.58,25.21],[94.74,25.13],[94.71,24.94],[94.63,24.84],[94.6,24.71],[94.54,24.7],[94.51,24.59],[94.4,24.48],[94.16,23.85],[93.93,23.95],[93.81,23.93],[93.75,24.01],[93.62,24.01],[93.51,23.94],[93.41,24.07],[93.33,24.08],[93.44,23.69],[93.4,23.38],[93.36,23.35],[93.39,23.13],[93.29,23.01],[93.13,23.04],[93.16,22.91],[93.09,22.81],[93.14,22.59],[93.11,22.53],[93.19,22.43],[93.2,22.26],[93.14,22.25],[93.15,22.18],[93.04,22.2],[93.06,22.1],[93.0,22.1],[93.01,21.99],[92.95,22.03],[92.91,21.94],[92.86,22.06],[92.7,22.16],[92.68,22.01],[92.6,21.98],[92.52,22.72],[92.47,22.75],[92.45,22.89],[92.37,22.94],[92.39,23.06],[92.35,23.24],[92.4,23.24],[92.28,23.72],[92.21,23.65],[92.15,23.74],[92.05,23.65],[91.96,23.73],[91.97,23.48],[91.76,23.3],[91.84,23.09],[91.62,22.94],[91.54,23.0],[91.45,23.26],[91.41,23.29],[91.38,23.21],[91.42,23.06],[91.35,23.1],[91.29,23.32],[91.32,23.36],[91.16,23.61],[91.16,23.67],[91.2,23.65],[91.21,23.69],[91.15,23.69],[91.16,23.74],[91.22,23.74],[91.25,23.84],[91.23,23.93],[91.28,23.92],[91.3,24.0],[91.38,23.98],[91.37,24.11],[91.59,24.07],[91.64,24.1],[91.67,24.23],[91.69,24.16],[91.76,24.14],[91.74,24.25],[91.85,24.22],[91.9,24.14],[91.92,24.34],[92.0,24.32],[91.97,24.38],[92.1,24.37],[92.16,24.42],[92.15,24.52],[92.22,24.52],[92.3,24.74],[92.23,24.9],[92.3,24.92],[92.4,24.85],[92.5,24.88],[92.49,24.95],[92.42,24.97],[92.43,25.03],[92.06,25.19],[91.75,25.18],[91.75,25.14],[91.64,25.12],[91.61,25.18],[91.47,25.13],[91.27,25.21],[90.73,25.16],[90.66,25.2],[90.44,25.14],[89.97,25.3],[89.84,25.29],[89.82,25.38],[89.88,25.62],[89.82,25.82],[89.89,25.95],[89.83,25.95],[89.87,25.98],[89.77,26.04],[89.79,26.09],[89.75,26.16],[89.68,26.16],[89.68,26.24],[89.63,26.23],[89.65,26.16],[89.59,26.16],[89.65,26.06],[89.61,26.06],[89.58,25.97],[89.42,26.05],[89.36,26.01],[89.16,26.14],[89.09,26.4],[88.96,26.46],[88.9,26.41],[89.0,26.29],[89.06,26.29],[89.05,26.24],[88.9,26.29],[88.84,26.23],[88.79,26.31],[88.67,26.26],[88.71,26.29],[88.67,26.32],[88.75,26.35],[88.7,26.33],[88.62,26.47],[88.56,26.46],[88.44,26.55],[88.4,26.63],[88.33,26.48],[88.35,26.45],[88.37,26.49],[88.49,26.46],[88.52,26.36],[88.46,26.38],[88.35,26.28],[88.35,26.22],[88.18,26.15],[88.18,26.03],[88.09,25.92],[88.11,25.82],[88.15,25.78],[88.27,25.81],[88.45,25.66],[88.44,25.6],[88.54,25.51],[88.7,25.47],[88.81,25.52],[88.84,25.36],[89.01,25.3],[89.01,25.26],[88.96,25.26],[88.92,25.17],[88.84,25.21],[88.81,25.17],[88.44,25.21],[88.45,25.04],[88.4,24.95],[88.34,24.94],[88.33,24.87],[88.26,24.88],[88.22,24.96],[88.14,24.94],[88.18,24.86],[88.01,24.67],[88.14,24.51],[88.33,24.38],[88.44,24.38],[88.56,24.29],[88.57,24.33],[88.74,24.28],[88.75,24.15],[88.7,24.12],[88.73,23.99],[88.77,23.98],[88.67,23.87],[88.58,23.86],[88.6,23.82],[88.56,23.78],[88.56,23.65],[88.58,23.6],[88.65,23.61],[88.74,23.48],[88.8,23.5],[88.75,23.31],[88.7,23.3],[88.72,23.26],[89.0,23.22],[88.87,23.1],[88.88,23.01],[88.84,23.01],[88.97,22.84],[88.91,22.76],[88.96,22.69],[88.94,22.56],[89.0,22.47],[89.0,22.29],[89.1,22.16],[89.04,22.1],[89.06,21.94],[89.01,21.94],[89.02,21.98],[88.99,21.9],[89.1,21.64],[89.06,21.61],[89.02,21.66],[89.03,21.6],[88.94,21.67],[88.92,21.63],[88.86,21.78],[88.85,21.62],[88.82,21.68],[88.72,21.68],[88.7,21.86],[88.78,22.01],[88.75,22.08],[88.69,22.07],[88.72,22.0],[88.64,22.08],[88.55,21.82],[88.55,21.88],[88.5,21.88],[88.52,21.95],[88.46,21.9],[88.49,21.84],[88.45,21.81],[88.45,21.61],[88.42,21.72],[88.43,21.62],[88.4,21.59],[88.4,21.72],[88.36,21.73],[88.4,21.71],[88.37,21.68],[88.27,21.73],[88.31,21.58],[88.25,21.56],[88.16,21.96],[88.22,22.07],[88.21,22.15],[88.02,22.22],[88.13,22.18],[88.19,22.1],[88.05,22.01],[87.97,21.85],[87.92,21.8],[87.88,21.82],[87.89,21.78],[87.8,21.7],[87.35,21.58],[87.38,21.55],[87.09,21.54],[87.11,21.5],[86.91,21.34],[86.83,21.14],[86.97,20.82],[86.97,20.78],[86.87,20.78],[87.0,20.77],[87.0,20.71],[86.93,20.71],[86.96,20.69],[87.07,20.72],[86.77,20.5],[86.73,20.53],[86.76,20.5],[86.71,20.41],[86.79,20.38],[86.67,20.29],[86.8,20.35],[86.52,20.18],[86.42,20.0],[86.38,19.97],[86.32,19.99],[86.37,19.95],[85.54,19.7],[85.08,19.38],[85.04,19.39],[85.08,19.37],[84.91,19.28],[84.79,19.12],[84.75,19.12],[84.75,19.07],[84.79,19.11],[84.77,19.07],[84.33,18.58],[84.31,18.53],[84.36,18.55],[84.1,18.35],[84.13,18.31],[83.56,18.03],[83.21,17.59],[82.6,17.28],[82.31,17.04],[82.25,16.88],[82.36,16.82],[82.33,16.99],[82.37,16.91],[82.34,16.74],[82.27,16.71],[82.37,16.71],[82.31,16.6],[82.26,16.69],[82.3,16.58],[82.26,16.56],[82.3,16.56],[81.72,16.31],[81.72,16.36],[81.71,16.31],[81.55,16.37],[81.27,16.29],[81.15,15.97],[81.13,15.99],[81.0,15.82],[81.03,15.76],[80.98,15.77],[81.01,15.76],[80.96,15.76],[80.94,15.71],[80.9,15.76],[80.92,15.71],[80.83,15.7],[80.81,15.84],[80.68,15.89],[80.52,15.86],[80.26,15.67],[80.2,15.47],[80.1,15.32],[80.05,15.07],[80.08,14.81],[80.19,14.6],[80.14,14.57],[80.2,14.58],[80.17,14.34],[80.14,14.24],[80.1,14.25],[80.14,14.24],[80.13,14.07],[80.26,13.78],[80.24,13.64],[80.35,13.28],[80.16,12.46],[79.87,12.04],[79.76,11.67],[79.77,11.48],[79.83,11.36],[79.76,11.38],[79.84,11.35],[79.86,11.2],[79.83,10.82],[79.88,10.31],[79.79,10.27],[79.64,10.37],[79.58,10.31],[79.6,10.35],[79.46,10.35],[79.52,10.31],[79.39,10.32],[79.29,10.26],[79.23,10.15],[79.27,10.04],[79.0,9.71],[78.9,9.49],[79.0,9.35],[78.96,9.34],[79.19,9.28],[78.86,9.25],[78.58,9.13],[78.49,9.14],[78.27,9.02],[78.17,8.88],[78.16,8.76],[78.13,8.76],[78.2,8.76],[78.11,8.64],[78.13,8.49],[78.07,8.37],[77.75,8.18],[77.58,8.14],[77.55,8.07],[77.32,8.12],[77.01,8.35],[76.55,8.9],[76.67,8.99],[76.59,8.99],[76.54,8.93],[76.46,9.14],[76.49,9.11],[76.5,9.17],[76.47,9.14],[76.43,9.25],[76.46,9.14],[76.36,9.36],[76.24,9.96],[76.29,9.95],[76.27,10.03],[76.23,10.02],[76.24,9.97],[76.22,10.0],[76.17,10.18],[76.21,10.2],[76.15,10.19],[76.03,10.53],[76.07,10.54],[76.03,10.53],[75.92,10.78],[75.96,10.81],[75.92,10.79],[75.91,10.83],[75.91,10.78],[75.83,11.12],[75.87,11.12],[75.81,11.15],[75.76,11.36],[75.62,11.48],[75.54,11.71],[75.36,11.86],[75.31,11.97],[75.2,12.0],[74.83,12.84],[74.87,12.84],[74.81,12.91],[74.82,12.85],[74.7,13.34],[74.72,13.45],[74.67,13.63],[74.72,13.64],[74.65,13.66],[74.59,13.92],[74.51,13.99],[74.43,14.27],[74.52,14.24],[74.42,14.29],[74.35,14.5],[74.38,14.54],[74.31,14.52],[74.29,14.59],[74.35,14.6],[74.27,14.62],[74.28,14.71],[74.12,14.77],[74.09,14.8],[74.16,14.82],[74.16,14.86],[74.12,14.84],[74.04,14.92],[74.05,14.98],[73.91,15.08],[73.96,15.16],[73.9,15.33],[73.78,15.41],[73.89,15.43],[73.79,15.46],[73.83,15.5],[73.77,15.49],[73.73,15.59],[73.79,15.65],[73.73,15.61],[73.63,15.87],[73.51,15.94],[73.46,16.05],[73.46,16.21],[73.39,16.34],[73.43,16.37],[73.37,16.38],[73.47,16.41],[73.37,16.39],[73.39,16.45],[73.32,16.51],[73.34,16.56],[73.36,16.48],[73.44,16.5],[73.36,16.52],[73.35,16.55],[73.41,16.56],[73.32,16.6],[73.4,16.62],[73.33,16.62],[73.31,16.73],[73.35,16.83],[73.3,16.81],[73.28,16.95],[73.33,16.97],[73.27,16.99],[73.26,17.05],[73.29,17.0],[73.33,17.04],[73.28,17.04],[73.32,17.08],[73.19,17.3],[73.26,17.26],[73.3,17.29],[73.24,17.29],[73.17,17.4],[73.21,17.43],[73.14,17.56],[73.22,17.59],[73.14,17.61],[73.09,17.83],[73.13,17.83],[73.05,17.9],[73.09,17.94],[73.03,17.95],[73.09,17.99],[73.02,17.99],[72.99,18.19],[72.93,18.22],[72.97,18.28],[73.07,18.22],[73.1,18.14],[73.04,18.3],[73.09,18.32],[73.03,18.26],[72.92,18.35],[72.91,18.54],[72.96,18.54],[73.01,18.47],[72.86,18.69],[72.87,18.8],[72.94,18.83],[73.02,18.72],[72.99,18.87],[72.93,18.85],[72.91,18.9],[73.07,19.02],[73.0,19.0],[72.99,19.19],[72.93,19.09],[72.96,19.04],[72.87,19.01],[72.81,18.89],[72.83,19.18],[72.8,19.13],[72.78,19.15],[72.84,19.25],[72.78,19.19],[72.79,19.3],[72.91,19.29],[72.85,19.35],[72.78,19.35],[72.74,19.46],[72.89,19.52],[72.73,19.53],[72.71,19.74],[72.66,19.83],[72.69,19.86],[72.67,19.93],[72.71,19.97],[72.75,19.94],[72.71,20.07],[72.78,20.21],[72.75,20.21],[72.75,20.29],[72.9,20.53],[72.91,20.64],[72.85,20.74],[72.93,20.76],[72.86,20.75],[72.85,20.82],[72.83,20.79],[72.78,20.92],[72.85,20.97],[72.76,20.93],[72.73,21.0],[72.73,21.05],[72.85,21.03],[72.8,21.05],[72.83,21.09],[72.71,21.09],[72.79,21.18],[72.68,21.16],[72.64,21.08],[72.64,21.21],[72.74,21.2],[72.6,21.3],[72.69,21.35],[72.65,21.39],[72.7,21.46],[72.76,21.45],[72.73,21.48],[72.65,21.45],[72.68,21.5],[72.83,21.67],[72.93,21.68],[72.54,21.66],[72.62,21.91],[72.75,21.97],[72.54,21.9],[72.51,21.98],[72.59,22.2],[72.76,22.17],[72.82,22.26],[72.88,22.23],[72.91,22.26],[72.84,22.28],[72.75,22.23],[72.54,22.31],[72.43,22.2],[72.38,22.34],[72.36,22.29],[72.33,22.31],[72.33,22.25],[72.28,22.24],[72.3,22.1],[72.23,22.01],[72.18,22.02],[72.24,22.0],[72.25,21.92],[72.16,21.96],[72.25,21.91],[72.25,21.81],[72.21,21.86],[72.17,21.81],[72.22,21.8],[72.31,21.63],[72.24,21.45],[72.09,21.32],[72.11,21.2],[71.78,21.07],[71.81,21.04],[71.76,21.07],[71.77,21.02],[71.51,20.96],[71.44,20.87],[71.36,20.87],[70.98,20.7],[70.88,20.73],[70.82,20.69],[70.45,20.85],[70.16,21.05],[69.81,21.46],[69.39,21.81],[69.4,21.85],[69.36,21.84],[69.26,21.91],[68.94,22.31],[69.07,22.48],[69.04,22.39],[69.19,22.42],[69.16,22.31],[69.23,22.26],[69.33,22.33],[69.48,22.33],[69.52,22.37],[69.51,22.43],[69.55,22.35],[69.59,22.36],[69.57,22.32],[69.62,22.37],[69.67,22.32],[69.65,22.36],[69.73,22.47],[69.81,22.4],[69.83,22.45],[69.92,22.44],[69.91,22.49],[69.99,22.54],[70.17,22.54],[70.28,22.68],[70.26,22.72],[70.32,22.76],[70.35,22.89],[70.45,22.97],[70.4,22.98],[70.35,22.92],[70.29,22.94],[70.22,23.06],[70.22,22.95],[70.15,22.95],[70.13,23.0],[70.1,22.91],[69.9,22.87],[69.88,22.91],[69.87,22.87],[69.73,22.82],[69.72,22.74],[69.68,22.76],[69.71,22.74],[69.58,22.76],[69.57,22.8],[69.45,22.78],[69.35,22.82],[69.36,22.88],[69.35,22.82],[69.23,22.83],[69.22,22.88],[69.2,22.84],[69.08,22.95],[69.06,22.92],[69.01,22.98],[68.99,22.95],[68.63,23.17],[68.72,23.13],[68.58,23.23],[68.63,23.22],[68.6,23.24],[68.66,23.27],[68.63,23.29],[68.68,23.3],[68.61,23.37],[68.62,23.33],[68.58,23.35],[68.51,23.49],[68.45,23.48],[68.47,23.55],[68.43,23.51],[68.55,23.71],[68.81,23.88],[68.66,23.86],[68.51,23.75],[68.46,23.77],[68.43,23.74],[68.43,23.82],[68.39,23.61],[68.35,23.58],[68.27,23.56],[68.27,23.62],[68.25,23.57],[68.17,23.62],[68.35,23.73],[68.32,23.76],[68.27,23.7],[68.26,23.74],[68.25,23.67],[68.19,23.73],[68.21,23.83],[68.26,23.84],[68.28,23.92],[68.33,23.92],[68.36,23.97],[68.37,23.94],[68.75,23.97],[68.76,24.3],[68.81,24.31],[68.87,24.21],[68.95,24.3],[69.0,24.22],[69.09,24.27],[69.19,24.24],[69.59,24.29],[69.73,24.17],[70.03,24.17],[70.11,24.3],[70.56,24.42],[70.6,24.41],[70.57,24.25],[70.71,24.22],[70.91,24.26],[70.87,24.29],[70.95,24.35],[71.12,24.4],[71.0,24.44],[70.99,24.6],[71.1,24.69],[70.94,24.94],[70.89,25.15],[70.66,25.4],[70.66,25.7],[70.39,25.67],[70.27,25.71],[70.1,25.94],[70.08,26.08],[70.18,26.25],[70.17,26.55],[70.06,26.6],[69.82,26.59],[69.51,26.74],[69.51,27.01],[69.59,27.18],[70.03,27.56],[70.13,27.81],[70.37,28.01],[70.59,28.01],[70.68,27.92],[70.74,27.74],[70.87,27.71],[71.21,27.84],[71.67,27.88],[71.9,27.96],[71.93,28.12],[72.21,28.39],[72.3,28.67],[72.39,28.77],[72.95,29.03],[73.28,29.57],[73.4,29.95],[73.81,30.07],[73.97,30.2],[73.88,30.36],[73.97,30.44],[73.93,30.44],[73.93,30.49],[73.96,30.46],[74.01,30.53],[74.07,30.52],[74.1,30.61],[74.29,30.74],[74.26,30.77],[74.42,30.94],[74.55,30.99],[74.57,31.05],[74.7,31.07],[74.69,31.13],[74.6,31.13],[74.57,31.08],[74.51,31.13],[74.55,31.36],[74.65,31.43],[74.64,31.48],[74.58,31.5],[74.62,31.57],[74.49,31.72],[74.56,31.76],[74.61,31.89],[74.82,31.96],[74.88,32.05],[75.17,32.07],[75.2,32.12],[75.24,32.09],[75.37,32.23],[75.32,32.34],[75.19,32.43],[75.13,32.41],[75.1,32.48],[75.03,32.5],[74.95,32.45],[74.88,32.49],[74.68,32.49],[74.64,32.61],[74.7,32.66],[74.65,32.73],[74.71,32.84],[74.63,32.81],[74.64,32.75],[74.51,32.74],[74.45,32.8],[74.37,32.77],[74.0,32.95],[73.93,33.03],[73.82,33.01],[73.63,33.09],[73.67,33.21],[73.58,33.38],[73.63,33.53],[73.57,33.63],[73.59,33.89],[73.5,34.02],[73.49,34.28],[73.4,34.38],[73.45,34.57],[73.66,34.56],[73.73,34.76],[73.93,34.81],[74.05,34.89],[74.13,35.12],[73.81,35.24],[73.75,35.22],[73.69,35.35],[73.79,35.45],[73.79,35.52],[73.41,35.53],[73.33,35.66],[73.13,35.72],[73.11,35.76],[73.2,35.79],[73.18,35.86],[72.9,35.84],[72.82,35.89],[72.68,35.82],[72.57,35.85],[72.51,35.9],[72.57,36.01],[72.52,36.08],[72.55,36.23],[72.69,36.28],[72.85,36.38],[72.87,36.45],[72.97,36.48],[73.07,36.61],[73.06,36.7],[73.37,36.76],[73.85,36.72],[73.84,36.8],[73.7,36.85],[73.67,36.92],[74.04,36.83],[74.13,36.86],[74.15,36.92],[74.28,36.92],[74.42,37.01],[74.56,36.97],[74.57,37.04],[74.69,37.1],[74.73,37.04],[74.84,37.07],[74.9,36.94],[74.94,36.99],[75.15,37.03],[75.24,36.97],[75.42,36.96],[75.46,36.73],[75.53,36.73],[75.54,36.78],[75.74,36.75],[75.94,36.61],[76.03,36.44],[76.15,36.42],[76.24,36.32],[76.39,36.31],[76.47,36.22],[76.72,36.16],[76.78,36.04],[76.78,35.91],[76.84,35.86],[77.01,35.82],[77.09,35.74],[77.35,35.72],[77.42,35.64],[77.47,35.65],[77.52,35.49]],[[92.91,12.91],[92.93,12.91],[92.91,12.88],[92.94,12.88],[92.96,12.84],[92.96,12.79],[92.94,12.77],[92.99,12.71],[92.98,12.7],[92.97,12.62],[92.95,12.62],[92.97,12.61],[92.99,12.53],[92.98,12.49],[92.96,12.49],[92.93,12.46],[92.97,12.46],[92.93,12.44],[92.92,12.4],[92.9,12.44],[92.91,12.46],[92.89,12.44],[92.85,12.47],[92.91,12.42],[92.89,12.41],[92.81,12.44],[92.81,12.46],[92.81,12.43],[92.84,12.42],[92.87,12.36],[92.9,12.35],[92.88,12.33],[92.9,12.32],[92.83,12.3],[92.78,12.32],[92.75,12.3],[92.71,12.33],[92.72,12.6],[92.69,12.61],[92.72,12.61],[92.72,12.64],[92.73,12.62],[92.76,12.67],[92.78,12.67],[92.79,12.63],[92.8,12.7],[92.78,12.67],[92.74,12.67],[92.75,12.72],[92.73,12.82],[92.74,12.83],[92.75,12.81],[92.76,12.84],[92.79,12.82],[92.8,12.89],[92.86,12.89],[92.87,12.88],[92.91,12.91]],[[93.05,13.55],[93.05,13.48],[93.03,13.46],[93.04,13.43],[93.02,13.43],[93.05,13.4],[93.07,13.41],[93.08,13.4],[93.06,13.38],[93.1,13.33],[93.07,13.31],[93.07,13.32],[93.05,13.32],[93.05,13.35],[93.01,13.35],[93.0,13.32],[92.97,13.36],[92.96,13.34],[93.01,13.31],[93.0,13.29],[93.02,13.32],[93.02,13.27],[93.07,13.26],[93.04,13.19],[93.04,13.06],[93.01,13.02],[92.98,13.03],[92.97,13.01],[92.94,13.03],[92.95,13.1],[92.94,13.05],[92.9,13.09],[92.92,13.06],[92.89,13.04],[92.92,13.04],[92.91,13.0],[92.95,12.97],[92.91,12.94],[92.91,12.99],[92.89,12.94],[92.86,12.94],[92.88,12.88],[92.81,12.9],[92.8,12.97],[92.83,12.98],[92.84,13.01],[92.79,13.01],[92.8,13.09],[92.82,13.07],[92.81,13.09],[92.83,13.11],[92.82,13.12],[92.86,13.14],[92.82,13.15],[92.82,13.17],[92.84,13.17],[92.83,13.18],[92.84,13.23],[92.86,13.24],[92.83,13.27],[92.85,13.3],[92.83,13.31],[92.85,13.37],[92.86,13.36],[92.89,13.39],[92.85,13.4],[92.89,13.4],[92.88,13.47],[92.91,13.48],[92.91,13.5],[92.94,13.49],[92.92,13.5],[92.94,13.52],[92.93,13.53],[93.0,13.53],[93.0,13.57],[93.02,13.54],[93.04,13.57],[93.05,13.55]],[[92.71,12.23],[92.72,12.19],[92.71,12.16],[92.74,12.18],[92.76,12.17],[92.74,12.1],[92.75,12.05],[92.71,12.05],[92.75,12.06],[92.8,12.05],[92.77,12.02],[92.74,12.03],[92.77,12.0],[92.75,11.99],[92.76,11.98],[92.73,11.98],[92.74,11.96],[92.72,11.96],[92.72,11.92],[92.74,11.89],[92.75,11.93],[92.79,11.94],[92.8,11.9],[92.76,11.7],[92.75,11.7],[92.75,11.68],[92.71,11.7],[92.7,11.69],[92.71,11.69],[92.72,11.67],[92.67,11.65],[92.68,11.62],[92.69,11.63],[92.7,11.62],[92.71,11.65],[92.74,11.65],[92.73,11.68],[92.76,11.66],[92.76,11.64],[92.74,11.63],[92.76,11.63],[92.76,11.61],[92.72,11.47],[92.71,11.5],[92.66,11.51],[92.66,11.57],[92.63,11.56],[92.61,11.61],[92.64,11.61],[92.65,11.63],[92.61,11.63],[92.61,11.71],[92.58,11.71],[92.57,11.69],[92.56,11.84],[92.53,11.82],[92.52,11.84],[92.57,11.94],[92.59,11.88],[92.61,11.89],[92.61,11.85],[92.63,12.1],[92.67,12.21],[92.68,12.17],[92.68,12.21],[92.7,12.24],[92.71,12.23]],[[93.85,7.24],[93.86,7.21],[93.89,7.2],[93.9,7.09],[93.93,7.03],[93.96,7.0],[93.94,7.01],[93.93,7.0],[93.96,6.96],[93.91,6.91],[93.91,6.85],[93.93,6.84],[93.91,6.81],[93.89,6.79],[93.87,6.82],[93.84,6.75],[93.82,6.76],[93.83,6.82],[93.8,6.84],[93.79,6.88],[93.8,6.88],[93.77,6.92],[93.76,6.91],[93.73,6.99],[93.7,7.02],[93.67,7.02],[93.66,7.1],[93.68,7.12],[93.66,7.13],[93.69,7.16],[93.69,7.19],[93.73,7.19],[93.76,7.22],[93.81,7.21],[93.81,7.24],[93.85,7.24]],[[92.55,10.88],[92.54,10.87],[92.56,10.86],[92.55,10.88],[92.59,10.85],[92.6,10.79],[92.57,10.8],[92.62,10.76],[92.62,10.67],[92.55,10.59],[92.58,10.57],[92.52,10.51],[92.44,10.54],[92.39,10.53],[92.42,10.63],[92.39,10.66],[92.38,10.79],[92.4,10.8],[92.41,10.79],[92.5,10.89],[92.51,10.87],[92.52,10.9],[92.55,10.88]],[[88.17,21.79],[88.16,21.68],[88.13,21.68],[88.16,21.67],[88.15,21.63],[88.11,21.62],[88.05,21.64],[88.04,21.67],[88.05,21.72],[88.12,21.86],[88.14,21.88],[88.17,21.82],[88.17,21.79]],[[92.83,12.3],[92.88,12.3],[92.89,12.28],[92.9,12.25],[92.87,12.24],[92.89,12.19],[92.85,12.19],[92.86,12.16],[92.82,12.16],[92.82,12.1],[92.79,12.1],[92.81,12.09],[92.77,12.06],[92.75,12.09],[92.79,12.24],[92.77,12.23],[92.75,12.25],[92.79,12.28],[92.78,12.31],[92.83,12.3]]]};
 </script>
@@ -278,9 +285,12 @@ const MAPDATA={"grid":{"lon0":60.0,"lat1":40.0,"step":0.18,"w":222,"h":200,"b64"
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 const REDUCE = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-const viewport = $('#viewport');
-const stage = $('#stage');
-viewport.classList.remove('nojs');
+const stage = $('#stage'), cam = $('#cam');
+
+/* A photo can be embedded here as a data: URL once we have a licensed file.
+   Until then the presenter adds one by clicking the sketch; it is kept in this browser. */
+const EMBED_PHOTO = null;
+const EMBED_CREDIT = '';
 
 /* =================== content =================== */
 const PAGES = [
@@ -317,162 +327,386 @@ const NOTES = [
   'So why did we choose Ajit Doval? Because his life shows every side of leadership: the police officer who calmed a riot, the spy who lived among the enemy, the negotiator who talked down hijackers, and the advisor who guides the nation today. As a person, he offers courage, calm, patience and humility. He rarely gives interviews and almost never seeks credit. And for us as students of communication, the biggest lesson is this: many of his greatest victories came from listening, showing up in person, keeping promises and explaining clearly, not from force. As he told young Indians this year: put the nation’s interest above your own.',
   'That was the story of Ajit Doval, the Quiet Guardian of India. Thank you for listening. We’re happy to take your questions.'
 ];
-const TICKER = [
-  [1945, 'Born in Ghiri Banelsyun, Pauri Garhwal'], [1967, 'Tops MA Economics, Agra University'],
-  [1968, 'Joins the IPS, Kerala cadre'], [1972, 'Ends the Thalassery riot'],
-  [1974, 'Youngest to win the Police Medal'], [1983, 'Posted to Islamabad'],
-  [1988, 'Operation Black Thunder'], [1989, 'Kirti Chakra'], [1999, 'IC-814 negotiator, Kandahar'],
-  [2004, 'Director, Intelligence Bureau'], [2014, 'National Security Advisor'],
-  [2019, 'Cabinet rank'], [2024, 'Third term as NSA'], [2025, 'Operation Sindoor'],
-  [2026, 'Lokmanya Tilak National Award']
-];
 
-/* =================== build chrome =================== */
-$('#ticker-run').innerHTML = TICKER.concat(TICKER).map(([y, t]) => `<span><b>${y}</b>${t}</span>`).join('');
-$('#ticks').innerHTML = PAGES.map(() => '<span></span>').join('');
+/* =================== helpers =================== */
+let seed = 1945;
+const rnd = () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
+const smooth = (a, b, v) => { const t = clamp((v - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+const easeOut = k => 1 - Math.pow(1 - k, 3);
+let S = 1;
+const prFor = cap => Math.min(cap, Math.max(1, (window.devicePixelRatio || 1) * S));
+
+/* =================== build pages + menu =================== */
 const slidesEl = $('#slides');
 PAGES.forEach((p, i) => {
   if (i === 0) return;
   const s = document.createElement('section');
-  s.className = 'slide';
-  s.id = 's' + (i + 1);
+  s.className = 'slide'; s.id = 's' + (i + 1);
   s.setAttribute('aria-label', `Slide ${i + 1}: ${p.t}`);
-  s.innerHTML = `<div class="ph"><div class="num">${String(i + 1).padStart(2, '0')}</div><h2>${p.t}</h2><p>${p.h}</p><div class="wip">Design in review · we build this page next</div></div>`;
+  s.innerHTML = `<div class="ph"><div class="num">Page ${String(i + 1).padStart(2, '0')} · Part ${['I', 'II', 'III'][p.m - 1]}</div><h2>${p.t}</h2><p>${p.h}</p><div class="wip">Design in review: we build this page next</div></div>`;
   slidesEl.appendChild(s);
 });
 const slides = $$('.slide', slidesEl);
 $('#menu-grid').innerHTML = PAGES.map((p, i) =>
-  `<button data-to="${i}" class="${p.done ? 'done' : ''}"><span class="n">${String(i + 1).padStart(2, '0')} · Part ${['I', 'II', 'III'][p.m - 1]}</span><span class="t">${p.t}</span><span class="st">${p.done ? 'Designed' : 'In review'}</span></button>`).join('');
+  `<button data-to="${i}" class="${p.done ? 'done' : ''}"><span class="n">Page ${String(i + 1).padStart(2, '0')} · Part ${['I', 'II', 'III'][p.m - 1]}</span><span class="t">${p.t}</span><span class="st">${p.done ? 'designed' : 'in review'}</span></button>`).join('');
 
-// film grain texture
-(() => {
-  const c = document.createElement('canvas'); c.width = c.height = 220;
-  const x = c.getContext('2d'); const d = x.createImageData(220, 220);
-  for (let i = 0; i < d.data.length; i += 4) { const v = Math.random() * 255; d.data[i] = d.data[i + 1] = d.data[i + 2] = v; d.data[i + 3] = 255; }
-  x.putImageData(d, 0, 0); $('#grain').style.backgroundImage = `url(${c.toDataURL()})`;
-})();
+/* =================== textures =================== */
+function noiseCanvas(size, lo, hi, fibers) {
+  const c = document.createElement('canvas'); c.width = c.height = size;
+  const x = c.getContext('2d'); const d = x.createImageData(size, size);
+  for (let i = 0; i < d.data.length; i += 4) { const v = lo + Math.random() * (hi - lo); d.data[i] = d.data[i + 1] = d.data[i + 2] = v; d.data[i + 3] = 255; }
+  x.putImageData(d, 0, 0);
+  if (fibers) {
+    x.globalAlpha = .08; x.strokeStyle = '#7a6a50'; x.lineWidth = .6;
+    for (let i = 0; i < fibers; i++) { const a = Math.random() * 6.28, l = 4 + Math.random() * 14, px = Math.random() * size, py = Math.random() * size; x.beginPath(); x.moveTo(px, py); x.quadraticCurveTo(px + Math.cos(a + .6) * l / 2, py + Math.sin(a + .6) * l / 2, px + Math.cos(a) * l, py + Math.sin(a) * l); x.stroke(); }
+  }
+  return c;
+}
+const paperTex = noiseCanvas(256, 222, 255, 260);
+const paperURL = paperTex.toDataURL();
+$$('.sheet').forEach(s => {
+  const cs = getComputedStyle(s);
+  if (cs.backgroundImage && cs.backgroundImage !== 'none') {
+    s.style.backgroundImage = cs.backgroundImage + `,url(${paperURL})`;
+    s.style.backgroundSize = cs.backgroundSize + ',256px 256px';
+    s.style.backgroundPosition = cs.backgroundPosition + ',0 0';
+  } else { s.style.backgroundImage = `url(${paperURL})`; s.style.backgroundSize = '256px 256px'; }
+});
+$('#grain').style.backgroundImage = `url(${noiseCanvas(256, 0, 255, 0).toDataURL()})`;
+
+function drawCork() {
+  const cv = $('#cork'), W = 1680, H = 980, pr = prFor(1.6);
+  cv.width = Math.round(W * pr); cv.height = Math.round(H * pr);
+  const x = cv.getContext('2d'); x.setTransform(pr, 0, 0, pr, 0, 0);
+  seed = 77;
+  x.fillStyle = '#9f7240'; x.fillRect(0, 0, W, H);
+  for (let i = 0; i < 80; i++) {
+    const gx = rnd() * W, gy = rnd() * H, r = 70 + rnd() * 260, dark = rnd() < .55;
+    const g = x.createRadialGradient(gx, gy, 0, gx, gy, r);
+    g.addColorStop(0, dark ? 'rgba(66,38,14,.20)' : 'rgba(222,178,118,.15)'); g.addColorStop(1, 'rgba(0,0,0,0)');
+    x.fillStyle = g; x.fillRect(gx - r, gy - r, r * 2, r * 2);
+  }
+  const pal = ['#6a421e', '#7a4e24', '#8d5c2c', '#a06c37', '#b47f46', '#c89557', '#d9ac70', '#94622f'];
+  const n = Math.round(W * H / 8);
+  pal.forEach((col, ci) => {
+    x.fillStyle = col;
+    for (let i = ci; i < n; i += pal.length) {
+      const rx = rnd() * W, ry = rnd() * H, s = .55 + rnd() * rnd() * 3.4;
+      x.globalAlpha = .3 + rnd() * .65;
+      if (s < 1.5) x.fillRect(rx, ry, s, s * (.6 + rnd() * .8));
+      else { x.beginPath(); x.ellipse(rx, ry, s, s * (.45 + rnd() * .6), rnd() * 3.14, 0, 6.283); x.fill(); }
+    }
+  });
+  x.fillStyle = '#331d0b';
+  for (let i = 0; i < 11000; i++) { x.globalAlpha = .3 + rnd() * .55; const s = .5 + rnd() * 1.7; x.fillRect(rnd() * W, rnd() * H, s, s * (.5 + rnd() * .9)); }
+  x.fillStyle = '#ecca94';
+  for (let i = 0; i < 6000; i++) { x.globalAlpha = .2 + rnd() * .4; x.fillRect(rnd() * W, rnd() * H, .8 + rnd(), .8 + rnd()); }
+  for (let i = 0; i < 70; i++) {
+    const hx = rnd() * W, hy = rnd() * H;
+    x.globalAlpha = .85; x.fillStyle = '#1e1007'; x.beginPath(); x.arc(hx, hy, 1.1 + rnd() * .8, 0, 6.283); x.fill();
+    x.globalAlpha = .22; x.fillStyle = '#f3d6a3'; x.beginPath(); x.arc(hx - 1.2, hy - 1.2, 1.3, 0, 6.283); x.fill();
+  }
+  x.globalAlpha = 1;
+}
+
+/* =================== pins + string =================== */
+const PINS = [
+  { id: 'portrait', x: 1032, y: 166, c: 'red' }, { id: 'born', x: 737, y: 204, c: 'red' },
+  { id: 'ips', x: 751, y: 426, c: 'red' }, { id: 'nsa', x: 768, y: 650, c: 'red' },
+  { id: 'kc', x: 1393, y: 498, c: 'red' }, { id: 'map', x: 1428, y: 150, c: 'red' },
+  { id: 'file', x: 1574, y: 684, c: 'brass' }
+];
+const LINKS = [['portrait', 'born'], ['portrait', 'map'], ['born', 'ips'], ['map', 'kc'], ['ips', 'nsa'], ['kc', 'file']];
+function pinSVG(c, i) {
+  if (c === 'brass') return `<svg viewBox="0 0 36 40" width="36" height="40"><defs><radialGradient id="br${i}" cx=".38" cy=".34" r=".7"><stop offset="0" stop-color="#fff2c4"/><stop offset=".35" stop-color="#d9b25c"/><stop offset=".8" stop-color="#8a6420"/><stop offset="1" stop-color="#5a3f12"/></radialGradient><filter id="bs${i}"><feGaussianBlur stdDeviation="1.6"/></filter></defs><ellipse cx="18" cy="24" rx="11" ry="6" fill="rgba(0,0,0,.55)" filter="url(#bs${i})"/><circle cx="14" cy="18" r="10" fill="url(#br${i})"/><circle cx="14" cy="18" r="10" fill="none" stroke="rgba(60,40,10,.6)" stroke-width=".8"/><circle cx="14" cy="18" r="2" fill="#6b4b17"/></svg>`;
+  return `<svg viewBox="0 0 36 40" width="36" height="40"><defs><radialGradient id="pr${i}" cx=".35" cy=".3" r=".75"><stop offset="0" stop-color="#ff8a7d"/><stop offset=".28" stop-color="#e0262b"/><stop offset=".75" stop-color="#9c0f14"/><stop offset="1" stop-color="#5e070b"/></radialGradient><linearGradient id="pc${i}" x1="0" x2="1"><stop offset="0" stop-color="#7a0c10"/><stop offset=".5" stop-color="#c41b20"/><stop offset="1" stop-color="#6a0a0d"/></linearGradient><filter id="ps${i}"><feGaussianBlur stdDeviation="2"/></filter></defs><ellipse cx="21" cy="29" rx="10" ry="6" fill="rgba(0,0,0,.55)" filter="url(#ps${i})"/><path d="M14 22 L17 30" stroke="#c9ccd0" stroke-width="1.4" stroke-linecap="round"/><ellipse cx="14" cy="21" rx="7" ry="3.4" fill="url(#pc${i})"/><rect x="9.5" y="15" width="9" height="6" fill="url(#pc${i})"/><circle cx="14" cy="13" r="9.5" fill="url(#pr${i})"/><ellipse cx="10.6" cy="9.4" rx="3.2" ry="2" fill="rgba(255,255,255,.55)" transform="rotate(-30 10.6 9.4)"/></svg>`;
+}
+function buildPins() {
+  $('#pins').innerHTML = PINS.map((p, i) => `<div class="pin" style="left:${p.x}px;top:${p.y}px;transition-delay:${(REDUCE ? 0 : 1100 + i * 120)}ms">${pinSVG(p.c, i)}</div>`).join('');
+}
+function buildStrings() {
+  const at = id => PINS.find(p => p.id === id);
+  let sh = '', st = '';
+  LINKS.forEach(([a, b]) => {
+    const A = at(a), B = at(b); const mx = (A.x + B.x) / 2, my = (A.y + B.y) / 2, d = Math.hypot(B.x - A.x, B.y - A.y);
+    const path = `M${A.x} ${A.y} Q${mx} ${my + d * .07} ${B.x} ${B.y}`;
+    sh += `<path class="sh" d="M${A.x + 5} ${A.y + 8} Q${mx + 6} ${my + d * .07 + 10} ${B.x + 5} ${B.y + 8}"/>`;
+    st += `<path class="s" d="${path}"/><path class="h" d="${path}"/>`;
+  });
+  $('#str-sh').innerHTML = sh; $('#str').innerHTML = st;
+}
+function drawStrings(delay) {
+  const paths = $$('#strings path');
+  paths.forEach(p => { const L = p.getTotalLength(); p.style.strokeDasharray = p.classList.contains('h') ? '2 4' : `${L} ${L}`; if (!p.classList.contains('h')) p.style.strokeDashoffset = REDUCE ? 0 : L; p.style.opacity = REDUCE ? 1 : 0; });
+  if (REDUCE) return;
+  setTimeout(() => {
+    LINKS.forEach((_, i) => {
+      const group = paths.filter((p, j) => j === i || j === LINKS.length + i * 2 || j === LINKS.length + i * 2 + 1);
+      setTimeout(() => group.forEach(p => { p.style.transition = 'stroke-dashoffset 1.1s cubic-bezier(.6,0,.3,1), opacity .4s'; p.style.opacity = 1; p.style.strokeDashoffset = 0; }), i * 260);
+    });
+  }, delay);
+}
+
+/* =================== map scrap (official boundary) =================== */
+function drawMapScrap() {
+  const cv = $('#mapc'), W = 300, H = 318, pr = prFor(2.5);
+  cv.width = W * pr; cv.height = H * pr;
+  const x = cv.getContext('2d'); x.setTransform(pr, 0, 0, pr, 0, 0);
+  seed = 314;
+  const pts = []; const j = (a) => (rnd() - .5) * a;
+  for (let px = 4; px <= W - 4; px += 7) pts.push([px, 6 + j(8) + (rnd() < .15 ? 6 : 0)]);
+  for (let py = 6; py <= H - 6; py += 9) pts.push([W - 5 + j(5), py]);
+  for (let px = W - 4; px >= 4; px -= 6) pts.push([px, H - 7 + j(9) - (rnd() < .2 ? 7 : 0)]);
+  for (let py = H - 6; py >= 6; py -= 9) pts.push([5 + j(5), py]);
+  const torn = () => { x.beginPath(); pts.forEach((q, i) => i ? x.lineTo(q[0], q[1]) : x.moveTo(q[0], q[1])); x.closePath(); };
+  x.save(); torn(); x.fillStyle = '#efe5cb'; x.fill(); x.clip();
+  x.globalAlpha = .55; x.fillStyle = x.createPattern(paperTex, 'repeat'); x.globalCompositeOperation = 'multiply'; x.fillRect(0, 0, W, H);
+  x.globalCompositeOperation = 'source-over'; x.globalAlpha = 1;
+  // sea hatching
+  x.strokeStyle = 'rgba(70,105,130,.16)'; x.lineWidth = .7;
+  for (let y = 0; y < H; y += 4) { x.beginPath(); x.moveTo(0, y); x.lineTo(W, y); x.stroke(); }
+  const merc = lat => Math.log(Math.tan(Math.PI / 4 + lat * Math.PI / 360));
+  const L0 = 66.5, L1 = 98.5, T = merc(37.6 * 1), B = merc(5.6);
+  const P = (lon, lat) => [14 + (lon - L0) / (L1 - L0) * 272, 16 + (T - merc(lat)) / (T - B) * 290];
+  // graticule
+  x.setLineDash([2, 3]); x.strokeStyle = 'rgba(90,70,48,.25)'; x.lineWidth = .6;
+  for (let lo = 70; lo <= 95; lo += 5) { const a = P(lo, 38), b = P(lo, 5); x.beginPath(); x.moveTo(a[0], a[1]); x.lineTo(b[0], b[1]); x.stroke(); }
+  for (let la = 10; la <= 35; la += 5) { const a = P(66, la), b = P(99, la); x.beginPath(); x.moveTo(a[0], a[1]); x.lineTo(b[0], b[1]); x.stroke(); }
+  x.setLineDash([]);
+  // land
+  MAPDATA.rings.forEach(r => { x.beginPath(); r.forEach(([lo, la], i) => { const q = P(lo, la); i ? x.lineTo(q[0], q[1]) : x.moveTo(q[0], q[1]); }); x.closePath(); x.fillStyle = '#e8d8b2'; x.fill(); x.strokeStyle = '#4e3b27'; x.lineWidth = 1; x.stroke(); });
+  // relief stipple on land
+  x.fillStyle = 'rgba(110,80,45,.10)';
+  for (let i = 0; i < 1400; i++) { const lo = 68 + rnd() * 29, la = 7 + rnd() * 30; if (!inIndia(lo, la)) continue; const q = P(lo, la); x.fillRect(q[0], q[1], 1, 1); }
+  // labels
+  x.fillStyle = '#3b2e20'; x.font = '400 11px "Special Elite", monospace'; x.textAlign = 'center';
+  let q = P(78.5, 21); x.fillText('I N D I A', q[0], q[1]);
+  x.font = 'italic 400 10px "Special Elite", monospace'; x.fillStyle = 'rgba(50,70,90,.8)';
+  q = P(69.5, 15); x.fillText('Arabian Sea', q[0], q[1]); q = P(88.5, 15.5); x.fillText('Bay of Bengal', q[0], q[1]);
+  // New Delhi
+  q = P(77.21, 28.61); x.fillStyle = '#2a2016'; x.beginPath(); x.arc(q[0], q[1], 2.4, 0, 6.283); x.fill();
+  x.font = '400 10.5px "Special Elite", monospace'; x.textAlign = 'right'; x.fillText('New Delhi', q[0] - 5, q[1] + 11);
+  // red marker circle around Pauri Garhwal
+  const g = P(78.78, 30.15);
+  x.strokeStyle = 'rgba(178,20,26,.88)'; x.lineWidth = 2.2; x.lineCap = 'round';
+  x.beginPath();
+  for (let a = 0; a <= 6.283 * 1.85; a += .08) { const rr = 13 + Math.sin(a * 1.7) * 1.6 + a * .35; const px2 = g[0] + Math.cos(a - .6) * rr * 1.25, py2 = g[1] + Math.sin(a - .6) * rr * .9; a ? x.lineTo(px2, py2) : x.moveTo(px2, py2); }
+  x.stroke();
+  x.font = '700 17px "Kalam", cursive'; x.fillStyle = 'rgba(178,20,26,.92)'; x.textAlign = 'left';
+  x.save(); x.translate(g[0] + 30, g[1] - 26); x.rotate(-.12); x.fillText('born here, 1945', 0, 0); x.restore();
+  x.beginPath(); x.moveTo(g[0] + 34, g[1] - 20); x.quadraticCurveTo(g[0] + 26, g[1] - 10, g[0] + 18, g[1] - 7); x.stroke();
+  x.beginPath(); x.moveTo(g[0] + 18, g[1] - 7); x.lineTo(g[0] + 25, g[1] - 7); x.moveTo(g[0] + 18, g[1] - 7); x.lineTo(g[0] + 22, g[1] - 13); x.stroke();
+  // fold crease
+  const cg = x.createLinearGradient(W * .5 - 6, 0, W * .5 + 6, 0); cg.addColorStop(0, 'rgba(0,0,0,0)'); cg.addColorStop(.5, 'rgba(60,40,20,.14)'); cg.addColorStop(.52, 'rgba(255,255,255,.18)'); cg.addColorStop(1, 'rgba(0,0,0,0)');
+  x.fillStyle = cg; x.fillRect(W * .5 - 6, 0, 12, H);
+  x.restore();
+  torn(); x.strokeStyle = 'rgba(255,255,255,.55)'; x.lineWidth = .8; x.stroke();
+}
+const G = MAPDATA.grid, GRAW = atob(G.b64);
+function inIndia(lon, lat) { const gx = Math.floor((lon - G.lon0) / G.step), gy = Math.floor((G.lat1 - lat) / G.step); if (gx < 0 || gy < 0 || gx >= G.w || gy >= G.h) return false; const i = gy * G.w + gx; return ((GRAW.charCodeAt(i >> 2) >> ((i & 3) * 2)) & 3) === 2; }
+
+/* =================== pencil sketch =================== */
+const SK_W = 656, SK_H = 872;
+function boxBlur(a, w, h, r) {
+  const b = new Float32Array(w * h), n = 2 * r + 1;
+  for (let pass = 0; pass < 3; pass++) {
+    for (let y = 0; y < h; y++) { const row = y * w; let acc = 0; for (let k = -r; k <= r; k++) acc += a[row + clamp(k, 0, w - 1)]; for (let x = 0; x < w; x++) { b[row + x] = acc / n; acc += a[row + Math.min(w - 1, x + r + 1)] - a[row + Math.max(0, x - r)]; } }
+    for (let x = 0; x < w; x++) { let acc = 0; for (let k = -r; k <= r; k++) acc += b[clamp(k, 0, h - 1) * w + x]; for (let y = 0; y < h; y++) { a[y * w + x] = acc / n; acc += b[Math.min(h - 1, y + r + 1) * w + x] - b[Math.max(0, y - r) * w + x]; } }
+  }
+  return a;
+}
+function hatchMap(angle, count, seedV) {
+  const c = document.createElement('canvas'); c.width = SK_W; c.height = SK_H; const x = c.getContext('2d');
+  seed = seedV; x.strokeStyle = '#000'; x.lineCap = 'round';
+  for (let i = 0; i < count; i++) {
+    const a = angle + (rnd() - .5) * .22, l = 10 + rnd() * 22, px = rnd() * SK_W, py = rnd() * SK_H;
+    x.globalAlpha = .25 + rnd() * .55; x.lineWidth = .6 + rnd() * .9;
+    x.beginPath(); x.moveTo(px, py); x.lineTo(px + Math.cos(a) * l, py + Math.sin(a) * l); x.stroke();
+  }
+  const d = x.getImageData(0, 0, SK_W, SK_H).data, out = new Float32Array(SK_W * SK_H);
+  for (let i = 0; i < out.length; i++) out[i] = d[i * 4 + 3] / 255;
+  return out;
+}
+let H1 = null, H2 = null;
+function sketchFrom(src) {
+  if (!H1) { H1 = hatchMap(-0.85, 9000, 11); H2 = hatchMap(0.75, 6000, 23); }
+  const W = SK_W, H = SK_H, N = W * H;
+  const c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d');
+  x.fillStyle = '#fff'; x.fillRect(0, 0, W, H);
+  const sw = src.naturalWidth || src.width, sh = src.naturalHeight || src.height;
+  const r = Math.max(W / sw, H / sh), dw = sw * r, dh = sh * r;
+  x.drawImage(src, (W - dw) / 2, (H - dh) * 0.22, dw, dh);
+  const px = x.getImageData(0, 0, W, H).data;
+  const g = new Float32Array(N);
+  const hist = new Uint32Array(256);
+  for (let i = 0; i < N; i++) { const v = .299 * px[i * 4] + .587 * px[i * 4 + 1] + .114 * px[i * 4 + 2]; g[i] = v; hist[v | 0]++; }
+  let lo = 0, hi = 255, acc = 0; for (let v = 0; v < 256; v++) { acc += hist[v]; if (acc > N * .01) { lo = v; break; } }
+  acc = 0; for (let v = 255; v >= 0; v--) { acc += hist[v]; if (acc > N * .01) { hi = v; break; } }
+  const span = Math.max(30, hi - lo);
+  for (let i = 0; i < N; i++) g[i] = clamp((g[i] - lo) / span * 255, 0, 255);
+  const inv = new Float32Array(N); for (let i = 0; i < N; i++) inv[i] = 255 - g[i];
+  boxBlur(inv, W, H, Math.max(3, Math.round(W * 0.011)));
+  const alpha = new Float32Array(N), when = new Float32Array(N);
+  seed = 99;
+  for (let y = 0; y < H; y++) for (let xx = 0; xx < W; xx++) {
+    const i = y * W + xx;
+    const den = 255 - inv[i]; const s = den <= 0.5 ? 255 : Math.min(255, g[i] * 255 / den);
+    let line = 1 - s / 255; line = Math.min(1, Math.pow(line * 2.1, 1.2));
+    const tone = Math.pow(1 - g[i] / 255, 1.5);
+    let dark = Math.max(line, tone * (.18 + .55 * H1[i]) + Math.max(0, tone - .42) * H2[i] * .75);
+    const ex = (xx - W / 2) / (W * .54), ey = (y - H * .42) / (H * .6);
+    const e = ex * ex + ey * ey + (H1[i] - .3) * .22;
+    dark *= 1 - smooth(.62, 1.05, e);
+    alpha[i] = clamp(dark, 0, 1);
+    when[i] = clamp(.08 + .5 * (y / H) + .3 * rnd() - .4 * line, 0, 1);
+  }
+  return { alpha, when };
+}
+function blankSketch() {
+  // an empty, lightly pencil-shaded frame shown until a real photo is added
+  if (!H1) { H1 = hatchMap(-0.85, 9000, 11); H2 = hatchMap(0.75, 6000, 23); }
+  const W = SK_W, H = SK_H, N = W * H, alpha = new Float32Array(N), when = new Float32Array(N);
+  seed = 7;
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const i = y * W + x, ex = (x - W / 2) / (W * .5), ey = (y - H * .46) / (H * .52);
+    const e = ex * ex + ey * ey + (H1[i] - .3) * .3;
+    alpha[i] = (.06 + .2 * H1[i] + .08 * H2[i]) * (1 - smooth(.35, 1.0, e)) * (1 - .55 * smooth(.0, .3, 1 - e));
+    when[i] = clamp(.1 + .6 * (y / H) + .25 * rnd(), 0, 1);
+  }
+  return { alpha, when };
+}
+const skC = $('#sketch'), skX = skC.getContext('2d');
+skC.width = SK_W; skC.height = SK_H;
+let skImg = null, skAnim = 0;
+function showSketch(data, animate) {
+  const W = SK_W, H = SK_H, N = W * H;
+  if (!skImg) skImg = skX.createImageData(W, H);
+  const d = skImg.data;
+  for (let i = 0; i < N; i++) { d[i * 4] = 46; d[i * 4 + 1] = 48; d[i * 4 + 2] = 54; }
+  cancelAnimationFrame(skAnim);
+  const paint = p => { for (let i = 0; i < N; i++) d[i * 4 + 3] = data.alpha[i] * 240 * clamp((p - data.when[i]) / .12, 0, 1); skX.putImageData(skImg, 0, 0); };
+  if (!animate || REDUCE) { paint(2); return; }
+  const t0 = performance.now(), D = 2800;
+  const step = now => { const k = (now - t0) / D; paint(k * 1.15); if (k < 1) skAnim = requestAnimationFrame(step); };
+  skAnim = requestAnimationFrame(step);
+}
+function loadPhoto(url, credit, animate) {
+  const im = new Image();
+  im.onload = () => { $('#p-portrait').classList.add('has-photo'); $('#credit').textContent = credit || 'pencil sketch from photograph'; showSketch(sketchFrom(im), animate); };
+  im.src = url;
+}
+const STORE_KEY = 'aqg-portrait-v1';
+function savedPhoto() { try { return localStorage.getItem(STORE_KEY); } catch (e) { return null; } }
+function takeFile(file) {
+  if (!file || !/^image\//.test(file.type)) return;
+  const fr = new FileReader();
+  fr.onload = () => {
+    const im = new Image();
+    im.onload = () => {
+      const k = Math.min(1, 1100 / Math.max(im.width, im.height)); const c = document.createElement('canvas');
+      c.width = Math.round(im.width * k); c.height = Math.round(im.height * k); c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
+      const url = c.toDataURL('image/jpeg', .88);
+      try { localStorage.setItem(STORE_KEY, url); } catch (e) { /* storage full or blocked: the sketch still shows for now */ }
+      loadPhoto(url, '', true);
+    };
+    im.src = fr.result;
+  };
+  fr.readAsDataURL(file);
+}
+const photoInput = $('#photo-input');
+skC.addEventListener('click', () => photoInput.click());
+photoInput.addEventListener('change', () => { takeFile(photoInput.files[0]); photoInput.value = ''; });
+stage.addEventListener('dragover', e => { if (cur === 0) e.preventDefault(); });
+stage.addEventListener('drop', e => { if (cur !== 0) return; e.preventDefault(); takeFile(e.dataTransfer.files[0]); });
+
+/* =================== lamp dust =================== */
+const dust = $('#dust'), dx = dust.getContext('2d');
+const motes = Array.from({ length: 110 }, () => ({ x: 600 + Math.random() * 900, y: Math.random() * 900, r: .6 + Math.random() * 1.8, vx: (Math.random() - .5) * .12, vy: -.05 - Math.random() * .12, a: Math.random() }));
+function drawDust(t) {
+  dx.clearRect(0, 0, 1600, 900);
+  for (const m of motes) {
+    m.x += m.vx + Math.sin(t * .0004 + m.a * 9) * .08; m.y += m.vy;
+    if (m.y < -10) { m.y = 910; m.x = 600 + Math.random() * 900; }
+    const cx = 960 + (m.y - 0) * .08, w = 260 + m.y * .55; const inBeam = 1 - smooth(.55, 1, Math.abs(m.x - cx) / w);
+    const a = inBeam * (.25 + .35 * Math.sin(t * .001 + m.a * 20) ** 2);
+    if (a < .02) continue;
+    dx.globalAlpha = a; dx.fillStyle = '#ffe2b0'; dx.beginPath(); dx.arc(m.x, m.y, m.r, 0, 6.283); dx.fill();
+  }
+  dx.globalAlpha = 1;
+}
+
+/* =================== documentary camera =================== */
+let camT0 = performance.now(), px = 0, py = 0, spx = 0, spy = 0, wx = 0, wy = 0, lastWeave = 0;
+const warm = $('.light-warm');
+function frame(now) {
+  const t = (now - camT0) / 1000;
+  const k = REDUCE ? 1 : easeOut(clamp((t - .4) / 3.6, 0, 1));
+  const drift = REDUCE ? 0 : (Math.sin(t * .045 - 1.57) + 1) / 2 * .028 * k;
+  spx += (px - spx) * .04; spy += (py - spy) * .04;
+  if (!REDUCE && now - lastWeave > 84) { wx = (Math.random() - .5) * .7; wy = (Math.random() - .5) * .7; lastWeave = now; }
+  const sc = 1.075 - .075 * k + drift;
+  cam.style.transform = `translate(${(-14 * (1 - k) - spx * 10 + wx).toFixed(2)}px,${(-10 * (1 - k) - spy * 7 + wy).toFixed(2)}px) scale(${sc.toFixed(4)})`;
+  if (!REDUCE) { warm.style.opacity = (.94 + Math.sin(t * 7.3) * .02 + Math.sin(t * 2.1) * .03).toFixed(3); drawDust(now); }
+  if (!document.hidden) requestAnimationFrame(frame);
+}
+document.addEventListener('visibilitychange', () => { if (!document.hidden) requestAnimationFrame(frame); });
+stage.addEventListener('pointermove', e => { const r = stage.getBoundingClientRect(); px = (e.clientX - r.left) / r.width - .5; py = (e.clientY - r.top) / r.height - .5; });
+stage.addEventListener('pointerleave', () => { px = py = 0; });
 
 /* =================== stage scaling =================== */
-let S = 1;
-function fit() {
-  S = Math.min(innerWidth / 1600, innerHeight / 900);
-  stage.style.transform = `translate(-50%,-50%) scale(${S})`;
-  if (GL) GL.resize();
-  sizeIris();
-}
-function toStage(e) {
-  const r = stage.getBoundingClientRect();
-  return [(e.clientX - r.left) / S, (e.clientY - r.top) / S];
-}
-
-/* =================== iris transition =================== */
-const iris = $('#iris'); const ictx = iris.getContext('2d');
-let IPR = 1;
-function sizeIris() { IPR = Math.min(2, Math.max(1, (window.devicePixelRatio || 1) * S)); iris.width = 1600 * IPR; iris.height = 900 * IPR; drawIris(0); }
-function drawIris(p) {
-  ictx.setTransform(IPR, 0, 0, IPR, 0, 0);
-  ictx.clearRect(0, 0, 1600, 900);
-  if (p <= 0.001) return;
-  const R = 960 * (1 - p), cx = 800, cy = 450, n = 7, rot = p * 1.4;
-  const pts = [];
-  for (let i = 0; i < n; i++) { const a = rot + i / n * Math.PI * 2; pts.push([cx + Math.cos(a) * R, cy + Math.sin(a) * R]); }
-  ictx.fillStyle = '#020305'; ictx.fillRect(0, 0, 1600, 900);
-  if (R > 1) {
-    ictx.save(); ictx.globalCompositeOperation = 'destination-out'; ictx.beginPath();
-    pts.forEach((q, i) => i ? ictx.lineTo(q[0], q[1]) : ictx.moveTo(q[0], q[1])); ictx.closePath(); ictx.fill(); ictx.restore();
-    ictx.strokeStyle = 'rgba(244,180,67,.42)'; ictx.lineWidth = 1.5; ictx.beginPath();
-    for (let i = 0; i < n; i++) { const a = pts[i], b = pts[(i + 1) % n]; const dx = b[0] - a[0], dy = b[1] - a[1]; const L = Math.hypot(dx, dy) || 1; ictx.moveTo(a[0], a[1]); ictx.lineTo(a[0] + dx / L * 2200, a[1] + dy / L * 2200); }
-    ictx.stroke();
-  }
-}
-function tween(ms, fn, done) {
-  if (REDUCE) { fn(1); done && done(); return; }
-  const t0 = performance.now();
-  const step = now => { const k = Math.min(1, (now - t0) / ms); fn(k); if (k < 1) requestAnimationFrame(step); else done && done(); };
-  requestAnimationFrame(step);
-}
-const ease = k => k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
-function irisSwap(mid) {
-  if (REDUCE) { mid(); return; }
-  tween(380, k => drawIris(ease(k)), () => { mid(); tween(460, k => drawIris(1 - ease(k)), () => drawIris(0)); });
-}
+function fit() { S = Math.min(innerWidth / 1600, innerHeight / 900); stage.style.transform = `translate(-50%,-50%) scale(${S})`; }
 
 /* =================== navigation =================== */
-let cur = 0, busy = false, declassified = false;
+let cur = 0, busy = false;
 const N = PAGES.length;
 function updateChrome() {
   const p = PAGES[cur];
   $('#part').textContent = 'Part ' + ['I', 'II', 'III'][p.m - 1];
   $('#secname').textContent = p.t;
-  $('#count').innerHTML = `Page <b>${String(cur + 1).padStart(2, '0')}</b> / ${N}`;
-  $('#tape').style.width = ((cur + 1) / N * 100) + '%';
+  $('#count').innerHTML = `<b>${String(cur + 1).padStart(2, '0')}</b> / ${N}`;
+  $('#prog').style.width = ((cur + 1) / N * 100) + '%';
   $('#notes-h').textContent = `Slide ${String(cur + 1).padStart(2, '0')} · ${p.t} · Member ${p.m}`;
   $('#notes-p').textContent = NOTES[cur];
 }
+const fade = $('#fade');
+function dip(mid) {
+  if (REDUCE) { mid(); return; }
+  fade.style.transition = 'opacity .32s ease'; fade.style.opacity = 1;
+  setTimeout(() => { mid(); fade.style.transition = 'opacity .55s ease'; fade.style.opacity = 0; }, 340);
+}
 function go(n) {
   if (n === 'next') n = cur + 1; else if (n === 'prev') n = cur - 1;
-  n = Math.max(0, Math.min(N - 1, n));
+  n = clamp(n, 0, N - 1);
   if (n === cur || busy) return;
-  if (cur === 0 && n > 0 && !declassified) { declassify(n); return; }
   busy = true;
-  irisSwap(() => {
-    slides[cur].classList.remove('active');
-    cur = n;
-    slides[cur].classList.add('active');
+  dip(() => {
+    slides[cur].classList.remove('active'); cur = n; slides[cur].classList.add('active');
+    stage.classList.toggle('away', cur !== 0);
     updateChrome();
-    if (GL) GL.pose(cur);
-    setTimeout(() => { busy = false; }, 500);
+    setTimeout(() => { busy = false; }, 450);
   });
 }
-
-/* =================== slide 1 choreography =================== */
-const s1 = $('#s1');
-const stSecret = $('#st-secret'), stDeclass = $('#st-declass');
-function shake() { if (REDUCE) return; stage.classList.remove('shake'); void stage.offsetWidth; stage.classList.add('shake'); }
-function intro() {
-  if (REDUCE) {
-    s1.classList.add('shown');
-    stSecret.style.opacity = .9;
-    return;
-  }
-  s1.classList.add('pre');
-  $$('[data-in]', s1).forEach((el, i) => { el.style.transitionDelay = (i * 90) + 'ms'; });
-  setTimeout(() => { s1.classList.add('reveal'); }, 1300);
-  setTimeout(() => { s1.classList.add('shown'); }, 1700);
-  setTimeout(() => { stSecret.classList.add('on'); shake(); }, 2500);
-}
-function declassify(next) {
-  if (busy) return;
-  busy = true; declassified = true;
-  stSecret.classList.add('struck');
-  setTimeout(() => { stDeclass.classList.add('on'); shake(); }, 260);
-  if (REDUCE) stDeclass.style.opacity = .95;
-  setTimeout(() => { $('#dawn').classList.add('go'); if (GL) GL.dawn(); }, 420);
-  setTimeout(() => { busy = false; go(next === undefined ? 1 : next); }, REDUCE ? 600 : 2300);
-}
-$('#open-file').addEventListener('click', () => { if (!declassified) declassify(1); else go(1); });
-
-/* =================== controls =================== */
+$('#open-file').addEventListener('click', () => go(1));
 $$('[data-go]').forEach(b => b.addEventListener('click', () => go(b.dataset.go)));
 const notes = $('#notes'), menu = $('#menu');
-function toggleNotes() { notes.hidden = !notes.hidden; }
-function toggleMenu(open) { menu.hidden = open === undefined ? !menu.hidden : !open; }
+const toggleNotes = () => { notes.hidden = !notes.hidden; };
+const toggleMenu = open => { menu.hidden = open === undefined ? !menu.hidden : !open; };
 $('#btn-notes').addEventListener('click', toggleNotes);
 $('#btn-menu').addEventListener('click', () => toggleMenu());
 $('#menu-close').addEventListener('click', () => toggleMenu(false));
 $('#menu-grid').addEventListener('click', e => { const b = e.target.closest('button[data-to]'); if (!b) return; toggleMenu(false); go(+b.dataset.to); });
 function fullscreen() {
-  const d = document;
   try {
-    if (d.fullscreenElement) d.exitFullscreen && d.exitFullscreen();
-    else { const p = d.documentElement.requestFullscreen && d.documentElement.requestFullscreen(); p && p.catch && p.catch(() => {}); }
-  } catch (err) { /* not available here */ }
+    if (document.fullscreenElement) document.exitFullscreen && document.exitFullscreen();
+    else { const p = document.documentElement.requestFullscreen && document.documentElement.requestFullscreen(); p && p.catch && p.catch(() => {}); }
+  } catch (e) { /* not available in this view */ }
 }
 $('#btn-fs').addEventListener('click', fullscreen);
 addEventListener('keydown', e => {
   if (e.altKey || e.ctrlKey || e.metaKey) return;
-  const k = e.key;
-  if (k === 'ArrowRight' || k === 'PageDown' || k === ' ' || k === 'Enter') { if (e.target.closest && e.target.closest('button') && (k === ' ' || k === 'Enter')) return; e.preventDefault(); go('next'); }
+  const k = e.key, onBtn = e.target.closest && e.target.closest('button');
+  if (k === 'ArrowRight' || k === 'PageDown' || ((k === ' ' || k === 'Enter') && !onBtn)) { e.preventDefault(); go('next'); }
   else if (k === 'ArrowLeft' || k === 'PageUp') { e.preventDefault(); go('prev'); }
   else if (k === 'Home') go(0);
   else if (k === 'End') go(N - 1);
@@ -482,353 +716,36 @@ addEventListener('keydown', e => {
   else if (k === 'Escape') { notes.hidden = true; toggleMenu(false); }
 });
 
-/* =================== 3D night map =================== */
-let GL = null;
-function initGL() {
-  const T = window.THREE;
-  if (!T) return null;
-  const canvas = $('#gl');
-  let renderer;
-  try { renderer = new T.WebGLRenderer({ canvas, antialias: true, alpha: false, powerPreference: 'high-performance' }); }
-  catch (err) { return null; }
-  renderer.setClearColor(0x05070b, 1);
-
-  const scene = new T.Scene();
-  const camera = new T.PerspectiveCamera(32, 16 / 9, 0.1, 400);
-
-  /* projection: Mercator, centred on India */
-  const LON_C = 80, LAT_C = 22, K = 0.66, PL = 0.85;
-  const merc = lat => Math.log(Math.tan(Math.PI / 4 + lat * Math.PI / 360)) * 180 / Math.PI;
-  const M0 = merc(LAT_C);
-  const P = (lon, lat) => [(lon - LON_C) * K, -(merc(lat) - M0) * K];
-  const unP = (x, z) => { const m = -z / K + M0; return [x / K + LON_C, (2 * Math.atan(Math.exp(m * Math.PI / 180)) - Math.PI / 2) * 180 / Math.PI]; };
-
-  /* grid */
-  const G = MAPDATA.grid; const raw = atob(G.b64);
-  const cell = (x, y) => { const i = y * G.w + x; return (raw.charCodeAt(i >> 2) >> ((i & 3) * 2)) & 3; };
-  const classAt = (lon, lat) => { const x = Math.floor((lon - G.lon0) / G.step), y = Math.floor((G.lat1 - lat) / G.step); if (x < 0 || y < 0 || x >= G.w || y >= G.h) return 0; return cell(x, y); };
-
-  const DEL = P(77.209, 28.614), PAU = P(78.78, 30.15);
-  const dDel = (x, z) => Math.hypot(x - DEL[0], z - DEL[1]);
-
-  // seeded random
-  let seed = 1945;
-  const rnd = () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
-  const gauss = () => { let u = 0, v = 0; while (!u) u = rnd(); while (!v) v = rnd(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); };
-
-  const indPos = [], indRand = [], indDist = [], nbPos = [], nbDist = [];
-  const indiaCells = [];
-  for (let y = 0; y < G.h; y++) for (let x = 0; x < G.w; x++) {
-    const v = cell(x, y); if (!v) continue;
-    const lon = G.lon0 + (x + .5) * G.step, lat = G.lat1 - (y + .5) * G.step; const p = P(lon, lat);
-    if (v === 2) { indPos.push(p[0], 0, p[1]); indRand.push(rnd()); indDist.push(dDel(p[0], p[1])); indiaCells.push([lon, lat]); }
-    else { nbPos.push(p[0], -PL, p[1]); nbDist.push(dDel(p[0], p[1])); }
-  }
-
-  /* city lights: synthetic night lights from city sizes (not real satellite data) */
-  const CITIES = [[77.21,28.61,10],[72.88,19.08,10],[88.36,22.57,9],[77.59,12.97,9],[80.27,13.08,9],[78.49,17.39,9],[72.57,23.02,8],[73.86,18.52,8],[72.83,21.17,7],[75.79,26.91,7],[80.95,26.85,7],[80.33,26.45,6],[79.09,21.15,6],[75.86,22.72,6],[77.41,23.26,6],[85.14,25.59,6],[73.18,22.31,5],[75.86,30.9,5],[78.01,27.18,5],[73.79,20.0,5],[82.97,25.32,5],[74.8,34.08,5],[74.87,31.63,5],[85.31,23.34,4],[76.96,11.02,5],[78.12,9.93,4],[76.27,9.93,5],[76.94,8.52,4],[75.78,11.26,4],[75.49,11.75,3],[83.22,17.69,5],[80.65,16.51,4],[85.82,20.3,4],[91.74,26.14,4],[81.63,21.25,4],[76.78,30.73,5],[78.03,30.32,4],[74.86,32.73,4],[73.02,26.24,4],[73.71,24.59,3],[70.8,22.3,4],[78.18,26.22,4],[79.99,23.18,4],[75.34,19.88,4],[75.91,17.66,3],[74.86,12.91,3],[76.64,12.3,4],[75.12,15.36,3],[74.5,15.85,3],[73.83,15.49,3],[78.7,10.79,3],[78.15,11.66,3],[79.81,11.94,3],[79.59,17.97,3],[80.44,16.31,3],[79.99,14.44,3],[75.86,25.21,3],[74.64,26.45,3],[73.31,28.02,2],[77.71,28.98,4],[78.08,27.88,3],[79.43,28.37,3],[83.37,26.76,3],[81.85,25.44,4],[86.43,23.8,3],[86.2,22.8,3],[88.4,26.73,3],[93.94,24.82,2],[92.72,23.73,2],[91.89,25.58,2],[91.29,23.83,2],[94.11,25.67,1],[93.61,27.08,1],[88.61,27.33,1],[77.17,31.1,2],[77.58,34.16,1],[92.73,11.62,1],[78.16,29.95,2],[74.95,30.21,2],[75.58,31.33,3],[74.24,16.7,3],[77.32,19.15,2],[81.28,21.19,3],[85.88,20.46,3],[86.98,23.68,3],[85.39,26.12,2],[85.0,24.79,2],[86.98,25.24,2],[78.57,25.45,2],[77.55,29.97,2],[78.77,28.84,3],[79.42,13.63,2],[78.04,15.83,2],[76.21,10.53,3],[76.61,8.89,2],[72.15,21.76,2],[70.06,22.47,2],[72.65,23.22,2],[75.78,23.18,2],[78.74,23.84,1],[82.15,22.08,2],[83.97,21.47,1],[84.85,22.26,2],[94.91,27.47,1],[92.78,24.83,1],[94.2,26.75,1],[78.78,30.15,1]];
-  const lPos = [], lRand = [], lDist = [], lI = [];
-  for (const [lon, lat, w] of CITIES) {
-    const n = Math.round(w * 28), sg = 0.06 + w * 0.026;
-    for (let i = 0; i < n; i++) {
-      const gx = gauss(), gy = gauss();
-      const lo = lon + gx * sg * 1.05, la = lat + gy * sg;
-      if (classAt(lo, la) !== 2) continue;
-      const p = P(lo, la); const r2 = (gx * gx + gy * gy) / 2;
-      lPos.push(p[0], 0.04, p[1]); lRand.push(rnd()); lDist.push(dDel(p[0], p[1])); lI.push(Math.exp(-r2) * 0.85 + 0.15);
-    }
-  }
-  for (let i = 0; i < 1900; i++) {
-    const c = indiaCells[(rnd() * indiaCells.length) | 0];
-    const lo = c[0] + (rnd() - .5) * G.step, la = c[1] + (rnd() - .5) * G.step; const p = P(lo, la);
-    lPos.push(p[0], 0.04, p[1]); lRand.push(rnd()); lDist.push(dDel(p[0], p[1])); lI.push(0.08 + rnd() * 0.22);
-  }
-
-  const U = { uTime: { value: 0 }, uReveal: { value: 0 }, uTrace: { value: 0 }, uDawn: { value: -40 }, uDim: { value: 1 }, uPR: { value: 1 } };
-  const flagGLSL = `
-    vec3 flagCol(float z){ vec3 s=vec3(1.,.6,.2), w=vec3(1.,1.,1.), g=vec3(.16,.78,.2);
-      return mix(mix(s,w,smoothstep(-4.2,-2.6,z)),g,smoothstep(2.6,4.2,z)); }
-    float dawnBand(float x){ return exp(-pow(x-uDawn,2.)/9.); }`;
-  const ptFrag = `varying vec3 vC; varying float vA;
-    void main(){ float d=length(gl_PointCoord-.5); float a=smoothstep(.5,.08,d)*vA; if(a<.004) discard; gl_FragColor=vec4(vC,a); }`;
-  const geoPts = (pos, attrs) => { const g = new T.BufferGeometry(); g.setAttribute('position', new T.Float32BufferAttribute(pos, 3)); for (const k in attrs) g.setAttribute(k, new T.Float32BufferAttribute(attrs[k], 1)); return g; };
-
-  // India dot-matrix
-  const indMat = new T.ShaderMaterial({
-    uniforms: U, transparent: true, depthWrite: false,
-    vertexShader: `uniform float uTime,uReveal,uDawn,uDim,uPR; attribute float aRand,aDist; varying vec3 vC; varying float vA; ${flagGLSL}
-      void main(){ vec4 mv=modelViewMatrix*vec4(position,1.); gl_Position=projectionMatrix*mv;
-        float rev=clamp((uReveal-aDist)/4.,0.,1.); float tw=.82+.18*sin(uTime*1.1+aRand*50.); float b=dawnBand(position.x);
-        vC=mix(vec3(.24,.66,.66),flagCol(position.z),b); vA=rev*tw*(.62+.38*b)*uDim;
-        gl_PointSize=2.5*uPR*(34./-mv.z)*(1.+b*.9)*(.5+.5*rev); }`,
-    fragmentShader: ptFrag
-  });
-  scene.add(new T.Points(geoPts(indPos, { aRand: indRand, aDist: indDist }), indMat));
-
-  // neighbouring land, lower plane
-  const nbMat = new T.ShaderMaterial({
-    uniforms: U, transparent: true, depthWrite: false,
-    vertexShader: `uniform float uReveal,uDim,uPR; attribute float aDist; varying vec3 vC; varying float vA;
-      void main(){ vec4 mv=modelViewMatrix*vec4(position,1.); gl_Position=projectionMatrix*mv;
-        vC=vec3(.30,.40,.50); vA=.56*clamp((uReveal-aDist*.7)/6.,0.,1.)*(.55+.45*uDim); gl_PointSize=2.*uPR*(34./-mv.z); }`,
-    fragmentShader: ptFrag
-  });
-  scene.add(new T.Points(geoPts(nbPos, { aDist: nbDist }), nbMat));
-
-  // city lights
-  const lMat = new T.ShaderMaterial({
-    uniforms: U, transparent: true, depthWrite: false, blending: T.AdditiveBlending,
-    vertexShader: `uniform float uTime,uReveal,uDawn,uDim,uPR; attribute float aRand,aDist,aI; varying vec3 vC; varying float vA; ${flagGLSL}
-      void main(){ vec4 mv=modelViewMatrix*vec4(position,1.); gl_Position=projectionMatrix*mv;
-        float rev=clamp((uReveal-aDist-1.5)/3.,0.,1.); float tw=.62+.38*sin(uTime*(1.2+aRand*2.4)+aRand*90.); float b=dawnBand(position.x);
-        vec3 warm=mix(vec3(1.,.66,.26),vec3(1.,.92,.74),aRand*aI);
-        vC=mix(warm,flagCol(position.z),b*.85); vA=.85*rev*tw*(.25+.75*aI)*(.55+.45*uDim)*(1.+b*.6);
-        gl_PointSize=uPR*(34./-mv.z)*(1.1+2.6*aI)*(1.+b*.5); }`,
-    fragmentShader: ptFrag
-  });
-  scene.add(new T.Points(geoPts(lPos, { aRand: lRand, aDist: lDist, aI: lI }), lMat));
-
-  // border ribbons + hologram walls
-  const ribbonGeo = (ring, w, y) => {
-    const pts = ring.map(([lo, la]) => P(lo, la)); pts.push(pts[0]);
-    const n = pts.length, cum = [0];
-    for (let i = 1; i < n; i++) cum.push(cum[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]));
-    const L = cum[n - 1] || 1; const pos = [], side = [], along = [], idx = [];
-    for (let i = 0; i < n; i++) {
-      const a = pts[Math.max(0, i - 1)], b = pts[Math.min(n - 1, i + 1)];
-      let tx = b[0] - a[0], tz = b[1] - a[1]; const tl = Math.hypot(tx, tz) || 1; tx /= tl; tz /= tl;
-      const nx = -tz, nz = tx;
-      pos.push(pts[i][0] + nx * w / 2, y, pts[i][1] + nz * w / 2, pts[i][0] - nx * w / 2, y, pts[i][1] - nz * w / 2);
-      side.push(1, -1); along.push(cum[i] / L, cum[i] / L);
-      if (i < n - 1) { const k = i * 2; idx.push(k, k + 1, k + 2, k + 1, k + 3, k + 2); }
-    }
-    const g = new T.BufferGeometry(); g.setAttribute('position', new T.Float32BufferAttribute(pos, 3));
-    g.setAttribute('aSide', new T.Float32BufferAttribute(side, 1)); g.setAttribute('aAlong', new T.Float32BufferAttribute(along, 1)); g.setIndex(idx); return g;
-  };
-  const wallGeo = (ring, h) => {
-    const pts = ring.map(([lo, la]) => P(lo, la)); pts.push(pts[0]);
-    const n = pts.length, cum = [0];
-    for (let i = 1; i < n; i++) cum.push(cum[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]));
-    const L = cum[n - 1] || 1; const pos = [], vv = [], along = [], idx = [];
-    for (let i = 0; i < n; i++) {
-      pos.push(pts[i][0], 0, pts[i][1], pts[i][0], -h, pts[i][1]); vv.push(0, 1); along.push(cum[i] / L, cum[i] / L);
-      if (i < n - 1) { const k = i * 2; idx.push(k, k + 1, k + 2, k + 1, k + 3, k + 2); }
-    }
-    const g = new T.BufferGeometry(); g.setAttribute('position', new T.Float32BufferAttribute(pos, 3));
-    g.setAttribute('aV', new T.Float32BufferAttribute(vv, 1)); g.setAttribute('aAlong', new T.Float32BufferAttribute(along, 1)); g.setIndex(idx); return g;
-  };
-  const ribbonMat = (color, alpha, sharp) => new T.ShaderMaterial({
-    uniforms: Object.assign({ uColor: { value: new T.Color(color) }, uAlpha: { value: alpha }, uSharp: { value: sharp } }, U),
-    transparent: true, depthWrite: false, blending: T.AdditiveBlending, side: T.DoubleSide,
-    vertexShader: `uniform float uTrace,uDawn; attribute float aSide,aAlong; varying float vSide,vAlong,vB; ${'float dawnBand(float x){ return exp(-pow(x-uDawn,2.)/9.); }'}
-      void main(){ gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); vSide=aSide; vAlong=aAlong; vB=dawnBand(position.x); }`,
-    fragmentShader: `uniform vec3 uColor; uniform float uAlpha,uSharp,uTrace,uTime,uDim; varying float vSide,vAlong,vB;
-      void main(){ if(vAlong>uTrace) discard; float head=smoothstep(uTrace-.025,uTrace,vAlong)*(1.-step(.999,uTrace));
-        float prof=pow(1.-abs(vSide),uSharp); float fl=.88+.12*sin(uTime*2.2+vAlong*60.);
-        vec3 c=mix(uColor,vec3(1.,.97,.9),head*.8)+vB*.35;
-        gl_FragColor=vec4(c,prof*uAlpha*fl*(1.+head*2.5)*(.6+.4*uDim)); }`
-  });
-  const wallMat = new T.ShaderMaterial({
-    uniforms: U, transparent: true, depthWrite: false, blending: T.AdditiveBlending, side: T.DoubleSide,
-    vertexShader: `attribute float aV,aAlong; varying float vV,vAlong; void main(){ gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); vV=aV; vAlong=aAlong; }`,
-    fragmentShader: `uniform float uTrace,uTime,uDim; varying float vV,vAlong;
-      void main(){ if(vAlong>uTrace) discard; float a=pow(1.-vV,1.8)*.30*(.6+.4*uDim);
-        float scan=.75+.25*sin(vV*30.-uTime*3.); vec3 c=mix(vec3(1.,.72,.28),vec3(.31,.82,.77),vV);
-        gl_FragColor=vec4(c,a*scan); }`
-  });
-  const haloMat = ribbonMat(0xF4B443, 0.16, 1.6), coreMat = ribbonMat(0xFFC766, 0.95, 0.6);
-  MAPDATA.rings.forEach((ring, i) => {
-    const big = i === 0;
-    scene.add(new T.Mesh(ribbonGeo(ring, big ? 0.9 : 0.4, 0.02), haloMat));
-    scene.add(new T.Mesh(ribbonGeo(ring, big ? 0.075 : 0.05, 0.03), coreMat));
-    if (big) scene.add(new T.Mesh(wallGeo(ring, PL), wallMat));
-  });
-
-  // graticule on the lower plane
-  const gr = [];
-  for (let lo = 60; lo <= 100; lo += 5) { const a = P(lo, 4), b = P(lo, 40); gr.push(a[0], -PL - .01, a[1], b[0], -PL - .01, b[1]); }
-  for (let la = 5; la <= 40; la += 5) { const a = P(60, la), b = P(100, la); gr.push(a[0], -PL - .01, a[1], b[0], -PL - .01, b[1]); }
-  const grG = new T.BufferGeometry(); grG.setAttribute('position', new T.Float32BufferAttribute(gr, 3));
-  const grMat = new T.LineBasicMaterial({ color: 0x4FD1C5, transparent: true, opacity: 0.07, depthWrite: false });
-  scene.add(new T.LineSegments(grG, grMat));
-
-  // markers
-  const ringMat = (color, speed) => new T.ShaderMaterial({
-    uniforms: Object.assign({ uColor: { value: new T.Color(color) }, uSpeed: { value: speed } }, U),
-    transparent: true, depthWrite: false, blending: T.AdditiveBlending,
-    vertexShader: `varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }`,
-    fragmentShader: `uniform vec3 uColor; uniform float uTime,uSpeed,uReveal; varying vec2 vUv;
-      void main(){ float r=length(vUv-.5)*2.; float a=0.;
-        for(int i=0;i<2;i++){ float f=fract(uTime*uSpeed+float(i)*.5); a+=smoothstep(.06,0.,abs(r-f))*(1.-f); }
-        a+=smoothstep(.16,.0,r)*1.2; a*=smoothstep(1.,.9,r)*clamp((uReveal-2.)/3.,0.,1.);
-        gl_FragColor=vec4(uColor,a); }`
-  });
-  const marker = (p, color, size, speed, beamH) => {
-    const g = new T.Group(); g.position.set(p[0], 0.06, p[1]);
-    const ring = new T.Mesh(new T.PlaneGeometry(size, size), ringMat(color, speed)); ring.rotation.x = -Math.PI / 2; g.add(ring);
-    const beam = new T.Mesh(new T.CylinderGeometry(0.035, 0.035, beamH, 8, 1, true), new T.ShaderMaterial({
-      uniforms: Object.assign({ uColor: { value: new T.Color(color) } }, U), transparent: true, depthWrite: false, blending: T.AdditiveBlending,
-      vertexShader: `varying float vY; void main(){ vY=uv.y; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }`,
-      fragmentShader: `uniform vec3 uColor; uniform float uReveal; varying float vY; void main(){ gl_FragColor=vec4(uColor,(1.-vY)*.8*clamp((uReveal-3.)/3.,0.,1.)); }`
-    }));
-    beam.position.y = beamH / 2; g.add(beam); scene.add(g); return g;
-  };
-  marker(DEL, 0xF4B443, 2.6, 0.45, 3.4);
-  marker(PAU, 0x4FD1C5, 1.6, 0.6, 1.6);
-
-  // journey arc: Pauri Garhwal -> New Delhi
-  const arcPts = [], arcT = []; const A0 = new T.Vector3(PAU[0], 0.06, PAU[1]), A1 = new T.Vector3(DEL[0], 0.06, DEL[1]);
-  const AM = A0.clone().lerp(A1, .5); AM.y = 1.3;
-  const curve = new T.QuadraticBezierCurve3(A0, AM, A1);
-  for (let i = 0; i <= 80; i++) { const q = curve.getPoint(i / 80); arcPts.push(q.x, q.y, q.z); arcT.push(i / 80); }
-  const arcG = new T.BufferGeometry(); arcG.setAttribute('position', new T.Float32BufferAttribute(arcPts, 3)); arcG.setAttribute('aT', new T.Float32BufferAttribute(arcT, 1));
-  scene.add(new T.Line(arcG, new T.ShaderMaterial({
-    uniforms: U, transparent: true, depthWrite: false, blending: T.AdditiveBlending,
-    vertexShader: `attribute float aT; varying float vT; void main(){ vT=aT; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }`,
-    fragmentShader: `uniform float uTime,uReveal; varying float vT; void main(){ float on=clamp((uReveal-4.)/3.,0.,1.);
-      float dash=step(.45,fract(vT*14.-uTime*.8)); float pulse=smoothstep(.12,0.,abs(vT-fract(uTime*.32)));
-      gl_FragColor=vec4(mix(vec3(.31,.82,.77),vec3(1.,.8,.4),vT),(dash*.45+pulse)*on); }`
-  })));
-
-  // radar sweep around Delhi
-  const radar = new T.Mesh(new T.PlaneGeometry(16, 16), new T.ShaderMaterial({
-    uniforms: U, transparent: true, depthWrite: false, blending: T.AdditiveBlending,
-    vertexShader: `varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }`,
-    fragmentShader: `uniform float uTime,uReveal,uDim; varying vec2 vUv;
-      void main(){ vec2 c=vUv-.5; float r=length(c)*2.; if(r>1.) discard; float ang=atan(c.y,c.x)/6.28318+.5;
-        float s=fract(ang+uTime*.09); float trail=pow(s,7.)*.17; float rings=(smoothstep(.012,0.,abs(r-.33))+smoothstep(.012,0.,abs(r-.66))+smoothstep(.012,0.,abs(r-.985)))*.06;
-        float a=(trail+rings)*smoothstep(1.,.75,r)*clamp((uReveal-4.)/4.,0.,1.)*uDim;
-        gl_FragColor=vec4(.31,.82,.77,a); }`
-  }));
-  radar.rotation.x = -Math.PI / 2; radar.position.set(DEL[0], 0.05, DEL[1]); scene.add(radar);
-
-  // drifting dust
-  const dPos = [], dR = [];
-  for (let i = 0; i < 320; i++) { dPos.push((rnd() - .5) * 46, rnd() * 9, (rnd() - .5) * 36); dR.push(rnd()); }
-  const dust = new T.Points(geoPts(dPos, { aRand: dR }), new T.ShaderMaterial({
-    uniforms: U, transparent: true, depthWrite: false, blending: T.AdditiveBlending,
-    vertexShader: `uniform float uTime,uPR; attribute float aRand; varying vec3 vC; varying float vA;
-      void main(){ vec3 p=position; p.y=mod(p.y+uTime*(.08+aRand*.12),9.); p.x+=sin(uTime*.2+aRand*20.)*.6;
-        vec4 mv=modelViewMatrix*vec4(p,1.); gl_Position=projectionMatrix*mv; vC=vec3(1.,.85,.6); vA=.18*sin(p.y/9.*3.14159); gl_PointSize=uPR*(34./-mv.z)*(1.+aRand*2.); }`,
-    fragmentShader: ptFrag
-  }));
-  scene.add(dust);
-
-  /* labels projected from 3D */
-  const labelsEl = $('#labels');
-  const LABELS = [
-    { p: DEL, y: 0.1, t: 'New Delhi', s: 'Seat of the NSA', dx: -190, dy: 46 },
-    { p: PAU, y: 0.1, t: 'Pauri Garhwal', s: 'Born here · 1945', dx: 60, dy: -64, cls: 'teal' },
-    { p: P(67.5, 14), y: -PL, t: 'Arabian Sea', cls: 'sea' },
-    { p: P(89, 15.2), y: -PL, t: 'Bay of Bengal', cls: 'sea' },
-    { p: P(79, 5.2), y: -PL, t: 'Indian Ocean', cls: 'sea' }
-  ];
-  LABELS.forEach(L => {
-    const el = document.createElement('div'); el.className = 'mlabel ' + (L.cls || '');
-    if (L.dx !== undefined) {
-      const len = Math.hypot(L.dx, L.dy), ang = Math.atan2(L.dy, L.dx) * 180 / Math.PI;
-      el.innerHTML = `<i class="ln" style="width:${len}px;transform:rotate(${ang}deg)"></i><span class="box" style="position:absolute;left:${L.dx}px;top:${L.dy}px;transform:translate(${L.dx < 0 ? '-100%' : '0'},-50%);padding:${L.dx < 0 ? '0 10px 0 0' : '0 0 0 10px'};text-align:${L.dx < 0 ? 'right' : 'left'}"><span class="t">${L.t}</span><span class="s">${L.s}</span></span>`;
-    } else el.innerHTML = `<span class="t" style="transform:translate(-50%,-50%)">${L.t}</span>`;
-    labelsEl.appendChild(el); L.el = el; L.v = new T.Vector3(L.p[0], L.y, L.p[1]);
-  });
-  const projV = new T.Vector3();
-  const toScreen = v => { projV.copy(v).project(camera); return [(projV.x + 1) / 2 * 1600, (1 - projV.y) / 2 * 900]; };
-
-  /* camera */
-  const camFinal = { pos: new T.Vector3(2.4, 22.5, 21.5), tgt: new T.Vector3(1.4, 0, 0.6) };
-  const camStart = { pos: new T.Vector3(-1, 44, 7), tgt: new T.Vector3(1.4, 0, -1) };
-  const camAway = { pos: new T.Vector3(3, 30, 27), tgt: new T.Vector3(1.4, -0.5, 0.6) };
-  let camFrom = camStart, camTo = camFinal, camK = 0, camDur = 3.4, camT0 = 0;
-  const camPos = new T.Vector3(), camTgt = new T.Vector3();
-  let dimTarget = 1; let px = 0, py = 0, spx = 0, spy = 0;
-
-  function resize() {
-    const pr = Math.min(2, Math.max(1, (window.devicePixelRatio || 1) * S));
-    renderer.setPixelRatio(pr); renderer.setSize(1600, 900, false); U.uPR.value = pr;
-    camera.aspect = 16 / 9; camera.setViewOffset(1600, 900, -1600 * 0.155, 0, 1600, 900); camera.updateProjectionMatrix();
-  }
-  resize();
-
-  const t0 = performance.now();
-  let dawnT0 = -1;
-  const easeOut = k => 1 - Math.pow(1 - k, 3);
-  const io = k => k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
-  let labelsOn = false, scaleK = 0;
-
-  function frame(now) {
-    const t = (now - t0) / 1000; U.uTime.value = t;
-    if (REDUCE) { U.uTrace.value = 1; U.uReveal.value = 60; camK = 1; }
-    else {
-      U.uTrace.value = io(Math.min(1, Math.max(0, (t - 0.3) / 2.3)));
-      U.uReveal.value = Math.max(0, (t - 0.8) / 2.8) * 30;
-      camK = Math.min(1, (t - camT0) / camDur);
-    }
-    if (!labelsOn && (REDUCE || t > 2.9)) { labelsOn = true; LABELS.forEach(L => L.el.classList.add('on')); }
-    if (dawnT0 >= 0) { const k = (now - dawnT0) / 1700; U.uDawn.value = k > 1 ? -40 : -16 + k * 34; if (k > 1) dawnT0 = -1; }
-    U.uDim.value += (dimTarget - U.uDim.value) * 0.06;
-    spx += (px - spx) * 0.05; spy += (py - spy) * 0.05;
-    const k = easeOut(camK);
-    camPos.lerpVectors(camFrom.pos, camTo.pos, k); camTgt.lerpVectors(camFrom.tgt, camTo.tgt, k);
-    const drift = REDUCE ? 0 : Math.sin(t * 0.07) * 0.8;
-    camera.position.set(camPos.x + spx * 2.2 + drift, camPos.y - spy * 1.4, camPos.z + spy * 1.2);
-    camera.lookAt(camTgt.x + spx * 0.6, camTgt.y, camTgt.z + spy * 0.4);
-    renderer.render(scene, camera);
-    // labels + scale bar
-    for (const L of LABELS) { const [x, y] = toScreen(L.v); L.el.style.transform = `translate(${x}px,${y}px)`; if (L.cls === 'sea') L.el.classList.toggle('off', x < 760); }
-    if (++scaleK % 10 === 1) {
-      const a = toScreen(new T.Vector3(...[P(84, 12)[0], 0, P(84, 12)[1]])), b = toScreen(new T.Vector3(P(84 + 500 / (111.32 * Math.cos(12 * Math.PI / 180)), 12)[0], 0, P(84, 12)[1]));
-      $('#scale-line').style.width = Math.round(Math.hypot(b[0] - a[0], b[1] - a[1])) + 'px';
-    }
-    if (!document.hidden) requestAnimationFrame(frame);
-  }
-  document.addEventListener('visibilitychange', () => { if (!document.hidden) requestAnimationFrame(frame); });
-  requestAnimationFrame(frame);
-
-  /* crosshair readout */
-  const ray = new T.Raycaster(), plane = new T.Plane(new T.Vector3(0, 1, 0), 0), hit = new T.Vector3();
-  const cross = $('#cross'), roLat = $('#ro-lat'), roLon = $('#ro-lon'), roWhere = $('#ro-where');
-  const fmt = (v, pos, neg) => Math.abs(v).toFixed(2) + '° ' + (v >= 0 ? pos : neg);
-  const resetRO = () => { roLat.textContent = '28.61° N'; roLon.textContent = '77.21° E'; roWhere.textContent = 'New Delhi · seat of the NSA'; cross.classList.remove('on'); };
-  stage.addEventListener('pointermove', e => {
-    const [sx, sy] = toStage(e);
-    px = (sx / 1600 - .5); py = (sy / 900 - .5);
-    if (cur !== 0 || sx < 760 || sy < 100 || sy > 840) { resetRO(); return; }
-    ray.setFromCamera({ x: sx / 1600 * 2 - 1, y: -(sy / 900 * 2 - 1) }, camera);
-    if (!ray.ray.intersectPlane(plane, hit)) { resetRO(); return; }
-    const [lon, lat] = unP(hit.x, hit.z);
-    if (lon < 60 || lon > 100 || lat < 4 || lat > 40) { resetRO(); return; }
-    const c = classAt(lon, lat);
-    roLat.textContent = fmt(lat, 'N', 'S'); roLon.textContent = fmt(lon, 'E', 'W');
-    roWhere.textContent = c === 2 ? 'India' : c === 1 ? 'Neighbouring land' : 'Open sea';
-    cross.style.left = sx + 'px'; cross.style.top = sy + 'px'; cross.classList.add('on');
-  });
-  stage.addEventListener('pointerleave', () => { px = py = 0; resetRO(); });
-
-  return {
-    resize,
-    dawn() { dawnT0 = performance.now(); },
-    pose(i) {
-      const away = i !== 0;
-      dimTarget = away ? 0.4 : 1;
-      camFrom = { pos: camera.position.clone(), tgt: camTgt.clone() };
-      camTo = away ? camAway : camFinal; camT0 = (performance.now() - t0) / 1000; camDur = 1.4;
-      $('#hud').style.opacity = away ? 0 : 1; labelsEl.style.opacity = away ? 0.35 : 1;
-    }
-  };
+/* =================== intro =================== */
+function intro() {
+  const lamp = $('#lamp');
+  const title = $('#s1');
+  if (REDUCE) { lamp.style.opacity = 0; cam.classList.remove('pre'); title.classList.add('shown'); drawStrings(0); return; }
+  $$('.prop').forEach((p, i) => { p.style.transitionDelay = (700 + i * 110) + 'ms'; });
+  lamp.animate([{ opacity: 1 }, { opacity: .55, offset: .18 }, { opacity: .92, offset: .3 }, { opacity: .3, offset: .5 }, { opacity: .6, offset: .62 }, { opacity: 0 }], { duration: 1500, easing: 'linear', fill: 'forwards' });
+  setTimeout(() => cam.classList.remove('pre'), 60);
+  $$('[data-in]', title).forEach((el, i) => { el.style.transitionDelay = (1500 + i * 220) + 'ms'; });
+  setTimeout(() => title.classList.add('shown'), 60);
+  drawStrings(2500);
 }
 
-try { GL = initGL(); } catch (err) { GL = null; }
-if (!GL) {
-  const m = document.createElement('p'); m.id = 'nogl';
-  m.textContent = 'The 3D map needs WebGL. Open this deck in Chrome or Edge with hardware acceleration turned on.';
-  stage.appendChild(m);
-}
-$('#hud').style.transition = 'opacity .6s';
-$('#labels').style.transition = 'opacity .6s';
+/* =================== boot =================== */
 addEventListener('resize', fit);
 fit();
 updateChrome();
+drawCork();
+buildPins();
+buildStrings();
+const fontsReady = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
+fontsReady.then(() => Promise.all(['700 17px Kalam', '400 16px Kalam', '11px "Special Elite"'].map(f => document.fonts && document.fonts.load ? document.fonts.load(f).catch(() => {}) : 0))).then(() => {
+  drawMapScrap();
+  const stored = savedPhoto();
+  if (EMBED_PHOTO) loadPhoto(EMBED_PHOTO, EMBED_CREDIT, true);
+  else if (stored) setTimeout(() => loadPhoto(stored, '', true), REDUCE ? 0 : 1300);
+  else setTimeout(() => showSketch(blankSketch(), true), REDUCE ? 0 : 1300);
+});
 intro();
+requestAnimationFrame(frame);
 })();
 </script>
 </body>

@@ -3,9 +3,12 @@
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 const REDUCE = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-const viewport = $('#viewport');
-const stage = $('#stage');
-viewport.classList.remove('nojs');
+const stage = $('#stage'), cam = $('#cam');
+
+/* A photo can be embedded here as a data: URL once we have a licensed file.
+   Until then the presenter adds one by clicking the sketch; it is kept in this browser. */
+const EMBED_PHOTO = null;
+const EMBED_CREDIT = '';
 
 /* =================== content =================== */
 const PAGES = [
@@ -42,162 +45,386 @@ const NOTES = [
   'So why did we choose Ajit Doval? Because his life shows every side of leadership: the police officer who calmed a riot, the spy who lived among the enemy, the negotiator who talked down hijackers, and the advisor who guides the nation today. As a person, he offers courage, calm, patience and humility. He rarely gives interviews and almost never seeks credit. And for us as students of communication, the biggest lesson is this: many of his greatest victories came from listening, showing up in person, keeping promises and explaining clearly, not from force. As he told young Indians this year: put the nation’s interest above your own.',
   'That was the story of Ajit Doval, the Quiet Guardian of India. Thank you for listening. We’re happy to take your questions.'
 ];
-const TICKER = [
-  [1945, 'Born in Ghiri Banelsyun, Pauri Garhwal'], [1967, 'Tops MA Economics, Agra University'],
-  [1968, 'Joins the IPS, Kerala cadre'], [1972, 'Ends the Thalassery riot'],
-  [1974, 'Youngest to win the Police Medal'], [1983, 'Posted to Islamabad'],
-  [1988, 'Operation Black Thunder'], [1989, 'Kirti Chakra'], [1999, 'IC-814 negotiator, Kandahar'],
-  [2004, 'Director, Intelligence Bureau'], [2014, 'National Security Advisor'],
-  [2019, 'Cabinet rank'], [2024, 'Third term as NSA'], [2025, 'Operation Sindoor'],
-  [2026, 'Lokmanya Tilak National Award']
-];
 
-/* =================== build chrome =================== */
-$('#ticker-run').innerHTML = TICKER.concat(TICKER).map(([y, t]) => `<span><b>${y}</b>${t}</span>`).join('');
-$('#ticks').innerHTML = PAGES.map(() => '<span></span>').join('');
+/* =================== helpers =================== */
+let seed = 1945;
+const rnd = () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
+const smooth = (a, b, v) => { const t = clamp((v - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
+const easeOut = k => 1 - Math.pow(1 - k, 3);
+let S = 1;
+const prFor = cap => Math.min(cap, Math.max(1, (window.devicePixelRatio || 1) * S));
+
+/* =================== build pages + menu =================== */
 const slidesEl = $('#slides');
 PAGES.forEach((p, i) => {
   if (i === 0) return;
   const s = document.createElement('section');
-  s.className = 'slide';
-  s.id = 's' + (i + 1);
+  s.className = 'slide'; s.id = 's' + (i + 1);
   s.setAttribute('aria-label', `Slide ${i + 1}: ${p.t}`);
-  s.innerHTML = `<div class="ph"><div class="num">${String(i + 1).padStart(2, '0')}</div><h2>${p.t}</h2><p>${p.h}</p><div class="wip">Design in review · we build this page next</div></div>`;
+  s.innerHTML = `<div class="ph"><div class="num">Page ${String(i + 1).padStart(2, '0')} · Part ${['I', 'II', 'III'][p.m - 1]}</div><h2>${p.t}</h2><p>${p.h}</p><div class="wip">Design in review: we build this page next</div></div>`;
   slidesEl.appendChild(s);
 });
 const slides = $$('.slide', slidesEl);
 $('#menu-grid').innerHTML = PAGES.map((p, i) =>
-  `<button data-to="${i}" class="${p.done ? 'done' : ''}"><span class="n">${String(i + 1).padStart(2, '0')} · Part ${['I', 'II', 'III'][p.m - 1]}</span><span class="t">${p.t}</span><span class="st">${p.done ? 'Designed' : 'In review'}</span></button>`).join('');
+  `<button data-to="${i}" class="${p.done ? 'done' : ''}"><span class="n">Page ${String(i + 1).padStart(2, '0')} · Part ${['I', 'II', 'III'][p.m - 1]}</span><span class="t">${p.t}</span><span class="st">${p.done ? 'designed' : 'in review'}</span></button>`).join('');
 
-// film grain texture
-(() => {
-  const c = document.createElement('canvas'); c.width = c.height = 220;
-  const x = c.getContext('2d'); const d = x.createImageData(220, 220);
-  for (let i = 0; i < d.data.length; i += 4) { const v = Math.random() * 255; d.data[i] = d.data[i + 1] = d.data[i + 2] = v; d.data[i + 3] = 255; }
-  x.putImageData(d, 0, 0); $('#grain').style.backgroundImage = `url(${c.toDataURL()})`;
-})();
+/* =================== textures =================== */
+function noiseCanvas(size, lo, hi, fibers) {
+  const c = document.createElement('canvas'); c.width = c.height = size;
+  const x = c.getContext('2d'); const d = x.createImageData(size, size);
+  for (let i = 0; i < d.data.length; i += 4) { const v = lo + Math.random() * (hi - lo); d.data[i] = d.data[i + 1] = d.data[i + 2] = v; d.data[i + 3] = 255; }
+  x.putImageData(d, 0, 0);
+  if (fibers) {
+    x.globalAlpha = .08; x.strokeStyle = '#7a6a50'; x.lineWidth = .6;
+    for (let i = 0; i < fibers; i++) { const a = Math.random() * 6.28, l = 4 + Math.random() * 14, px = Math.random() * size, py = Math.random() * size; x.beginPath(); x.moveTo(px, py); x.quadraticCurveTo(px + Math.cos(a + .6) * l / 2, py + Math.sin(a + .6) * l / 2, px + Math.cos(a) * l, py + Math.sin(a) * l); x.stroke(); }
+  }
+  return c;
+}
+const paperTex = noiseCanvas(256, 222, 255, 260);
+const paperURL = paperTex.toDataURL();
+$$('.sheet').forEach(s => {
+  const cs = getComputedStyle(s);
+  if (cs.backgroundImage && cs.backgroundImage !== 'none') {
+    s.style.backgroundImage = cs.backgroundImage + `,url(${paperURL})`;
+    s.style.backgroundSize = cs.backgroundSize + ',256px 256px';
+    s.style.backgroundPosition = cs.backgroundPosition + ',0 0';
+  } else { s.style.backgroundImage = `url(${paperURL})`; s.style.backgroundSize = '256px 256px'; }
+});
+$('#grain').style.backgroundImage = `url(${noiseCanvas(256, 0, 255, 0).toDataURL()})`;
+
+function drawCork() {
+  const cv = $('#cork'), W = 1680, H = 980, pr = prFor(1.6);
+  cv.width = Math.round(W * pr); cv.height = Math.round(H * pr);
+  const x = cv.getContext('2d'); x.setTransform(pr, 0, 0, pr, 0, 0);
+  seed = 77;
+  x.fillStyle = '#9f7240'; x.fillRect(0, 0, W, H);
+  for (let i = 0; i < 80; i++) {
+    const gx = rnd() * W, gy = rnd() * H, r = 70 + rnd() * 260, dark = rnd() < .55;
+    const g = x.createRadialGradient(gx, gy, 0, gx, gy, r);
+    g.addColorStop(0, dark ? 'rgba(66,38,14,.20)' : 'rgba(222,178,118,.15)'); g.addColorStop(1, 'rgba(0,0,0,0)');
+    x.fillStyle = g; x.fillRect(gx - r, gy - r, r * 2, r * 2);
+  }
+  const pal = ['#6a421e', '#7a4e24', '#8d5c2c', '#a06c37', '#b47f46', '#c89557', '#d9ac70', '#94622f'];
+  const n = Math.round(W * H / 8);
+  pal.forEach((col, ci) => {
+    x.fillStyle = col;
+    for (let i = ci; i < n; i += pal.length) {
+      const rx = rnd() * W, ry = rnd() * H, s = .55 + rnd() * rnd() * 3.4;
+      x.globalAlpha = .3 + rnd() * .65;
+      if (s < 1.5) x.fillRect(rx, ry, s, s * (.6 + rnd() * .8));
+      else { x.beginPath(); x.ellipse(rx, ry, s, s * (.45 + rnd() * .6), rnd() * 3.14, 0, 6.283); x.fill(); }
+    }
+  });
+  x.fillStyle = '#331d0b';
+  for (let i = 0; i < 11000; i++) { x.globalAlpha = .3 + rnd() * .55; const s = .5 + rnd() * 1.7; x.fillRect(rnd() * W, rnd() * H, s, s * (.5 + rnd() * .9)); }
+  x.fillStyle = '#ecca94';
+  for (let i = 0; i < 6000; i++) { x.globalAlpha = .2 + rnd() * .4; x.fillRect(rnd() * W, rnd() * H, .8 + rnd(), .8 + rnd()); }
+  for (let i = 0; i < 70; i++) {
+    const hx = rnd() * W, hy = rnd() * H;
+    x.globalAlpha = .85; x.fillStyle = '#1e1007'; x.beginPath(); x.arc(hx, hy, 1.1 + rnd() * .8, 0, 6.283); x.fill();
+    x.globalAlpha = .22; x.fillStyle = '#f3d6a3'; x.beginPath(); x.arc(hx - 1.2, hy - 1.2, 1.3, 0, 6.283); x.fill();
+  }
+  x.globalAlpha = 1;
+}
+
+/* =================== pins + string =================== */
+const PINS = [
+  { id: 'portrait', x: 1032, y: 166, c: 'red' }, { id: 'born', x: 737, y: 204, c: 'red' },
+  { id: 'ips', x: 751, y: 426, c: 'red' }, { id: 'nsa', x: 768, y: 650, c: 'red' },
+  { id: 'kc', x: 1393, y: 498, c: 'red' }, { id: 'map', x: 1428, y: 150, c: 'red' },
+  { id: 'file', x: 1574, y: 684, c: 'brass' }
+];
+const LINKS = [['portrait', 'born'], ['portrait', 'map'], ['born', 'ips'], ['map', 'kc'], ['ips', 'nsa'], ['kc', 'file']];
+function pinSVG(c, i) {
+  if (c === 'brass') return `<svg viewBox="0 0 36 40" width="36" height="40"><defs><radialGradient id="br${i}" cx=".38" cy=".34" r=".7"><stop offset="0" stop-color="#fff2c4"/><stop offset=".35" stop-color="#d9b25c"/><stop offset=".8" stop-color="#8a6420"/><stop offset="1" stop-color="#5a3f12"/></radialGradient><filter id="bs${i}"><feGaussianBlur stdDeviation="1.6"/></filter></defs><ellipse cx="18" cy="24" rx="11" ry="6" fill="rgba(0,0,0,.55)" filter="url(#bs${i})"/><circle cx="14" cy="18" r="10" fill="url(#br${i})"/><circle cx="14" cy="18" r="10" fill="none" stroke="rgba(60,40,10,.6)" stroke-width=".8"/><circle cx="14" cy="18" r="2" fill="#6b4b17"/></svg>`;
+  return `<svg viewBox="0 0 36 40" width="36" height="40"><defs><radialGradient id="pr${i}" cx=".35" cy=".3" r=".75"><stop offset="0" stop-color="#ff8a7d"/><stop offset=".28" stop-color="#e0262b"/><stop offset=".75" stop-color="#9c0f14"/><stop offset="1" stop-color="#5e070b"/></radialGradient><linearGradient id="pc${i}" x1="0" x2="1"><stop offset="0" stop-color="#7a0c10"/><stop offset=".5" stop-color="#c41b20"/><stop offset="1" stop-color="#6a0a0d"/></linearGradient><filter id="ps${i}"><feGaussianBlur stdDeviation="2"/></filter></defs><ellipse cx="21" cy="29" rx="10" ry="6" fill="rgba(0,0,0,.55)" filter="url(#ps${i})"/><path d="M14 22 L17 30" stroke="#c9ccd0" stroke-width="1.4" stroke-linecap="round"/><ellipse cx="14" cy="21" rx="7" ry="3.4" fill="url(#pc${i})"/><rect x="9.5" y="15" width="9" height="6" fill="url(#pc${i})"/><circle cx="14" cy="13" r="9.5" fill="url(#pr${i})"/><ellipse cx="10.6" cy="9.4" rx="3.2" ry="2" fill="rgba(255,255,255,.55)" transform="rotate(-30 10.6 9.4)"/></svg>`;
+}
+function buildPins() {
+  $('#pins').innerHTML = PINS.map((p, i) => `<div class="pin" style="left:${p.x}px;top:${p.y}px;transition-delay:${(REDUCE ? 0 : 1100 + i * 120)}ms">${pinSVG(p.c, i)}</div>`).join('');
+}
+function buildStrings() {
+  const at = id => PINS.find(p => p.id === id);
+  let sh = '', st = '';
+  LINKS.forEach(([a, b]) => {
+    const A = at(a), B = at(b); const mx = (A.x + B.x) / 2, my = (A.y + B.y) / 2, d = Math.hypot(B.x - A.x, B.y - A.y);
+    const path = `M${A.x} ${A.y} Q${mx} ${my + d * .07} ${B.x} ${B.y}`;
+    sh += `<path class="sh" d="M${A.x + 5} ${A.y + 8} Q${mx + 6} ${my + d * .07 + 10} ${B.x + 5} ${B.y + 8}"/>`;
+    st += `<path class="s" d="${path}"/><path class="h" d="${path}"/>`;
+  });
+  $('#str-sh').innerHTML = sh; $('#str').innerHTML = st;
+}
+function drawStrings(delay) {
+  const paths = $$('#strings path');
+  paths.forEach(p => { const L = p.getTotalLength(); p.style.strokeDasharray = p.classList.contains('h') ? '2 4' : `${L} ${L}`; if (!p.classList.contains('h')) p.style.strokeDashoffset = REDUCE ? 0 : L; p.style.opacity = REDUCE ? 1 : 0; });
+  if (REDUCE) return;
+  setTimeout(() => {
+    LINKS.forEach((_, i) => {
+      const group = paths.filter((p, j) => j === i || j === LINKS.length + i * 2 || j === LINKS.length + i * 2 + 1);
+      setTimeout(() => group.forEach(p => { p.style.transition = 'stroke-dashoffset 1.1s cubic-bezier(.6,0,.3,1), opacity .4s'; p.style.opacity = 1; p.style.strokeDashoffset = 0; }), i * 260);
+    });
+  }, delay);
+}
+
+/* =================== map scrap (official boundary) =================== */
+function drawMapScrap() {
+  const cv = $('#mapc'), W = 300, H = 318, pr = prFor(2.5);
+  cv.width = W * pr; cv.height = H * pr;
+  const x = cv.getContext('2d'); x.setTransform(pr, 0, 0, pr, 0, 0);
+  seed = 314;
+  const pts = []; const j = (a) => (rnd() - .5) * a;
+  for (let px = 4; px <= W - 4; px += 7) pts.push([px, 6 + j(8) + (rnd() < .15 ? 6 : 0)]);
+  for (let py = 6; py <= H - 6; py += 9) pts.push([W - 5 + j(5), py]);
+  for (let px = W - 4; px >= 4; px -= 6) pts.push([px, H - 7 + j(9) - (rnd() < .2 ? 7 : 0)]);
+  for (let py = H - 6; py >= 6; py -= 9) pts.push([5 + j(5), py]);
+  const torn = () => { x.beginPath(); pts.forEach((q, i) => i ? x.lineTo(q[0], q[1]) : x.moveTo(q[0], q[1])); x.closePath(); };
+  x.save(); torn(); x.fillStyle = '#efe5cb'; x.fill(); x.clip();
+  x.globalAlpha = .55; x.fillStyle = x.createPattern(paperTex, 'repeat'); x.globalCompositeOperation = 'multiply'; x.fillRect(0, 0, W, H);
+  x.globalCompositeOperation = 'source-over'; x.globalAlpha = 1;
+  // sea hatching
+  x.strokeStyle = 'rgba(70,105,130,.16)'; x.lineWidth = .7;
+  for (let y = 0; y < H; y += 4) { x.beginPath(); x.moveTo(0, y); x.lineTo(W, y); x.stroke(); }
+  const merc = lat => Math.log(Math.tan(Math.PI / 4 + lat * Math.PI / 360));
+  const L0 = 66.5, L1 = 98.5, T = merc(37.6 * 1), B = merc(5.6);
+  const P = (lon, lat) => [14 + (lon - L0) / (L1 - L0) * 272, 16 + (T - merc(lat)) / (T - B) * 290];
+  // graticule
+  x.setLineDash([2, 3]); x.strokeStyle = 'rgba(90,70,48,.25)'; x.lineWidth = .6;
+  for (let lo = 70; lo <= 95; lo += 5) { const a = P(lo, 38), b = P(lo, 5); x.beginPath(); x.moveTo(a[0], a[1]); x.lineTo(b[0], b[1]); x.stroke(); }
+  for (let la = 10; la <= 35; la += 5) { const a = P(66, la), b = P(99, la); x.beginPath(); x.moveTo(a[0], a[1]); x.lineTo(b[0], b[1]); x.stroke(); }
+  x.setLineDash([]);
+  // land
+  MAPDATA.rings.forEach(r => { x.beginPath(); r.forEach(([lo, la], i) => { const q = P(lo, la); i ? x.lineTo(q[0], q[1]) : x.moveTo(q[0], q[1]); }); x.closePath(); x.fillStyle = '#e8d8b2'; x.fill(); x.strokeStyle = '#4e3b27'; x.lineWidth = 1; x.stroke(); });
+  // relief stipple on land
+  x.fillStyle = 'rgba(110,80,45,.10)';
+  for (let i = 0; i < 1400; i++) { const lo = 68 + rnd() * 29, la = 7 + rnd() * 30; if (!inIndia(lo, la)) continue; const q = P(lo, la); x.fillRect(q[0], q[1], 1, 1); }
+  // labels
+  x.fillStyle = '#3b2e20'; x.font = '400 11px "Special Elite", monospace'; x.textAlign = 'center';
+  let q = P(78.5, 21); x.fillText('I N D I A', q[0], q[1]);
+  x.font = 'italic 400 10px "Special Elite", monospace'; x.fillStyle = 'rgba(50,70,90,.8)';
+  q = P(69.5, 15); x.fillText('Arabian Sea', q[0], q[1]); q = P(88.5, 15.5); x.fillText('Bay of Bengal', q[0], q[1]);
+  // New Delhi
+  q = P(77.21, 28.61); x.fillStyle = '#2a2016'; x.beginPath(); x.arc(q[0], q[1], 2.4, 0, 6.283); x.fill();
+  x.font = '400 10.5px "Special Elite", monospace'; x.textAlign = 'right'; x.fillText('New Delhi', q[0] - 5, q[1] + 11);
+  // red marker circle around Pauri Garhwal
+  const g = P(78.78, 30.15);
+  x.strokeStyle = 'rgba(178,20,26,.88)'; x.lineWidth = 2.2; x.lineCap = 'round';
+  x.beginPath();
+  for (let a = 0; a <= 6.283 * 1.85; a += .08) { const rr = 13 + Math.sin(a * 1.7) * 1.6 + a * .35; const px2 = g[0] + Math.cos(a - .6) * rr * 1.25, py2 = g[1] + Math.sin(a - .6) * rr * .9; a ? x.lineTo(px2, py2) : x.moveTo(px2, py2); }
+  x.stroke();
+  x.font = '700 17px "Kalam", cursive'; x.fillStyle = 'rgba(178,20,26,.92)'; x.textAlign = 'left';
+  x.save(); x.translate(g[0] + 30, g[1] - 26); x.rotate(-.12); x.fillText('born here, 1945', 0, 0); x.restore();
+  x.beginPath(); x.moveTo(g[0] + 34, g[1] - 20); x.quadraticCurveTo(g[0] + 26, g[1] - 10, g[0] + 18, g[1] - 7); x.stroke();
+  x.beginPath(); x.moveTo(g[0] + 18, g[1] - 7); x.lineTo(g[0] + 25, g[1] - 7); x.moveTo(g[0] + 18, g[1] - 7); x.lineTo(g[0] + 22, g[1] - 13); x.stroke();
+  // fold crease
+  const cg = x.createLinearGradient(W * .5 - 6, 0, W * .5 + 6, 0); cg.addColorStop(0, 'rgba(0,0,0,0)'); cg.addColorStop(.5, 'rgba(60,40,20,.14)'); cg.addColorStop(.52, 'rgba(255,255,255,.18)'); cg.addColorStop(1, 'rgba(0,0,0,0)');
+  x.fillStyle = cg; x.fillRect(W * .5 - 6, 0, 12, H);
+  x.restore();
+  torn(); x.strokeStyle = 'rgba(255,255,255,.55)'; x.lineWidth = .8; x.stroke();
+}
+const G = MAPDATA.grid, GRAW = atob(G.b64);
+function inIndia(lon, lat) { const gx = Math.floor((lon - G.lon0) / G.step), gy = Math.floor((G.lat1 - lat) / G.step); if (gx < 0 || gy < 0 || gx >= G.w || gy >= G.h) return false; const i = gy * G.w + gx; return ((GRAW.charCodeAt(i >> 2) >> ((i & 3) * 2)) & 3) === 2; }
+
+/* =================== pencil sketch =================== */
+const SK_W = 656, SK_H = 872;
+function boxBlur(a, w, h, r) {
+  const b = new Float32Array(w * h), n = 2 * r + 1;
+  for (let pass = 0; pass < 3; pass++) {
+    for (let y = 0; y < h; y++) { const row = y * w; let acc = 0; for (let k = -r; k <= r; k++) acc += a[row + clamp(k, 0, w - 1)]; for (let x = 0; x < w; x++) { b[row + x] = acc / n; acc += a[row + Math.min(w - 1, x + r + 1)] - a[row + Math.max(0, x - r)]; } }
+    for (let x = 0; x < w; x++) { let acc = 0; for (let k = -r; k <= r; k++) acc += b[clamp(k, 0, h - 1) * w + x]; for (let y = 0; y < h; y++) { a[y * w + x] = acc / n; acc += b[Math.min(h - 1, y + r + 1) * w + x] - b[Math.max(0, y - r) * w + x]; } }
+  }
+  return a;
+}
+function hatchMap(angle, count, seedV) {
+  const c = document.createElement('canvas'); c.width = SK_W; c.height = SK_H; const x = c.getContext('2d');
+  seed = seedV; x.strokeStyle = '#000'; x.lineCap = 'round';
+  for (let i = 0; i < count; i++) {
+    const a = angle + (rnd() - .5) * .22, l = 10 + rnd() * 22, px = rnd() * SK_W, py = rnd() * SK_H;
+    x.globalAlpha = .25 + rnd() * .55; x.lineWidth = .6 + rnd() * .9;
+    x.beginPath(); x.moveTo(px, py); x.lineTo(px + Math.cos(a) * l, py + Math.sin(a) * l); x.stroke();
+  }
+  const d = x.getImageData(0, 0, SK_W, SK_H).data, out = new Float32Array(SK_W * SK_H);
+  for (let i = 0; i < out.length; i++) out[i] = d[i * 4 + 3] / 255;
+  return out;
+}
+let H1 = null, H2 = null;
+function sketchFrom(src) {
+  if (!H1) { H1 = hatchMap(-0.85, 9000, 11); H2 = hatchMap(0.75, 6000, 23); }
+  const W = SK_W, H = SK_H, N = W * H;
+  const c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d');
+  x.fillStyle = '#fff'; x.fillRect(0, 0, W, H);
+  const sw = src.naturalWidth || src.width, sh = src.naturalHeight || src.height;
+  const r = Math.max(W / sw, H / sh), dw = sw * r, dh = sh * r;
+  x.drawImage(src, (W - dw) / 2, (H - dh) * 0.22, dw, dh);
+  const px = x.getImageData(0, 0, W, H).data;
+  const g = new Float32Array(N);
+  const hist = new Uint32Array(256);
+  for (let i = 0; i < N; i++) { const v = .299 * px[i * 4] + .587 * px[i * 4 + 1] + .114 * px[i * 4 + 2]; g[i] = v; hist[v | 0]++; }
+  let lo = 0, hi = 255, acc = 0; for (let v = 0; v < 256; v++) { acc += hist[v]; if (acc > N * .01) { lo = v; break; } }
+  acc = 0; for (let v = 255; v >= 0; v--) { acc += hist[v]; if (acc > N * .01) { hi = v; break; } }
+  const span = Math.max(30, hi - lo);
+  for (let i = 0; i < N; i++) g[i] = clamp((g[i] - lo) / span * 255, 0, 255);
+  const inv = new Float32Array(N); for (let i = 0; i < N; i++) inv[i] = 255 - g[i];
+  boxBlur(inv, W, H, Math.max(3, Math.round(W * 0.011)));
+  const alpha = new Float32Array(N), when = new Float32Array(N);
+  seed = 99;
+  for (let y = 0; y < H; y++) for (let xx = 0; xx < W; xx++) {
+    const i = y * W + xx;
+    const den = 255 - inv[i]; const s = den <= 0.5 ? 255 : Math.min(255, g[i] * 255 / den);
+    let line = 1 - s / 255; line = Math.min(1, Math.pow(line * 2.1, 1.2));
+    const tone = Math.pow(1 - g[i] / 255, 1.5);
+    let dark = Math.max(line, tone * (.18 + .55 * H1[i]) + Math.max(0, tone - .42) * H2[i] * .75);
+    const ex = (xx - W / 2) / (W * .54), ey = (y - H * .42) / (H * .6);
+    const e = ex * ex + ey * ey + (H1[i] - .3) * .22;
+    dark *= 1 - smooth(.62, 1.05, e);
+    alpha[i] = clamp(dark, 0, 1);
+    when[i] = clamp(.08 + .5 * (y / H) + .3 * rnd() - .4 * line, 0, 1);
+  }
+  return { alpha, when };
+}
+function blankSketch() {
+  // an empty, lightly pencil-shaded frame shown until a real photo is added
+  if (!H1) { H1 = hatchMap(-0.85, 9000, 11); H2 = hatchMap(0.75, 6000, 23); }
+  const W = SK_W, H = SK_H, N = W * H, alpha = new Float32Array(N), when = new Float32Array(N);
+  seed = 7;
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const i = y * W + x, ex = (x - W / 2) / (W * .5), ey = (y - H * .46) / (H * .52);
+    const e = ex * ex + ey * ey + (H1[i] - .3) * .3;
+    alpha[i] = (.06 + .2 * H1[i] + .08 * H2[i]) * (1 - smooth(.35, 1.0, e)) * (1 - .55 * smooth(.0, .3, 1 - e));
+    when[i] = clamp(.1 + .6 * (y / H) + .25 * rnd(), 0, 1);
+  }
+  return { alpha, when };
+}
+const skC = $('#sketch'), skX = skC.getContext('2d');
+skC.width = SK_W; skC.height = SK_H;
+let skImg = null, skAnim = 0;
+function showSketch(data, animate) {
+  const W = SK_W, H = SK_H, N = W * H;
+  if (!skImg) skImg = skX.createImageData(W, H);
+  const d = skImg.data;
+  for (let i = 0; i < N; i++) { d[i * 4] = 46; d[i * 4 + 1] = 48; d[i * 4 + 2] = 54; }
+  cancelAnimationFrame(skAnim);
+  const paint = p => { for (let i = 0; i < N; i++) d[i * 4 + 3] = data.alpha[i] * 240 * clamp((p - data.when[i]) / .12, 0, 1); skX.putImageData(skImg, 0, 0); };
+  if (!animate || REDUCE) { paint(2); return; }
+  const t0 = performance.now(), D = 2800;
+  const step = now => { const k = (now - t0) / D; paint(k * 1.15); if (k < 1) skAnim = requestAnimationFrame(step); };
+  skAnim = requestAnimationFrame(step);
+}
+function loadPhoto(url, credit, animate) {
+  const im = new Image();
+  im.onload = () => { $('#p-portrait').classList.add('has-photo'); $('#credit').textContent = credit || 'pencil sketch from photograph'; showSketch(sketchFrom(im), animate); };
+  im.src = url;
+}
+const STORE_KEY = 'aqg-portrait-v1';
+function savedPhoto() { try { return localStorage.getItem(STORE_KEY); } catch (e) { return null; } }
+function takeFile(file) {
+  if (!file || !/^image\//.test(file.type)) return;
+  const fr = new FileReader();
+  fr.onload = () => {
+    const im = new Image();
+    im.onload = () => {
+      const k = Math.min(1, 1100 / Math.max(im.width, im.height)); const c = document.createElement('canvas');
+      c.width = Math.round(im.width * k); c.height = Math.round(im.height * k); c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
+      const url = c.toDataURL('image/jpeg', .88);
+      try { localStorage.setItem(STORE_KEY, url); } catch (e) { /* storage full or blocked: the sketch still shows for now */ }
+      loadPhoto(url, '', true);
+    };
+    im.src = fr.result;
+  };
+  fr.readAsDataURL(file);
+}
+const photoInput = $('#photo-input');
+skC.addEventListener('click', () => photoInput.click());
+photoInput.addEventListener('change', () => { takeFile(photoInput.files[0]); photoInput.value = ''; });
+stage.addEventListener('dragover', e => { if (cur === 0) e.preventDefault(); });
+stage.addEventListener('drop', e => { if (cur !== 0) return; e.preventDefault(); takeFile(e.dataTransfer.files[0]); });
+
+/* =================== lamp dust =================== */
+const dust = $('#dust'), dx = dust.getContext('2d');
+const motes = Array.from({ length: 110 }, () => ({ x: 600 + Math.random() * 900, y: Math.random() * 900, r: .6 + Math.random() * 1.8, vx: (Math.random() - .5) * .12, vy: -.05 - Math.random() * .12, a: Math.random() }));
+function drawDust(t) {
+  dx.clearRect(0, 0, 1600, 900);
+  for (const m of motes) {
+    m.x += m.vx + Math.sin(t * .0004 + m.a * 9) * .08; m.y += m.vy;
+    if (m.y < -10) { m.y = 910; m.x = 600 + Math.random() * 900; }
+    const cx = 960 + (m.y - 0) * .08, w = 260 + m.y * .55; const inBeam = 1 - smooth(.55, 1, Math.abs(m.x - cx) / w);
+    const a = inBeam * (.25 + .35 * Math.sin(t * .001 + m.a * 20) ** 2);
+    if (a < .02) continue;
+    dx.globalAlpha = a; dx.fillStyle = '#ffe2b0'; dx.beginPath(); dx.arc(m.x, m.y, m.r, 0, 6.283); dx.fill();
+  }
+  dx.globalAlpha = 1;
+}
+
+/* =================== documentary camera =================== */
+let camT0 = performance.now(), px = 0, py = 0, spx = 0, spy = 0, wx = 0, wy = 0, lastWeave = 0;
+const warm = $('.light-warm');
+function frame(now) {
+  const t = (now - camT0) / 1000;
+  const k = REDUCE ? 1 : easeOut(clamp((t - .4) / 3.6, 0, 1));
+  const drift = REDUCE ? 0 : (Math.sin(t * .045 - 1.57) + 1) / 2 * .028 * k;
+  spx += (px - spx) * .04; spy += (py - spy) * .04;
+  if (!REDUCE && now - lastWeave > 84) { wx = (Math.random() - .5) * .7; wy = (Math.random() - .5) * .7; lastWeave = now; }
+  const sc = 1.075 - .075 * k + drift;
+  cam.style.transform = `translate(${(-14 * (1 - k) - spx * 10 + wx).toFixed(2)}px,${(-10 * (1 - k) - spy * 7 + wy).toFixed(2)}px) scale(${sc.toFixed(4)})`;
+  if (!REDUCE) { warm.style.opacity = (.94 + Math.sin(t * 7.3) * .02 + Math.sin(t * 2.1) * .03).toFixed(3); drawDust(now); }
+  if (!document.hidden) requestAnimationFrame(frame);
+}
+document.addEventListener('visibilitychange', () => { if (!document.hidden) requestAnimationFrame(frame); });
+stage.addEventListener('pointermove', e => { const r = stage.getBoundingClientRect(); px = (e.clientX - r.left) / r.width - .5; py = (e.clientY - r.top) / r.height - .5; });
+stage.addEventListener('pointerleave', () => { px = py = 0; });
 
 /* =================== stage scaling =================== */
-let S = 1;
-function fit() {
-  S = Math.min(innerWidth / 1600, innerHeight / 900);
-  stage.style.transform = `translate(-50%,-50%) scale(${S})`;
-  if (GL) GL.resize();
-  sizeIris();
-}
-function toStage(e) {
-  const r = stage.getBoundingClientRect();
-  return [(e.clientX - r.left) / S, (e.clientY - r.top) / S];
-}
-
-/* =================== iris transition =================== */
-const iris = $('#iris'); const ictx = iris.getContext('2d');
-let IPR = 1;
-function sizeIris() { IPR = Math.min(2, Math.max(1, (window.devicePixelRatio || 1) * S)); iris.width = 1600 * IPR; iris.height = 900 * IPR; drawIris(0); }
-function drawIris(p) {
-  ictx.setTransform(IPR, 0, 0, IPR, 0, 0);
-  ictx.clearRect(0, 0, 1600, 900);
-  if (p <= 0.001) return;
-  const R = 960 * (1 - p), cx = 800, cy = 450, n = 7, rot = p * 1.4;
-  const pts = [];
-  for (let i = 0; i < n; i++) { const a = rot + i / n * Math.PI * 2; pts.push([cx + Math.cos(a) * R, cy + Math.sin(a) * R]); }
-  ictx.fillStyle = '#020305'; ictx.fillRect(0, 0, 1600, 900);
-  if (R > 1) {
-    ictx.save(); ictx.globalCompositeOperation = 'destination-out'; ictx.beginPath();
-    pts.forEach((q, i) => i ? ictx.lineTo(q[0], q[1]) : ictx.moveTo(q[0], q[1])); ictx.closePath(); ictx.fill(); ictx.restore();
-    ictx.strokeStyle = 'rgba(244,180,67,.42)'; ictx.lineWidth = 1.5; ictx.beginPath();
-    for (let i = 0; i < n; i++) { const a = pts[i], b = pts[(i + 1) % n]; const dx = b[0] - a[0], dy = b[1] - a[1]; const L = Math.hypot(dx, dy) || 1; ictx.moveTo(a[0], a[1]); ictx.lineTo(a[0] + dx / L * 2200, a[1] + dy / L * 2200); }
-    ictx.stroke();
-  }
-}
-function tween(ms, fn, done) {
-  if (REDUCE) { fn(1); done && done(); return; }
-  const t0 = performance.now();
-  const step = now => { const k = Math.min(1, (now - t0) / ms); fn(k); if (k < 1) requestAnimationFrame(step); else done && done(); };
-  requestAnimationFrame(step);
-}
-const ease = k => k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
-function irisSwap(mid) {
-  if (REDUCE) { mid(); return; }
-  tween(380, k => drawIris(ease(k)), () => { mid(); tween(460, k => drawIris(1 - ease(k)), () => drawIris(0)); });
-}
+function fit() { S = Math.min(innerWidth / 1600, innerHeight / 900); stage.style.transform = `translate(-50%,-50%) scale(${S})`; }
 
 /* =================== navigation =================== */
-let cur = 0, busy = false, declassified = false;
+let cur = 0, busy = false;
 const N = PAGES.length;
 function updateChrome() {
   const p = PAGES[cur];
   $('#part').textContent = 'Part ' + ['I', 'II', 'III'][p.m - 1];
   $('#secname').textContent = p.t;
-  $('#count').innerHTML = `Page <b>${String(cur + 1).padStart(2, '0')}</b> / ${N}`;
-  $('#tape').style.width = ((cur + 1) / N * 100) + '%';
+  $('#count').innerHTML = `<b>${String(cur + 1).padStart(2, '0')}</b> / ${N}`;
+  $('#prog').style.width = ((cur + 1) / N * 100) + '%';
   $('#notes-h').textContent = `Slide ${String(cur + 1).padStart(2, '0')} · ${p.t} · Member ${p.m}`;
   $('#notes-p').textContent = NOTES[cur];
 }
+const fade = $('#fade');
+function dip(mid) {
+  if (REDUCE) { mid(); return; }
+  fade.style.transition = 'opacity .32s ease'; fade.style.opacity = 1;
+  setTimeout(() => { mid(); fade.style.transition = 'opacity .55s ease'; fade.style.opacity = 0; }, 340);
+}
 function go(n) {
   if (n === 'next') n = cur + 1; else if (n === 'prev') n = cur - 1;
-  n = Math.max(0, Math.min(N - 1, n));
+  n = clamp(n, 0, N - 1);
   if (n === cur || busy) return;
-  if (cur === 0 && n > 0 && !declassified) { declassify(n); return; }
   busy = true;
-  irisSwap(() => {
-    slides[cur].classList.remove('active');
-    cur = n;
-    slides[cur].classList.add('active');
+  dip(() => {
+    slides[cur].classList.remove('active'); cur = n; slides[cur].classList.add('active');
+    stage.classList.toggle('away', cur !== 0);
     updateChrome();
-    if (GL) GL.pose(cur);
-    setTimeout(() => { busy = false; }, 500);
+    setTimeout(() => { busy = false; }, 450);
   });
 }
-
-/* =================== slide 1 choreography =================== */
-const s1 = $('#s1');
-const stSecret = $('#st-secret'), stDeclass = $('#st-declass');
-function shake() { if (REDUCE) return; stage.classList.remove('shake'); void stage.offsetWidth; stage.classList.add('shake'); }
-function intro() {
-  if (REDUCE) {
-    s1.classList.add('shown');
-    stSecret.style.opacity = .9;
-    return;
-  }
-  s1.classList.add('pre');
-  $$('[data-in]', s1).forEach((el, i) => { el.style.transitionDelay = (i * 90) + 'ms'; });
-  setTimeout(() => { s1.classList.add('reveal'); }, 1300);
-  setTimeout(() => { s1.classList.add('shown'); }, 1700);
-  setTimeout(() => { stSecret.classList.add('on'); shake(); }, 2500);
-}
-function declassify(next) {
-  if (busy) return;
-  busy = true; declassified = true;
-  stSecret.classList.add('struck');
-  setTimeout(() => { stDeclass.classList.add('on'); shake(); }, 260);
-  if (REDUCE) stDeclass.style.opacity = .95;
-  setTimeout(() => { $('#dawn').classList.add('go'); if (GL) GL.dawn(); }, 420);
-  setTimeout(() => { busy = false; go(next === undefined ? 1 : next); }, REDUCE ? 600 : 2300);
-}
-$('#open-file').addEventListener('click', () => { if (!declassified) declassify(1); else go(1); });
-
-/* =================== controls =================== */
+$('#open-file').addEventListener('click', () => go(1));
 $$('[data-go]').forEach(b => b.addEventListener('click', () => go(b.dataset.go)));
 const notes = $('#notes'), menu = $('#menu');
-function toggleNotes() { notes.hidden = !notes.hidden; }
-function toggleMenu(open) { menu.hidden = open === undefined ? !menu.hidden : !open; }
+const toggleNotes = () => { notes.hidden = !notes.hidden; };
+const toggleMenu = open => { menu.hidden = open === undefined ? !menu.hidden : !open; };
 $('#btn-notes').addEventListener('click', toggleNotes);
 $('#btn-menu').addEventListener('click', () => toggleMenu());
 $('#menu-close').addEventListener('click', () => toggleMenu(false));
 $('#menu-grid').addEventListener('click', e => { const b = e.target.closest('button[data-to]'); if (!b) return; toggleMenu(false); go(+b.dataset.to); });
 function fullscreen() {
-  const d = document;
   try {
-    if (d.fullscreenElement) d.exitFullscreen && d.exitFullscreen();
-    else { const p = d.documentElement.requestFullscreen && d.documentElement.requestFullscreen(); p && p.catch && p.catch(() => {}); }
-  } catch (err) { /* not available here */ }
+    if (document.fullscreenElement) document.exitFullscreen && document.exitFullscreen();
+    else { const p = document.documentElement.requestFullscreen && document.documentElement.requestFullscreen(); p && p.catch && p.catch(() => {}); }
+  } catch (e) { /* not available in this view */ }
 }
 $('#btn-fs').addEventListener('click', fullscreen);
 addEventListener('keydown', e => {
   if (e.altKey || e.ctrlKey || e.metaKey) return;
-  const k = e.key;
-  if (k === 'ArrowRight' || k === 'PageDown' || k === ' ' || k === 'Enter') { if (e.target.closest && e.target.closest('button') && (k === ' ' || k === 'Enter')) return; e.preventDefault(); go('next'); }
+  const k = e.key, onBtn = e.target.closest && e.target.closest('button');
+  if (k === 'ArrowRight' || k === 'PageDown' || ((k === ' ' || k === 'Enter') && !onBtn)) { e.preventDefault(); go('next'); }
   else if (k === 'ArrowLeft' || k === 'PageUp') { e.preventDefault(); go('prev'); }
   else if (k === 'Home') go(0);
   else if (k === 'End') go(N - 1);
@@ -207,351 +434,34 @@ addEventListener('keydown', e => {
   else if (k === 'Escape') { notes.hidden = true; toggleMenu(false); }
 });
 
-/* =================== 3D night map =================== */
-let GL = null;
-function initGL() {
-  const T = window.THREE;
-  if (!T) return null;
-  const canvas = $('#gl');
-  let renderer;
-  try { renderer = new T.WebGLRenderer({ canvas, antialias: true, alpha: false, powerPreference: 'high-performance' }); }
-  catch (err) { return null; }
-  renderer.setClearColor(0x05070b, 1);
-
-  const scene = new T.Scene();
-  const camera = new T.PerspectiveCamera(32, 16 / 9, 0.1, 400);
-
-  /* projection: Mercator, centred on India */
-  const LON_C = 80, LAT_C = 22, K = 0.66, PL = 0.85;
-  const merc = lat => Math.log(Math.tan(Math.PI / 4 + lat * Math.PI / 360)) * 180 / Math.PI;
-  const M0 = merc(LAT_C);
-  const P = (lon, lat) => [(lon - LON_C) * K, -(merc(lat) - M0) * K];
-  const unP = (x, z) => { const m = -z / K + M0; return [x / K + LON_C, (2 * Math.atan(Math.exp(m * Math.PI / 180)) - Math.PI / 2) * 180 / Math.PI]; };
-
-  /* grid */
-  const G = MAPDATA.grid; const raw = atob(G.b64);
-  const cell = (x, y) => { const i = y * G.w + x; return (raw.charCodeAt(i >> 2) >> ((i & 3) * 2)) & 3; };
-  const classAt = (lon, lat) => { const x = Math.floor((lon - G.lon0) / G.step), y = Math.floor((G.lat1 - lat) / G.step); if (x < 0 || y < 0 || x >= G.w || y >= G.h) return 0; return cell(x, y); };
-
-  const DEL = P(77.209, 28.614), PAU = P(78.78, 30.15);
-  const dDel = (x, z) => Math.hypot(x - DEL[0], z - DEL[1]);
-
-  // seeded random
-  let seed = 1945;
-  const rnd = () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
-  const gauss = () => { let u = 0, v = 0; while (!u) u = rnd(); while (!v) v = rnd(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); };
-
-  const indPos = [], indRand = [], indDist = [], nbPos = [], nbDist = [];
-  const indiaCells = [];
-  for (let y = 0; y < G.h; y++) for (let x = 0; x < G.w; x++) {
-    const v = cell(x, y); if (!v) continue;
-    const lon = G.lon0 + (x + .5) * G.step, lat = G.lat1 - (y + .5) * G.step; const p = P(lon, lat);
-    if (v === 2) { indPos.push(p[0], 0, p[1]); indRand.push(rnd()); indDist.push(dDel(p[0], p[1])); indiaCells.push([lon, lat]); }
-    else { nbPos.push(p[0], -PL, p[1]); nbDist.push(dDel(p[0], p[1])); }
-  }
-
-  /* city lights: synthetic night lights from city sizes (not real satellite data) */
-  const CITIES = [[77.21,28.61,10],[72.88,19.08,10],[88.36,22.57,9],[77.59,12.97,9],[80.27,13.08,9],[78.49,17.39,9],[72.57,23.02,8],[73.86,18.52,8],[72.83,21.17,7],[75.79,26.91,7],[80.95,26.85,7],[80.33,26.45,6],[79.09,21.15,6],[75.86,22.72,6],[77.41,23.26,6],[85.14,25.59,6],[73.18,22.31,5],[75.86,30.9,5],[78.01,27.18,5],[73.79,20.0,5],[82.97,25.32,5],[74.8,34.08,5],[74.87,31.63,5],[85.31,23.34,4],[76.96,11.02,5],[78.12,9.93,4],[76.27,9.93,5],[76.94,8.52,4],[75.78,11.26,4],[75.49,11.75,3],[83.22,17.69,5],[80.65,16.51,4],[85.82,20.3,4],[91.74,26.14,4],[81.63,21.25,4],[76.78,30.73,5],[78.03,30.32,4],[74.86,32.73,4],[73.02,26.24,4],[73.71,24.59,3],[70.8,22.3,4],[78.18,26.22,4],[79.99,23.18,4],[75.34,19.88,4],[75.91,17.66,3],[74.86,12.91,3],[76.64,12.3,4],[75.12,15.36,3],[74.5,15.85,3],[73.83,15.49,3],[78.7,10.79,3],[78.15,11.66,3],[79.81,11.94,3],[79.59,17.97,3],[80.44,16.31,3],[79.99,14.44,3],[75.86,25.21,3],[74.64,26.45,3],[73.31,28.02,2],[77.71,28.98,4],[78.08,27.88,3],[79.43,28.37,3],[83.37,26.76,3],[81.85,25.44,4],[86.43,23.8,3],[86.2,22.8,3],[88.4,26.73,3],[93.94,24.82,2],[92.72,23.73,2],[91.89,25.58,2],[91.29,23.83,2],[94.11,25.67,1],[93.61,27.08,1],[88.61,27.33,1],[77.17,31.1,2],[77.58,34.16,1],[92.73,11.62,1],[78.16,29.95,2],[74.95,30.21,2],[75.58,31.33,3],[74.24,16.7,3],[77.32,19.15,2],[81.28,21.19,3],[85.88,20.46,3],[86.98,23.68,3],[85.39,26.12,2],[85.0,24.79,2],[86.98,25.24,2],[78.57,25.45,2],[77.55,29.97,2],[78.77,28.84,3],[79.42,13.63,2],[78.04,15.83,2],[76.21,10.53,3],[76.61,8.89,2],[72.15,21.76,2],[70.06,22.47,2],[72.65,23.22,2],[75.78,23.18,2],[78.74,23.84,1],[82.15,22.08,2],[83.97,21.47,1],[84.85,22.26,2],[94.91,27.47,1],[92.78,24.83,1],[94.2,26.75,1],[78.78,30.15,1]];
-  const lPos = [], lRand = [], lDist = [], lI = [];
-  for (const [lon, lat, w] of CITIES) {
-    const n = Math.round(w * 28), sg = 0.06 + w * 0.026;
-    for (let i = 0; i < n; i++) {
-      const gx = gauss(), gy = gauss();
-      const lo = lon + gx * sg * 1.05, la = lat + gy * sg;
-      if (classAt(lo, la) !== 2) continue;
-      const p = P(lo, la); const r2 = (gx * gx + gy * gy) / 2;
-      lPos.push(p[0], 0.04, p[1]); lRand.push(rnd()); lDist.push(dDel(p[0], p[1])); lI.push(Math.exp(-r2) * 0.85 + 0.15);
-    }
-  }
-  for (let i = 0; i < 1900; i++) {
-    const c = indiaCells[(rnd() * indiaCells.length) | 0];
-    const lo = c[0] + (rnd() - .5) * G.step, la = c[1] + (rnd() - .5) * G.step; const p = P(lo, la);
-    lPos.push(p[0], 0.04, p[1]); lRand.push(rnd()); lDist.push(dDel(p[0], p[1])); lI.push(0.08 + rnd() * 0.22);
-  }
-
-  const U = { uTime: { value: 0 }, uReveal: { value: 0 }, uTrace: { value: 0 }, uDawn: { value: -40 }, uDim: { value: 1 }, uPR: { value: 1 } };
-  const flagGLSL = `
-    vec3 flagCol(float z){ vec3 s=vec3(1.,.6,.2), w=vec3(1.,1.,1.), g=vec3(.16,.78,.2);
-      return mix(mix(s,w,smoothstep(-4.2,-2.6,z)),g,smoothstep(2.6,4.2,z)); }
-    float dawnBand(float x){ return exp(-pow(x-uDawn,2.)/9.); }`;
-  const ptFrag = `varying vec3 vC; varying float vA;
-    void main(){ float d=length(gl_PointCoord-.5); float a=smoothstep(.5,.08,d)*vA; if(a<.004) discard; gl_FragColor=vec4(vC,a); }`;
-  const geoPts = (pos, attrs) => { const g = new T.BufferGeometry(); g.setAttribute('position', new T.Float32BufferAttribute(pos, 3)); for (const k in attrs) g.setAttribute(k, new T.Float32BufferAttribute(attrs[k], 1)); return g; };
-
-  // India dot-matrix
-  const indMat = new T.ShaderMaterial({
-    uniforms: U, transparent: true, depthWrite: false,
-    vertexShader: `uniform float uTime,uReveal,uDawn,uDim,uPR; attribute float aRand,aDist; varying vec3 vC; varying float vA; ${flagGLSL}
-      void main(){ vec4 mv=modelViewMatrix*vec4(position,1.); gl_Position=projectionMatrix*mv;
-        float rev=clamp((uReveal-aDist)/4.,0.,1.); float tw=.82+.18*sin(uTime*1.1+aRand*50.); float b=dawnBand(position.x);
-        vC=mix(vec3(.24,.66,.66),flagCol(position.z),b); vA=rev*tw*(.62+.38*b)*uDim;
-        gl_PointSize=2.5*uPR*(34./-mv.z)*(1.+b*.9)*(.5+.5*rev); }`,
-    fragmentShader: ptFrag
-  });
-  scene.add(new T.Points(geoPts(indPos, { aRand: indRand, aDist: indDist }), indMat));
-
-  // neighbouring land, lower plane
-  const nbMat = new T.ShaderMaterial({
-    uniforms: U, transparent: true, depthWrite: false,
-    vertexShader: `uniform float uReveal,uDim,uPR; attribute float aDist; varying vec3 vC; varying float vA;
-      void main(){ vec4 mv=modelViewMatrix*vec4(position,1.); gl_Position=projectionMatrix*mv;
-        vC=vec3(.30,.40,.50); vA=.56*clamp((uReveal-aDist*.7)/6.,0.,1.)*(.55+.45*uDim); gl_PointSize=2.*uPR*(34./-mv.z); }`,
-    fragmentShader: ptFrag
-  });
-  scene.add(new T.Points(geoPts(nbPos, { aDist: nbDist }), nbMat));
-
-  // city lights
-  const lMat = new T.ShaderMaterial({
-    uniforms: U, transparent: true, depthWrite: false, blending: T.AdditiveBlending,
-    vertexShader: `uniform float uTime,uReveal,uDawn,uDim,uPR; attribute float aRand,aDist,aI; varying vec3 vC; varying float vA; ${flagGLSL}
-      void main(){ vec4 mv=modelViewMatrix*vec4(position,1.); gl_Position=projectionMatrix*mv;
-        float rev=clamp((uReveal-aDist-1.5)/3.,0.,1.); float tw=.62+.38*sin(uTime*(1.2+aRand*2.4)+aRand*90.); float b=dawnBand(position.x);
-        vec3 warm=mix(vec3(1.,.66,.26),vec3(1.,.92,.74),aRand*aI);
-        vC=mix(warm,flagCol(position.z),b*.85); vA=.85*rev*tw*(.25+.75*aI)*(.55+.45*uDim)*(1.+b*.6);
-        gl_PointSize=uPR*(34./-mv.z)*(1.1+2.6*aI)*(1.+b*.5); }`,
-    fragmentShader: ptFrag
-  });
-  scene.add(new T.Points(geoPts(lPos, { aRand: lRand, aDist: lDist, aI: lI }), lMat));
-
-  // border ribbons + hologram walls
-  const ribbonGeo = (ring, w, y) => {
-    const pts = ring.map(([lo, la]) => P(lo, la)); pts.push(pts[0]);
-    const n = pts.length, cum = [0];
-    for (let i = 1; i < n; i++) cum.push(cum[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]));
-    const L = cum[n - 1] || 1; const pos = [], side = [], along = [], idx = [];
-    for (let i = 0; i < n; i++) {
-      const a = pts[Math.max(0, i - 1)], b = pts[Math.min(n - 1, i + 1)];
-      let tx = b[0] - a[0], tz = b[1] - a[1]; const tl = Math.hypot(tx, tz) || 1; tx /= tl; tz /= tl;
-      const nx = -tz, nz = tx;
-      pos.push(pts[i][0] + nx * w / 2, y, pts[i][1] + nz * w / 2, pts[i][0] - nx * w / 2, y, pts[i][1] - nz * w / 2);
-      side.push(1, -1); along.push(cum[i] / L, cum[i] / L);
-      if (i < n - 1) { const k = i * 2; idx.push(k, k + 1, k + 2, k + 1, k + 3, k + 2); }
-    }
-    const g = new T.BufferGeometry(); g.setAttribute('position', new T.Float32BufferAttribute(pos, 3));
-    g.setAttribute('aSide', new T.Float32BufferAttribute(side, 1)); g.setAttribute('aAlong', new T.Float32BufferAttribute(along, 1)); g.setIndex(idx); return g;
-  };
-  const wallGeo = (ring, h) => {
-    const pts = ring.map(([lo, la]) => P(lo, la)); pts.push(pts[0]);
-    const n = pts.length, cum = [0];
-    for (let i = 1; i < n; i++) cum.push(cum[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]));
-    const L = cum[n - 1] || 1; const pos = [], vv = [], along = [], idx = [];
-    for (let i = 0; i < n; i++) {
-      pos.push(pts[i][0], 0, pts[i][1], pts[i][0], -h, pts[i][1]); vv.push(0, 1); along.push(cum[i] / L, cum[i] / L);
-      if (i < n - 1) { const k = i * 2; idx.push(k, k + 1, k + 2, k + 1, k + 3, k + 2); }
-    }
-    const g = new T.BufferGeometry(); g.setAttribute('position', new T.Float32BufferAttribute(pos, 3));
-    g.setAttribute('aV', new T.Float32BufferAttribute(vv, 1)); g.setAttribute('aAlong', new T.Float32BufferAttribute(along, 1)); g.setIndex(idx); return g;
-  };
-  const ribbonMat = (color, alpha, sharp) => new T.ShaderMaterial({
-    uniforms: Object.assign({ uColor: { value: new T.Color(color) }, uAlpha: { value: alpha }, uSharp: { value: sharp } }, U),
-    transparent: true, depthWrite: false, blending: T.AdditiveBlending, side: T.DoubleSide,
-    vertexShader: `uniform float uTrace,uDawn; attribute float aSide,aAlong; varying float vSide,vAlong,vB; ${'float dawnBand(float x){ return exp(-pow(x-uDawn,2.)/9.); }'}
-      void main(){ gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); vSide=aSide; vAlong=aAlong; vB=dawnBand(position.x); }`,
-    fragmentShader: `uniform vec3 uColor; uniform float uAlpha,uSharp,uTrace,uTime,uDim; varying float vSide,vAlong,vB;
-      void main(){ if(vAlong>uTrace) discard; float head=smoothstep(uTrace-.025,uTrace,vAlong)*(1.-step(.999,uTrace));
-        float prof=pow(1.-abs(vSide),uSharp); float fl=.88+.12*sin(uTime*2.2+vAlong*60.);
-        vec3 c=mix(uColor,vec3(1.,.97,.9),head*.8)+vB*.35;
-        gl_FragColor=vec4(c,prof*uAlpha*fl*(1.+head*2.5)*(.6+.4*uDim)); }`
-  });
-  const wallMat = new T.ShaderMaterial({
-    uniforms: U, transparent: true, depthWrite: false, blending: T.AdditiveBlending, side: T.DoubleSide,
-    vertexShader: `attribute float aV,aAlong; varying float vV,vAlong; void main(){ gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); vV=aV; vAlong=aAlong; }`,
-    fragmentShader: `uniform float uTrace,uTime,uDim; varying float vV,vAlong;
-      void main(){ if(vAlong>uTrace) discard; float a=pow(1.-vV,1.8)*.30*(.6+.4*uDim);
-        float scan=.75+.25*sin(vV*30.-uTime*3.); vec3 c=mix(vec3(1.,.72,.28),vec3(.31,.82,.77),vV);
-        gl_FragColor=vec4(c,a*scan); }`
-  });
-  const haloMat = ribbonMat(0xF4B443, 0.16, 1.6), coreMat = ribbonMat(0xFFC766, 0.95, 0.6);
-  MAPDATA.rings.forEach((ring, i) => {
-    const big = i === 0;
-    scene.add(new T.Mesh(ribbonGeo(ring, big ? 0.9 : 0.4, 0.02), haloMat));
-    scene.add(new T.Mesh(ribbonGeo(ring, big ? 0.075 : 0.05, 0.03), coreMat));
-    if (big) scene.add(new T.Mesh(wallGeo(ring, PL), wallMat));
-  });
-
-  // graticule on the lower plane
-  const gr = [];
-  for (let lo = 60; lo <= 100; lo += 5) { const a = P(lo, 4), b = P(lo, 40); gr.push(a[0], -PL - .01, a[1], b[0], -PL - .01, b[1]); }
-  for (let la = 5; la <= 40; la += 5) { const a = P(60, la), b = P(100, la); gr.push(a[0], -PL - .01, a[1], b[0], -PL - .01, b[1]); }
-  const grG = new T.BufferGeometry(); grG.setAttribute('position', new T.Float32BufferAttribute(gr, 3));
-  const grMat = new T.LineBasicMaterial({ color: 0x4FD1C5, transparent: true, opacity: 0.07, depthWrite: false });
-  scene.add(new T.LineSegments(grG, grMat));
-
-  // markers
-  const ringMat = (color, speed) => new T.ShaderMaterial({
-    uniforms: Object.assign({ uColor: { value: new T.Color(color) }, uSpeed: { value: speed } }, U),
-    transparent: true, depthWrite: false, blending: T.AdditiveBlending,
-    vertexShader: `varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }`,
-    fragmentShader: `uniform vec3 uColor; uniform float uTime,uSpeed,uReveal; varying vec2 vUv;
-      void main(){ float r=length(vUv-.5)*2.; float a=0.;
-        for(int i=0;i<2;i++){ float f=fract(uTime*uSpeed+float(i)*.5); a+=smoothstep(.06,0.,abs(r-f))*(1.-f); }
-        a+=smoothstep(.16,.0,r)*1.2; a*=smoothstep(1.,.9,r)*clamp((uReveal-2.)/3.,0.,1.);
-        gl_FragColor=vec4(uColor,a); }`
-  });
-  const marker = (p, color, size, speed, beamH) => {
-    const g = new T.Group(); g.position.set(p[0], 0.06, p[1]);
-    const ring = new T.Mesh(new T.PlaneGeometry(size, size), ringMat(color, speed)); ring.rotation.x = -Math.PI / 2; g.add(ring);
-    const beam = new T.Mesh(new T.CylinderGeometry(0.035, 0.035, beamH, 8, 1, true), new T.ShaderMaterial({
-      uniforms: Object.assign({ uColor: { value: new T.Color(color) } }, U), transparent: true, depthWrite: false, blending: T.AdditiveBlending,
-      vertexShader: `varying float vY; void main(){ vY=uv.y; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }`,
-      fragmentShader: `uniform vec3 uColor; uniform float uReveal; varying float vY; void main(){ gl_FragColor=vec4(uColor,(1.-vY)*.8*clamp((uReveal-3.)/3.,0.,1.)); }`
-    }));
-    beam.position.y = beamH / 2; g.add(beam); scene.add(g); return g;
-  };
-  marker(DEL, 0xF4B443, 2.6, 0.45, 3.4);
-  marker(PAU, 0x4FD1C5, 1.6, 0.6, 1.6);
-
-  // journey arc: Pauri Garhwal -> New Delhi
-  const arcPts = [], arcT = []; const A0 = new T.Vector3(PAU[0], 0.06, PAU[1]), A1 = new T.Vector3(DEL[0], 0.06, DEL[1]);
-  const AM = A0.clone().lerp(A1, .5); AM.y = 1.3;
-  const curve = new T.QuadraticBezierCurve3(A0, AM, A1);
-  for (let i = 0; i <= 80; i++) { const q = curve.getPoint(i / 80); arcPts.push(q.x, q.y, q.z); arcT.push(i / 80); }
-  const arcG = new T.BufferGeometry(); arcG.setAttribute('position', new T.Float32BufferAttribute(arcPts, 3)); arcG.setAttribute('aT', new T.Float32BufferAttribute(arcT, 1));
-  scene.add(new T.Line(arcG, new T.ShaderMaterial({
-    uniforms: U, transparent: true, depthWrite: false, blending: T.AdditiveBlending,
-    vertexShader: `attribute float aT; varying float vT; void main(){ vT=aT; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }`,
-    fragmentShader: `uniform float uTime,uReveal; varying float vT; void main(){ float on=clamp((uReveal-4.)/3.,0.,1.);
-      float dash=step(.45,fract(vT*14.-uTime*.8)); float pulse=smoothstep(.12,0.,abs(vT-fract(uTime*.32)));
-      gl_FragColor=vec4(mix(vec3(.31,.82,.77),vec3(1.,.8,.4),vT),(dash*.45+pulse)*on); }`
-  })));
-
-  // radar sweep around Delhi
-  const radar = new T.Mesh(new T.PlaneGeometry(16, 16), new T.ShaderMaterial({
-    uniforms: U, transparent: true, depthWrite: false, blending: T.AdditiveBlending,
-    vertexShader: `varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }`,
-    fragmentShader: `uniform float uTime,uReveal,uDim; varying vec2 vUv;
-      void main(){ vec2 c=vUv-.5; float r=length(c)*2.; if(r>1.) discard; float ang=atan(c.y,c.x)/6.28318+.5;
-        float s=fract(ang+uTime*.09); float trail=pow(s,7.)*.17; float rings=(smoothstep(.012,0.,abs(r-.33))+smoothstep(.012,0.,abs(r-.66))+smoothstep(.012,0.,abs(r-.985)))*.06;
-        float a=(trail+rings)*smoothstep(1.,.75,r)*clamp((uReveal-4.)/4.,0.,1.)*uDim;
-        gl_FragColor=vec4(.31,.82,.77,a); }`
-  }));
-  radar.rotation.x = -Math.PI / 2; radar.position.set(DEL[0], 0.05, DEL[1]); scene.add(radar);
-
-  // drifting dust
-  const dPos = [], dR = [];
-  for (let i = 0; i < 320; i++) { dPos.push((rnd() - .5) * 46, rnd() * 9, (rnd() - .5) * 36); dR.push(rnd()); }
-  const dust = new T.Points(geoPts(dPos, { aRand: dR }), new T.ShaderMaterial({
-    uniforms: U, transparent: true, depthWrite: false, blending: T.AdditiveBlending,
-    vertexShader: `uniform float uTime,uPR; attribute float aRand; varying vec3 vC; varying float vA;
-      void main(){ vec3 p=position; p.y=mod(p.y+uTime*(.08+aRand*.12),9.); p.x+=sin(uTime*.2+aRand*20.)*.6;
-        vec4 mv=modelViewMatrix*vec4(p,1.); gl_Position=projectionMatrix*mv; vC=vec3(1.,.85,.6); vA=.18*sin(p.y/9.*3.14159); gl_PointSize=uPR*(34./-mv.z)*(1.+aRand*2.); }`,
-    fragmentShader: ptFrag
-  }));
-  scene.add(dust);
-
-  /* labels projected from 3D */
-  const labelsEl = $('#labels');
-  const LABELS = [
-    { p: DEL, y: 0.1, t: 'New Delhi', s: 'Seat of the NSA', dx: -190, dy: 46 },
-    { p: PAU, y: 0.1, t: 'Pauri Garhwal', s: 'Born here · 1945', dx: 60, dy: -64, cls: 'teal' },
-    { p: P(67.5, 14), y: -PL, t: 'Arabian Sea', cls: 'sea' },
-    { p: P(89, 15.2), y: -PL, t: 'Bay of Bengal', cls: 'sea' },
-    { p: P(79, 5.2), y: -PL, t: 'Indian Ocean', cls: 'sea' }
-  ];
-  LABELS.forEach(L => {
-    const el = document.createElement('div'); el.className = 'mlabel ' + (L.cls || '');
-    if (L.dx !== undefined) {
-      const len = Math.hypot(L.dx, L.dy), ang = Math.atan2(L.dy, L.dx) * 180 / Math.PI;
-      el.innerHTML = `<i class="ln" style="width:${len}px;transform:rotate(${ang}deg)"></i><span class="box" style="position:absolute;left:${L.dx}px;top:${L.dy}px;transform:translate(${L.dx < 0 ? '-100%' : '0'},-50%);padding:${L.dx < 0 ? '0 10px 0 0' : '0 0 0 10px'};text-align:${L.dx < 0 ? 'right' : 'left'}"><span class="t">${L.t}</span><span class="s">${L.s}</span></span>`;
-    } else el.innerHTML = `<span class="t" style="transform:translate(-50%,-50%)">${L.t}</span>`;
-    labelsEl.appendChild(el); L.el = el; L.v = new T.Vector3(L.p[0], L.y, L.p[1]);
-  });
-  const projV = new T.Vector3();
-  const toScreen = v => { projV.copy(v).project(camera); return [(projV.x + 1) / 2 * 1600, (1 - projV.y) / 2 * 900]; };
-
-  /* camera */
-  const camFinal = { pos: new T.Vector3(2.4, 22.5, 21.5), tgt: new T.Vector3(1.4, 0, 0.6) };
-  const camStart = { pos: new T.Vector3(-1, 44, 7), tgt: new T.Vector3(1.4, 0, -1) };
-  const camAway = { pos: new T.Vector3(3, 30, 27), tgt: new T.Vector3(1.4, -0.5, 0.6) };
-  let camFrom = camStart, camTo = camFinal, camK = 0, camDur = 3.4, camT0 = 0;
-  const camPos = new T.Vector3(), camTgt = new T.Vector3();
-  let dimTarget = 1; let px = 0, py = 0, spx = 0, spy = 0;
-
-  function resize() {
-    const pr = Math.min(2, Math.max(1, (window.devicePixelRatio || 1) * S));
-    renderer.setPixelRatio(pr); renderer.setSize(1600, 900, false); U.uPR.value = pr;
-    camera.aspect = 16 / 9; camera.setViewOffset(1600, 900, -1600 * 0.155, 0, 1600, 900); camera.updateProjectionMatrix();
-  }
-  resize();
-
-  const t0 = performance.now();
-  let dawnT0 = -1;
-  const easeOut = k => 1 - Math.pow(1 - k, 3);
-  const io = k => k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
-  let labelsOn = false, scaleK = 0;
-
-  function frame(now) {
-    const t = (now - t0) / 1000; U.uTime.value = t;
-    if (REDUCE) { U.uTrace.value = 1; U.uReveal.value = 60; camK = 1; }
-    else {
-      U.uTrace.value = io(Math.min(1, Math.max(0, (t - 0.3) / 2.3)));
-      U.uReveal.value = Math.max(0, (t - 0.8) / 2.8) * 30;
-      camK = Math.min(1, (t - camT0) / camDur);
-    }
-    if (!labelsOn && (REDUCE || t > 2.9)) { labelsOn = true; LABELS.forEach(L => L.el.classList.add('on')); }
-    if (dawnT0 >= 0) { const k = (now - dawnT0) / 1700; U.uDawn.value = k > 1 ? -40 : -16 + k * 34; if (k > 1) dawnT0 = -1; }
-    U.uDim.value += (dimTarget - U.uDim.value) * 0.06;
-    spx += (px - spx) * 0.05; spy += (py - spy) * 0.05;
-    const k = easeOut(camK);
-    camPos.lerpVectors(camFrom.pos, camTo.pos, k); camTgt.lerpVectors(camFrom.tgt, camTo.tgt, k);
-    const drift = REDUCE ? 0 : Math.sin(t * 0.07) * 0.8;
-    camera.position.set(camPos.x + spx * 2.2 + drift, camPos.y - spy * 1.4, camPos.z + spy * 1.2);
-    camera.lookAt(camTgt.x + spx * 0.6, camTgt.y, camTgt.z + spy * 0.4);
-    renderer.render(scene, camera);
-    // labels + scale bar
-    for (const L of LABELS) { const [x, y] = toScreen(L.v); L.el.style.transform = `translate(${x}px,${y}px)`; if (L.cls === 'sea') L.el.classList.toggle('off', x < 760); }
-    if (++scaleK % 10 === 1) {
-      const a = toScreen(new T.Vector3(...[P(84, 12)[0], 0, P(84, 12)[1]])), b = toScreen(new T.Vector3(P(84 + 500 / (111.32 * Math.cos(12 * Math.PI / 180)), 12)[0], 0, P(84, 12)[1]));
-      $('#scale-line').style.width = Math.round(Math.hypot(b[0] - a[0], b[1] - a[1])) + 'px';
-    }
-    if (!document.hidden) requestAnimationFrame(frame);
-  }
-  document.addEventListener('visibilitychange', () => { if (!document.hidden) requestAnimationFrame(frame); });
-  requestAnimationFrame(frame);
-
-  /* crosshair readout */
-  const ray = new T.Raycaster(), plane = new T.Plane(new T.Vector3(0, 1, 0), 0), hit = new T.Vector3();
-  const cross = $('#cross'), roLat = $('#ro-lat'), roLon = $('#ro-lon'), roWhere = $('#ro-where');
-  const fmt = (v, pos, neg) => Math.abs(v).toFixed(2) + '° ' + (v >= 0 ? pos : neg);
-  const resetRO = () => { roLat.textContent = '28.61° N'; roLon.textContent = '77.21° E'; roWhere.textContent = 'New Delhi · seat of the NSA'; cross.classList.remove('on'); };
-  stage.addEventListener('pointermove', e => {
-    const [sx, sy] = toStage(e);
-    px = (sx / 1600 - .5); py = (sy / 900 - .5);
-    if (cur !== 0 || sx < 760 || sy < 100 || sy > 840) { resetRO(); return; }
-    ray.setFromCamera({ x: sx / 1600 * 2 - 1, y: -(sy / 900 * 2 - 1) }, camera);
-    if (!ray.ray.intersectPlane(plane, hit)) { resetRO(); return; }
-    const [lon, lat] = unP(hit.x, hit.z);
-    if (lon < 60 || lon > 100 || lat < 4 || lat > 40) { resetRO(); return; }
-    const c = classAt(lon, lat);
-    roLat.textContent = fmt(lat, 'N', 'S'); roLon.textContent = fmt(lon, 'E', 'W');
-    roWhere.textContent = c === 2 ? 'India' : c === 1 ? 'Neighbouring land' : 'Open sea';
-    cross.style.left = sx + 'px'; cross.style.top = sy + 'px'; cross.classList.add('on');
-  });
-  stage.addEventListener('pointerleave', () => { px = py = 0; resetRO(); });
-
-  return {
-    resize,
-    dawn() { dawnT0 = performance.now(); },
-    pose(i) {
-      const away = i !== 0;
-      dimTarget = away ? 0.4 : 1;
-      camFrom = { pos: camera.position.clone(), tgt: camTgt.clone() };
-      camTo = away ? camAway : camFinal; camT0 = (performance.now() - t0) / 1000; camDur = 1.4;
-      $('#hud').style.opacity = away ? 0 : 1; labelsEl.style.opacity = away ? 0.35 : 1;
-    }
-  };
+/* =================== intro =================== */
+function intro() {
+  const lamp = $('#lamp');
+  const title = $('#s1');
+  if (REDUCE) { lamp.style.opacity = 0; cam.classList.remove('pre'); title.classList.add('shown'); drawStrings(0); return; }
+  $$('.prop').forEach((p, i) => { p.style.transitionDelay = (700 + i * 110) + 'ms'; });
+  lamp.animate([{ opacity: 1 }, { opacity: .55, offset: .18 }, { opacity: .92, offset: .3 }, { opacity: .3, offset: .5 }, { opacity: .6, offset: .62 }, { opacity: 0 }], { duration: 1500, easing: 'linear', fill: 'forwards' });
+  setTimeout(() => cam.classList.remove('pre'), 60);
+  $$('[data-in]', title).forEach((el, i) => { el.style.transitionDelay = (1500 + i * 220) + 'ms'; });
+  setTimeout(() => title.classList.add('shown'), 60);
+  drawStrings(2500);
 }
 
-try { GL = initGL(); } catch (err) { GL = null; }
-if (!GL) {
-  const m = document.createElement('p'); m.id = 'nogl';
-  m.textContent = 'The 3D map needs WebGL. Open this deck in Chrome or Edge with hardware acceleration turned on.';
-  stage.appendChild(m);
-}
-$('#hud').style.transition = 'opacity .6s';
-$('#labels').style.transition = 'opacity .6s';
+/* =================== boot =================== */
 addEventListener('resize', fit);
 fit();
 updateChrome();
+drawCork();
+buildPins();
+buildStrings();
+const fontsReady = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
+fontsReady.then(() => Promise.all(['700 17px Kalam', '400 16px Kalam', '11px "Special Elite"'].map(f => document.fonts && document.fonts.load ? document.fonts.load(f).catch(() => {}) : 0))).then(() => {
+  drawMapScrap();
+  const stored = savedPhoto();
+  if (EMBED_PHOTO) loadPhoto(EMBED_PHOTO, EMBED_CREDIT, true);
+  else if (stored) setTimeout(() => loadPhoto(stored, '', true), REDUCE ? 0 : 1300);
+  else setTimeout(() => showSketch(blankSketch(), true), REDUCE ? 0 : 1300);
+});
 intro();
+requestAnimationFrame(frame);
 })();

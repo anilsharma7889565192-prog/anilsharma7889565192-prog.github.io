@@ -11,10 +11,9 @@ SRC = ROOT / "src"
 DIST = ROOT / "dist"
 DIST.mkdir(exist_ok=True)
 
-FONTS = ("https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900"
-         "&family=Big+Shoulders+Stencil+Display:wght@800&family=Instrument+Serif:ital@0;1"
-         "&family=JetBrains+Mono:wght@500;600&family=Manrope:wght@400;500;600;700&display=swap")
-THREE = "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"
+FONTS = ("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,500;1,600"
+         "&family=Special+Elite&family=Kalam:wght@400;700&family=IBM+Plex+Sans:wght@400;500;600"
+         "&family=IBM+Plex+Mono:wght@500;600&display=swap")
 
 css = (SRC / "deck.css").read_text()
 body = (SRC / "deck.body.html").read_text()
@@ -23,14 +22,13 @@ app = (SRC / "deck.js").read_text()
 
 head = (
     "<title>Operation Quiet Guardian</title>\n"
-    '<meta name="description" content="Ajit Doval, the Quiet Guardian of India: a declassified-file presentation over a live 3D night map of India.">\n'
+    '<meta name="description" content="Ajit Doval, the Quiet Guardian of India: a documentary-style case-board presentation.">\n'
     '<meta name="theme-color" content="#05070B">\n'
     '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
     f'<link rel="stylesheet" href="{FONTS}">\n'
     f"<style>\n{css}</style>\n"
 )
 scripts = (
-    f'<script src="{THREE}"></script>\n'
     f"<script>\n{data}</script>\n"
     f"<script>\n{app}</script>\n"
 )

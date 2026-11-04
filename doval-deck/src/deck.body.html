@@ -1,23 +1,47 @@
-<div id="viewport" class="nojs">
+<div id="viewport">
 <div id="stage">
-  <canvas id="gl" aria-hidden="true"></canvas>
-  <div id="labels" aria-hidden="true"></div>
-  <div class="fx fx-left"></div>
-  <div class="fx fx-vignette"></div>
-  <div class="fx fx-scan"></div>
-  <div class="fx fx-grain" id="grain"></div>
-
-  <div id="hud" aria-hidden="true">
-    <div class="livechip"><i></i>Night map · India</div>
-    <div class="scalebar"><span id="scale-line" style="width:90px"></span><em id="scale-txt">500 km</em></div>
-    <div class="readout"><div>Lat <b id="ro-lat">28.61° N</b> · Lon <b id="ro-lon">77.21° E</b></div><div class="where" id="ro-where">New Delhi · seat of the NSA</div></div>
-    <div id="cross"><span></span></div>
+  <!-- the case board: everything inside #cam moves with the documentary camera -->
+  <div id="cam" class="pre" aria-hidden="true">
+    <canvas id="cork"></canvas>
+    <div class="layer" id="props">
+      <div class="prop" id="p-file"><div class="sheet"><span class="ring"></span><pre>FILE NO.  AD/1945
+SUBJECT   AJIT KUMAR DOVAL
+BORN      20 JAN 1945
+          PAURI GARHWAL
+SERVICE   I.P.S. 1968 (KERALA)
+          INTELLIGENCE BUREAU
+          1972 - 2005
+PRESENT   NATIONAL SECURITY
+          ADVISOR, SINCE
+          30 MAY 2014</pre><span class="confid">CONFIDENTIAL</span></div>
+        <svg class="clip" viewBox="0 0 30 84"><defs><linearGradient id="steel" x1="0" x2="1"><stop offset="0" stop-color="#7d838a"/><stop offset=".45" stop-color="#e9edf0"/><stop offset=".7" stop-color="#9aa1a8"/><stop offset="1" stop-color="#5d636a"/></linearGradient></defs><path d="M8 66V14a7 7 0 0 1 14 0v58a10 10 0 0 1-20 0V22" fill="none" stroke="url(#steel)" stroke-width="3" stroke-linecap="round"/></svg>
+      </div>
+      <div class="prop" id="p-map"><canvas id="mapc"></canvas></div>
+      <div class="prop card" id="c-kc"><div class="sheet"><small>Kirti Chakra · 1989</small><b>First police officer ever to win it</b></div></div>
+      <div class="prop card" id="c-born"><div class="sheet"><small>Born · 1945</small><b>Ghiri Banelsyun, Garhwal</b></div></div>
+      <div class="prop card" id="c-ips"><div class="sheet"><small>IPS officer · 1968</small><b>Kerala cadre, at 23</b></div></div>
+      <div class="prop card" id="c-nsa"><div class="sheet"><small>NSA · since 2014</small><b>Now in his 3rd term</b></div></div>
+      <div class="prop" id="p-portrait"><div class="sheet"></div>
+        <canvas id="sketch" title="Click to add or change the photo"></canvas>
+        <p class="hint">Click here to add his photo<small>it will be sketched in pencil</small></p>
+        <span class="credit" id="credit"></span>
+      </div>
+      <div class="prop" id="p-caption"><div class="sheet"><b>AJIT KUMAR DOVAL</b><span>b. 20 January 1945</span></div><i class="tape l"></i><i class="tape r"></i></div>
+    </div>
+    <svg id="strings" viewBox="0 0 1680 980"><defs><filter id="blur3" x="-5%" y="-5%" width="110%" height="110%"><feGaussianBlur stdDeviation="2.2"/></filter></defs><g id="str-sh"></g><g id="str"></g></svg>
+    <div class="layer" id="pins"></div>
   </div>
 
-  <div id="ticker" aria-hidden="true"><div class="run" id="ticker-run"></div></div>
+  <div class="light light-warm"></div>
+  <div class="light light-fall"></div>
+  <div class="light light-left"></div>
+  <canvas id="dust" aria-hidden="true"></canvas>
+  <div class="fx fx-vig"></div>
+  <div class="fx fx-grain" id="grain"></div>
+  <div id="lamp"></div>
 
   <header class="top">
-    <div class="brand"><i class="rec"></i>File no. AD-1945<span class="sep">·</span><span class="part" id="part">Part I</span></div>
+    <div class="brand">Case file <b>AD/1945</b> · <span class="part" id="part">Part I</span></div>
     <div class="right">
       <span class="secname" id="secname">Introduction</span>
       <button class="ibtn" id="btn-notes" aria-label="Speaker notes (N)" title="Speaker notes (N)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 6h14M5 11h14M5 16h9"/></svg></button>
@@ -27,35 +51,23 @@
   </header>
 
   <main id="slides">
-    <!-- 1 · INTRODUCTION -->
-    <section class="slide s1 active" id="s1" data-title="Introduction" aria-label="Slide 1: Introduction">
-      <div class="dossier">
-        <p class="eyebrow" data-in>Communication project · Leader study</p>
-        <p class="subject" data-in><span>Subject<b>001</b></span><span>Office<b>National Security Advisor</b></span></p>
-        <h1 class="name"><span class="rd"><span>Ajit</span><i class="bar"></i></span><span class="rd l2"><span>Doval</span><i class="bar"></i></span></h1>
-        <p class="tagline" data-in>The Quiet <em>Guardian</em> of India</p>
+    <section class="slide active" id="s1" aria-label="Slide 1: Introduction">
+      <div class="title-card">
+        <p class="eyebrow" data-in>A communication project · Leader study</p>
+        <h1 class="name" data-in><span>Ajit</span><span>Doval</span></h1>
+        <p class="tagline" data-in>The Quiet Guardian of India</p>
         <p class="lead" data-in>India’s National Security Advisor since 2014: a former police officer, undercover intelligence officer and chief of the Intelligence Bureau.</p>
-        <ul class="tags">
-          <li data-in><small>Born</small><b>1945 · Garhwal, Uttarakhand</b></li>
-          <li data-in><small>Indian Police Service</small><b>IPS officer · 1968</b></li>
-          <li data-in><small>National Security Advisor</small><b>Since 2014 · 3rd term</b></li>
-          <li data-in><small>Kirti Chakra</small><b>First police officer to win it</b></li>
-        </ul>
         <div class="cta" data-in>
-          <button class="btn-open" id="open-file">Open the file<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+          <button class="btn-open" id="open-file">Open the case file<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
           <span class="keys">← → move · F full screen<br>N speaker notes</span>
         </div>
       </div>
-      <div class="stamp" id="st-secret">Top secret<i class="strike"></i></div>
-      <div class="stamp" id="st-declass">Declassified</div>
     </section>
   </main>
 
-  <div id="dawn"></div>
-
   <footer class="bottom">
-    <span class="count" id="count">Page <b>01</b> / 15</span>
-    <span class="tape"><i id="tape"></i><span class="ticks" id="ticks"></span></span>
+    <span class="count" id="count"><b>01</b> / 15</span>
+    <span class="prog"><i id="prog"></i></span>
     <span class="navbtns">
       <button class="ibtn" data-go="prev" aria-label="Previous slide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
       <button class="ibtn" data-go="next" aria-label="Next slide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
@@ -68,7 +80,8 @@
     <h2>All 15 pages</h2>
     <div class="grid" id="menu-grid"></div>
   </div>
-  <canvas id="iris" aria-hidden="true"></canvas>
+  <input type="file" id="photo-input" accept="image/*" aria-label="Choose a photo to sketch">
+  <div id="fade"></div>
 </div>
 </div>
 <div id="rotate-hint">Turn your phone sideways to see the full slide.</div>

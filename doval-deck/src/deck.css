@@ -601,3 +601,5 @@ canvas.mini{position:absolute;left:0;top:34px}
 #btn-snd.off svg .x{display:block}
 #btn-snd svg .x{display:none}
 @media (prefers-reduced-motion:reduce){#scene-file.kb{animation:none}.ch-t{transition:none}}
+
+.fin-again{margin-top:40px;font-size:16px}

@@ -712,6 +712,8 @@ function finale() {
     later(2400, () => { busy = false; });
   });
 }
+function playAgain() { try { location.reload(); } catch (e) { /* reload blocked: fall back to the first slide */ leaveFinale(); } }
+$('#play-again').addEventListener('click', playAgain);
 function leaveFinale() {
   busy = true; inFinale = false;
   const f = $('#finale'); f.classList.remove('on'); SFX.droneOff();
@@ -774,6 +776,7 @@ addEventListener('keydown', e => {
   const k = e.key, onBtn = e.target.closest && e.target.closest('button');
   if (coldState !== 2) { if (['ArrowRight', 'PageDown', ' ', 'Enter'].includes(k)) { e.preventDefault(); coldStart(); } else if (k === 'f' || k === 'F') fullscreen(); return; }
   if (k === 's' || k === 'S') { toggleSound(); return; }
+  if ((k === 'r' || k === 'R') && inFinale) { playAgain(); return; }
   if (k === 'c' || k === 'C') { chapOn = !chapOn; try { localStorage.setItem('aqg-chapters', chapOn ? 'on' : 'off'); } catch (err) { /* ignore */ } return; }
   if (k === 'ArrowRight' || k === 'PageDown' || ((k === ' ' || k === 'Enter') && !onBtn)) { e.preventDefault(); go('next'); }
   else if (k === 'ArrowLeft' || k === 'PageUp') { e.preventDefault(); go('prev'); }

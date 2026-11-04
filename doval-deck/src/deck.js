@@ -7,8 +7,8 @@ const stage = $('#stage'), cam = $('#cam');
 
 /* A photo can be embedded here as a data: URL once we have a licensed file.
    Until then the presenter adds one by clicking the sketch; it is kept in this browser. */
-const EMBED_PHOTO = null;
-const EMBED_CREDIT = '';
+const EMBED_PHOTO = (window.DOVAL_PHOTOS || {}).portrait || null;
+const EMBED_CREDIT = EMBED_PHOTO ? 'pencil sketch from a 2014 photograph' : '';
 
 /* =================== content =================== */
 const PAGES = [
@@ -673,7 +673,44 @@ addEventListener('keydown', e => {
   else if (k === 'f' || k === 'F') fullscreen();
   else if (k === 'n' || k === 'N') toggleNotes();
   else if (k === 'm' || k === 'M') toggleMenu();
-  else if (k === 'Escape') { notes.hidden = true; toggleMenu(false); }
+  else if (k === 'p' || k === 'P') togglePhotoMode();
+  else if (k === 'Escape') { notes.hidden = true; toggleMenu(false); lightbox.hidden = true; if (stage.classList.contains('photo-mode')) togglePhotoMode(); }
+});
+
+/* =================== real photographs =================== */
+const PH = window.DOVAL_PHOTOS || {};
+const IDB = (() => {
+  let dbp = null;
+  const open = () => dbp || (dbp = new Promise((res, rej) => {
+    try { const r = indexedDB.open('aqg-photos', 1); r.onupgradeneeded = () => r.result.createObjectStore('p'); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }
+    catch (e) { rej(e); }
+  }));
+  return {
+    get: k => open().then(db => new Promise(res => { const q = db.transaction('p').objectStore('p').get(k); q.onsuccess = () => res(q.result || null); q.onerror = () => res(null); })).catch(() => null),
+    set: (k, v) => open().then(db => new Promise(res => { const t = db.transaction('p', 'readwrite'); t.objectStore('p').put(v, k); t.oncomplete = () => res(true); t.onerror = () => res(false); })).catch(() => false)
+  };
+})();
+function setSlot(fig, url) { const img = $('img', fig); if (url) { img.src = url; fig.classList.remove('empty'); } else { img.removeAttribute('src'); fig.classList.add('empty'); } }
+$$('.photo-print').forEach(fig => { const k = fig.dataset.photo; setSlot(fig, PH[k] || null); IDB.get(k).then(u => { if (u) setSlot(fig, u); }); });
+const slotInput = $('#slot-input'), lightbox = $('#lightbox');
+let slotTarget = null;
+function togglePhotoMode() { const on = stage.classList.toggle('photo-mode'); $('#photo-banner').hidden = !on; }
+document.addEventListener('click', e => {
+  const fig = e.target.closest && e.target.closest('.photo-print'); if (!fig) return;
+  if (stage.classList.contains('photo-mode')) { slotTarget = fig; slotInput.click(); return; }
+  if (fig.classList.contains('empty')) return;
+  $('img', lightbox).src = $('img', fig).src; $('figcaption', lightbox).textContent = $('figcaption', fig).textContent; lightbox.hidden = false;
+});
+lightbox.addEventListener('click', () => { lightbox.hidden = true; });
+slotInput.addEventListener('change', () => {
+  const f = slotInput.files[0]; slotInput.value = ''; if (!f || !slotTarget || !/^image\//.test(f.type)) return;
+  const fig = slotTarget, fr = new FileReader();
+  fr.onload = () => { const im = new Image(); im.onload = () => {
+    const k = Math.min(1, 1400 / Math.max(im.width, im.height)), c = document.createElement('canvas');
+    c.width = Math.round(im.width * k); c.height = Math.round(im.height * k); c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
+    const url = c.toDataURL('image/jpeg', .86); setSlot(fig, url); IDB.set(fig.dataset.photo, url);
+  }; im.src = fr.result; };
+  fr.readAsDataURL(f);
 });
 
 /* =================== intro =================== */
@@ -709,8 +746,8 @@ fontsReady.then(() => Promise.all(['700 17px Kalam', '400 16px Kalam', '11px "Sp
     { lon: 92.72, lat: 23.73, t: 'Aizawl', s: 'IB unit, 1972–77', l: true },
     { lon: 88.61, lat: 27.33, t: 'Sikkim', s: 'joins India, 1975' }]);
   const stored = savedPhoto();
-  if (EMBED_PHOTO) loadPhoto(EMBED_PHOTO, EMBED_CREDIT, true);
-  else if (stored) setTimeout(() => loadPhoto(stored, '', true), REDUCE ? 0 : 1300);
+  if (stored) setTimeout(() => loadPhoto(stored, '', true), REDUCE ? 0 : 1300);
+  else if (EMBED_PHOTO) setTimeout(() => loadPhoto(EMBED_PHOTO, EMBED_CREDIT, true), REDUCE ? 0 : 1300);
   else setTimeout(() => showSketch(blankSketch(), true), REDUCE ? 0 : 1300);
 });
 intro();

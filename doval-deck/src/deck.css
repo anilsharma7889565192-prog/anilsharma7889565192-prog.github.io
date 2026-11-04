@@ -497,3 +497,32 @@ canvas.mini{position:absolute;left:0;top:34px}
 .mini-ink g.pt{opacity:0;transition:opacity .5s}
 .exhibits.play .mini-ink g.pt{opacity:1}
 .route-card .ink{width:610px}
+
+/* =================== real photographs (prints) =================== */
+.photo-print{position:absolute;margin:0;padding:10px 10px 40px;background:#fbfaf6;box-shadow:0 1px 1px rgba(0,0,0,.45),0 16px 24px -8px rgba(0,0,0,.65);z-index:2;cursor:pointer}
+.photo-print .pimg{position:relative;width:100%;height:100%;overflow:hidden;background:#d9d2c2}
+.photo-print img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:contrast(1.05) saturate(.9) sepia(.08)}
+.photo-print .pimg::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(135deg,rgba(255,255,255,.18),transparent 40%),radial-gradient(120% 100% at 50% 40%,transparent 60%,rgba(0,0,0,.28) 100%)}
+.photo-print figcaption{position:absolute;left:12px;right:12px;bottom:11px;font:400 13px/1.15 var(--f-type);color:#2b261f;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.photo-print .clip{z-index:3}
+.photo-print.empty{display:none}
+.photo-print.empty .pimg{background:repeating-linear-gradient(45deg,#ece6d6 0 10px,#e3dccb 10px 20px)}
+.photo-print.empty .pimg::before{content:"Click to add a photo";position:absolute;inset:0;display:grid;place-items:center;font:700 20px/1.2 var(--f-hand);color:var(--red);text-align:center}
+.photo-mode .photo-print.empty{display:block}
+.photo-mode .photo-print{outline:2px dashed rgba(179,23,29,.6);outline-offset:4px}
+.exhibits:not(.on) .photo-print{pointer-events:none}
+#photo-banner{position:absolute;left:50%;top:94px;transform:translateX(-50%);z-index:7;padding:10px 18px;border-radius:999px;background:var(--paper);color:var(--type);font:400 15px/1.2 var(--f-type);box-shadow:0 10px 30px -10px #000}
+.tray .velvet{gap:14px}
+.tray .velvet .medal{width:112px;height:168px}
+.year-card b{top:50px;font-size:56px}
+.year-card .pl{top:114px;font-size:22px}
+.year-card .nt{top:148px}
+.sources ol{font-size:12.8px;line-height:1.34;top:58px}
+.sources li{margin-bottom:5px}
+.note-src{font-size:15px}
+#slot-input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+#lightbox{position:absolute;inset:0;z-index:8;background:rgba(5,3,2,.9);display:grid;place-items:center;cursor:zoom-out}
+#lightbox[hidden]{display:none}
+#lightbox figure{margin:0;padding:14px 14px 52px;background:#fbfaf6;transform:rotate(-1deg);box-shadow:0 30px 80px -10px #000;position:relative}
+#lightbox img{display:block;max-width:1080px;max-height:660px;filter:contrast(1.04) saturate(.92)}
+#lightbox figcaption{position:absolute;left:18px;right:18px;bottom:16px;font:400 19px/1.2 var(--f-type);color:#2b261f}

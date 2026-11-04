@@ -28,7 +28,14 @@ head = (
     f'<link rel="stylesheet" href="{FONTS}">\n'
     f"<style>\n{css}</style>\n"
 )
+import base64, json
+photos = {}
+for f in sorted((ROOT / "photos").glob("*.jpg")):
+    photos[f.stem] = "data:image/jpeg;base64," + base64.b64encode(f.read_bytes()).decode()
+photo_js = "window.DOVAL_PHOTOS=" + json.dumps(photos) + ";\n"
+
 scripts = (
+    f"<script>\n{photo_js}</script>\n"
     f"<script>\n{data}</script>\n"
     f"<script>\n{app}</script>\n"
 )

@@ -9,3 +9,11 @@ Web presentation on Ajit Doval for a communication project: a declassified file 
 Keys: ← → or a clicker to move, F full screen, N speaker notes, M slide list.
 
 Map data: India outline from DataMeet's `india-composite` (official boundary). Surrounding land from Natural Earth (public domain). City lights are drawn from city sizes, not satellite imagery.
+
+## Photos
+
+Real photographs are embedded from `photos/` (resized by `prep_photos.py`) and placed as prints in the case file.
+Press P during the deck to enter photo mode: click any print to add or replace its picture (kept in that browser).
+
+Credits (Wikimedia Commons): `portrait.jpg` and `s02.jpg` U.S. Department of State (public domain);
+`s11.jpg` kremlin.ru (CC BY 4.0); other files as listed on their Commons pages.

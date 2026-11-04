@@ -208,8 +208,8 @@ button{font:inherit;color:inherit}
 .stack i:nth-child(2){transform:translate(4px,6px) rotate(-.4deg);background:#ede6d4}
 .stack i:nth-child(3){transform:translate(2px,3px) rotate(.25deg);background:#efe8d7}
 #pages{position:absolute;left:22px;top:24px;width:646px;height:700px;transform-style:preserve-3d}
-.page{position:absolute;inset:0;transform-origin:50% 30px;transform-style:preserve-3d;transform:translateZ(calc(var(--z) * 1px)) rotateX(0deg);transition:transform 1s cubic-bezier(.42,.05,.2,1)}
-.page.gone{transform:translateZ(calc(var(--z) * 1px)) rotateX(176deg)}
+.page{position:absolute;inset:0;transform-origin:50% 30px;transform-style:preserve-3d;transform:translateZ(calc(var(--z) * 1px)) rotateX(0deg);transition:transform 1s cubic-bezier(.42,.05,.2,1),opacity .25s}
+.page.gone{transform:translateZ(calc(var(--z) * 1px)) rotateX(176deg);opacity:0}
 .notrans,.notrans *{transition:none !important}
 .pf,.pb{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;background-color:#f2ebda;background-blend-mode:multiply;border-radius:1px;box-shadow:0 1px 1px rgba(0,0,0,.3),0 4px 10px rgba(0,0,0,.18)}
 .pb{transform:rotateX(180deg);background-color:#e8dfcb}
@@ -294,6 +294,40 @@ button{font:inherit;color:inherit}
 .ph-note{position:absolute;left:48px;right:48px;top:300px;font:700 26px/1.3 var(--f-hand);color:var(--red);transform:rotate(-2deg)}
 .ph-note small{display:block;margin-top:10px;font:400 19px/1.4 var(--f-hand);color:#1d2a6b}
 @media (prefers-reduced-motion:reduce){#folder-wrap,#cover,.page,.exhibits{transition:none}}
+
+/* =================== sheet 03 · roots =================== */
+.chrono{position:absolute;left:48px;right:46px;top:240px;margin:0;padding:0;list-style:none}
+.chrono::before{content:"";position:absolute;left:107px;top:9px;bottom:18px;border-left:1.5px dashed rgba(43,38,31,.5)}
+.chrono li{position:relative;display:grid;grid-template-columns:92px 1fr;column-gap:26px;padding:0 0 11px}
+.chrono li::before{content:"";position:absolute;left:102px;top:5px;width:9px;height:9px;border-radius:50%;border:1.5px solid #1b1813;background:#f2ebda}
+.chrono .yr{text-align:right;font:400 21px/1 var(--f-type);color:#1b1813;text-shadow:.45px 0 0 currentColor}
+.chrono .yr.w{font-size:13px;letter-spacing:.1em;text-transform:uppercase;padding-top:4px}
+.chrono p{margin:0;font:400 15.5px/1.4 var(--f-type);color:#221d16}
+.chrono .ann{display:inline-block;margin-left:8px;font:700 18px/1 var(--f-hand);color:#1d2a6b;transform:rotate(-3deg)}
+.sticky{position:absolute;left:46px;top:512px;width:336px;padding:12px 16px 14px;background:#f5df7a;background-image:linear-gradient(180deg,rgba(255,255,255,.18),transparent 30%,rgba(0,0,0,.05));
+  box-shadow:0 1px 1px rgba(0,0,0,.25),0 10px 14px -6px rgba(0,0,0,.45);transform:rotate(-1.8deg)}
+.sticky h4{margin:0;font:700 21px/1 var(--f-hand);color:var(--red)}
+.sticky p{margin:6px 0 0;font:400 16.5px/1.28 var(--f-hand);color:#1d2a6b}
+.sticky .tape{left:120px;top:-14px;transform:rotate(-3deg)}
+.lesson{position:absolute;left:412px;top:540px;width:196px;transform:rotate(1.5deg)}
+.lesson .st{display:inline-block;padding:5px 10px 3px;border:3px solid var(--red);border-radius:4px;font:400 17px/1 var(--f-type);letter-spacing:.24em;text-transform:uppercase;color:var(--red);opacity:.8;transform:rotate(-4deg);mix-blend-mode:multiply}
+.lesson p{margin:10px 0 0;font:700 21px/1.22 var(--f-hand);color:var(--red)}
+.ex-land{left:40px;top:40px;width:310px;height:252px;padding:14px 14px 44px}
+.ex-land canvas{width:282px;height:192px;background:#f4efe2;cursor:default}
+.ex-route{left:258px;top:248px;width:420px;height:470px;transform:rotate(1.5deg)}
+.ex-route canvas{position:absolute;left:0;top:30px;width:420px;height:440px}
+.ex-route .ink{top:30px;height:440px}
+.ex-route .ink path{stroke:var(--red);stroke-width:2.4;stroke-dasharray:7 6}
+.ex-route .ink path.draw{stroke-dasharray:var(--len)}
+.ex-route .ink circle{fill:#fbf8ef;stroke:var(--red);stroke-width:2}
+.ex-route .ink text{font:700 14px var(--f-hand);fill:var(--red);text-anchor:middle;dominant-baseline:central}
+.rl{position:absolute;font:700 16px/1.05 var(--f-hand);color:#1d2a6b;white-space:nowrap}
+.rl small{display:block;font:400 13.5px/1.1 var(--f-hand);color:#3b3f5c}
+.rl.l{text-align:right;transform:translateX(-100%)}
+.rl{opacity:0;transition:opacity .6s}
+.exhibits.play .rl{opacity:1}
+.ex-route .ink g.pt{opacity:0;transition:opacity .5s}
+.exhibits.play .ink g.pt{opacity:1}
 </style>
 <div id="viewport">
 <div id="stage">
@@ -370,6 +404,17 @@ PRESENT   NATIONAL SECURITY
               </svg>
               <span class="hw-note n1">briefs</span>
               <span class="hw-note n2">every report lands on his desk</span>
+              <svg class="clip" viewBox="0 0 30 84"><path d="M8 66V14a7 7 0 0 1 14 0v58a10 10 0 0 1-20 0V22" fill="none" stroke="url(#steel)" stroke-width="3" stroke-linecap="round"/></svg>
+            </div>
+          </div>
+          <div class="exhibits" data-for="2">
+            <div class="ex-print ex-land"><canvas id="hills" width="560" height="380"></canvas><span class="ex-cap">Exhibit B · Garhwal hills</span>
+              <svg class="clip" viewBox="0 0 30 84"><path d="M8 66V14a7 7 0 0 1 14 0v58a10 10 0 0 1-20 0V22" fill="none" stroke="url(#steel)" stroke-width="3" stroke-linecap="round"/></svg></div>
+            <div class="ex-sheet ex-route">
+              <p class="ch-title">Where he grew up</p>
+              <canvas id="routemap" width="840" height="880"></canvas>
+              <svg class="ink" id="route-ink" viewBox="0 0 420 440" aria-hidden="true"></svg>
+              <div id="route-labels"></div>
               <svg class="clip" viewBox="0 0 30 84"><path d="M8 66V14a7 7 0 0 1 14 0v58a10 10 0 0 1-20 0V22" fill="none" stroke="url(#steel)" stroke-width="3" stroke-linecap="round"/></svg>
             </div>
           </div>
@@ -453,8 +498,8 @@ const EMBED_CREDIT = '';
 /* =================== content =================== */
 const PAGES = [
   { t: 'Introduction', h: 'The Quiet Guardian of India', m: 1, done: true },
-  { t: 'Who He Is Today', h: 'The man India turns to in a crisis', m: 1 },
-  { t: 'Roots', h: 'A soldier’s son from the hills', m: 1 },
+  { t: 'Who He Is Today', h: 'The man India turns to in a crisis', m: 1, done: true },
+  { t: 'Roots', h: 'A soldier’s son from the hills', m: 1, done: true },
   { t: 'The Young Officer', h: 'A riot ended in one week', m: 1 },
   { t: 'Into the Shadows', h: 'The spy who talked rebels into peace', m: 1 },
   { t: 'Behind Enemy Lines', h: 'Seven years in Pakistan', m: 2 },
@@ -519,7 +564,20 @@ const SHEETS = {
       <div class="cell"><small>Age</small><b class="hw">81</b><em class="hw">and still on duty</em></div>
     </div>
     <svg class="redpen" viewBox="0 0 646 700" aria-hidden="true"><path class="draw" d="M50 592 C 46 564, 92 553, 122 555 C 160 557, 174 574, 168 594 C 162 616, 112 622, 84 618 C 58 614, 42 604, 58 576"/><path class="draw" d="M60 631 C 110 636, 170 635, 232 629"/></svg>
-    <p class="also"><b>3. Also:</b> chairs the Strategic Policy Group, and is India’s Special Representative for border talks with China (24th round: August 2025).</p>`
+    <p class="also"><b>3. Also:</b> chairs the Strategic Policy Group, and is India’s Special Representative for border talks with China (24th round: August 2025).</p>`,
+  2: `${SHEET_HEAD(2)}
+    <p class="subj">Subject: Ajit Kumar Doval · chapter 1, roots</p>
+    <h2 class="big" data-type>A soldier’s son|from the hills</h2>
+    <h3 class="sec" style="top:210px">Chronology</h3>
+    <ol class="chrono">
+      <li><span class="yr">1945</span><p>Born 20 January in Ghiri Banelsyun village, Pauri Garhwal, Uttarakhand.</p></li>
+      <li><span class="yr w">Early years</span><p>Father: Major G. N. Doval, 36 years in the Army. The family moved with his postings, including about 1.5 years in Pune.</p></li>
+      <li><span class="yr w">School</span><p>Ajmer Military School, Rajasthan, where discipline came first.</p></li>
+      <li><span class="yr">1967</span><p>MA in Economics, Agra University.<span class="ann hw">finished first!</span></p></li>
+      <li><span class="yr">1968</span><p>Cleared the UPSC exam and joined the Indian Police Service at 23.</p></li>
+    </ol>
+    <div class="sticky"><i class="tape"></i><h4 class="hw">Full circle · 1950 → 2026</h4><p class="hw">At 5, a teacher in Pune told him about Lokmanya Tilak. 76 years later, on 1 Aug 2026, he came back to Pune to receive the Lokmanya Tilak National Award.</p></div>
+    <div class="lesson"><span class="st">Lesson</span><p class="hw">Discipline built early becomes strength later.</p></div>`
 };
 const pagesEl = $('#pages');
 pagesEl.innerHTML = PAGES.map((p, i) => i === 0 ? '' :
@@ -529,7 +587,7 @@ pagesEl.innerHTML = PAGES.map((p, i) => i === 0 ? '' :
     <p class="ph-note">This sheet is next in our design review.<small>Content is approved; the page design comes after your OK on the sheet before it.</small></p>`}</div><div class="pb"></div></div>`).join('');
 const pageEls = $$('.page', pagesEl);
 const pageFor = i => pageEls.find(p => +p.dataset.i === i);
-$('#index-list').innerHTML = PAGES.map((p, i) => `<li data-i="${i}"><span>${two(i + 1)} · ${p.t}</span><i>${p.done || i === 1 ? '✓' : ''}</i></li>`).join('');
+$('#index-list').innerHTML = PAGES.map((p, i) => `<li data-i="${i}"><span>${two(i + 1)} · ${p.t}</span><i>${p.done ? '✓' : ''}</i></li>`).join('');
 $('#menu-grid').innerHTML = PAGES.map((p, i) =>
   `<button data-to="${i}" class="${p.done ? 'done' : ''}"><span class="n">Page ${String(i + 1).padStart(2, '0')} · Part ${['I', 'II', 'III'][p.m - 1]}</span><span class="t">${p.t}</span><span class="st">${p.done ? 'designed' : 'in review'}</span></button>`).join('');
 
@@ -712,6 +770,53 @@ function drawMapScrap() {
   x.fillStyle = cg; x.fillRect(W * .5 - 6, 0, 12, H);
   x.restore();
   torn(); x.strokeStyle = 'rgba(255,255,255,.55)'; x.lineWidth = .8; x.stroke();
+}
+/* exhibit B: a pencil study of layered Himalayan ridges (generic landscape, not a specific photo) */
+function drawHills() {
+  const cv = $('#hills'), x = cv.getContext('2d'), W = cv.width, H = cv.height;
+  seed = 30; x.clearRect(0, 0, W, H);
+  const ridge = (base, rough, n) => { let pts = [[0, base], [W, base + (rnd() - .5) * 40]]; for (let d = 0; d < n; d++) { const nx = []; for (let i = 0; i < pts.length - 1; i++) { const a = pts[i], b = pts[i + 1]; nx.push(a, [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2 + (rnd() - .5) * rough / (d + 1)]); } nx.push(pts[pts.length - 1]); pts = nx; } return pts; };
+  const layers = [[120, 200, .10], [175, 150, .16], [235, 120, .24], [300, 90, .34]];
+  layers.forEach(([base, rough, tone], li) => {
+    const pts = ridge(base, rough, 7);
+    x.save(); x.beginPath(); x.moveTo(0, H); pts.forEach(p => x.lineTo(p[0], p[1])); x.lineTo(W, H); x.closePath(); x.clip();
+    x.fillStyle = `rgba(52,54,59,${tone * .55})`; x.fillRect(0, 0, W, H);
+    x.strokeStyle = `rgba(40,42,48,${.18 + tone * .6})`; x.lineWidth = .7;
+    for (let i = 0; i < 260 + li * 140; i++) { const px = rnd() * W, py = base - 60 + rnd() * (H - base + 80), l = 6 + rnd() * 12, a = -0.9 + (rnd() - .5) * .3; x.beginPath(); x.moveTo(px, py); x.lineTo(px + Math.cos(a) * l, py + Math.sin(a) * l); x.stroke(); }
+    if (li === 3) { x.fillStyle = 'rgba(30,32,36,.55)'; for (let i = 0; i < 70; i++) { const tx = rnd() * W, ty = base + 30 + rnd() * 60, s = 5 + rnd() * 9; x.beginPath(); x.moveTo(tx, ty - s * 1.8); x.lineTo(tx - s * .55, ty); x.lineTo(tx + s * .55, ty); x.closePath(); x.fill(); } }
+    x.restore();
+    x.strokeStyle = `rgba(30,32,36,${.45 + li * .12})`; x.lineWidth = 1.3 + li * .3; x.beginPath(); pts.forEach((p, i) => i ? x.lineTo(p[0], p[1]) : x.moveTo(p[0], p[1])); x.stroke();
+  });
+  const fadeG = x.createLinearGradient(0, 0, 0, H); fadeG.addColorStop(0, 'rgba(244,239,226,1)'); fadeG.addColorStop(.18, 'rgba(244,239,226,0)');
+  x.globalCompositeOperation = 'destination-out'; x.fillStyle = fadeG; x.fillRect(0, 0, W, H * .2); x.globalCompositeOperation = 'source-over';
+}
+/* route map: where he grew up (official India outline) */
+function drawRouteMap() {
+  const cv = $('#routemap'), x = cv.getContext('2d'), k = cv.width / 420;
+  x.setTransform(k, 0, 0, k, 0, 0); x.clearRect(0, 0, 420, 440);
+  const merc = lat => Math.log(Math.tan(Math.PI / 4 + lat * Math.PI / 360)) * 180 / Math.PI;
+  const sc = 12.4, X = lon => 92 + (lon - 66) * sc, Y = lat => 12 + (merc(37.3) - merc(lat)) * sc;
+  x.setLineDash([2, 3]); x.strokeStyle = 'rgba(90,70,48,.22)'; x.lineWidth = .6;
+  for (let lo = 70; lo <= 95; lo += 5) { x.beginPath(); x.moveTo(X(lo), Y(37)); x.lineTo(X(lo), Y(6)); x.stroke(); }
+  for (let la = 10; la <= 35; la += 5) { x.beginPath(); x.moveTo(X(60), Y(la)); x.lineTo(X(98), Y(la)); x.stroke(); }
+  x.setLineDash([]);
+  MAPDATA.rings.forEach(r => { x.beginPath(); r.forEach(([lo, la], i) => i ? x.lineTo(X(lo), Y(la)) : x.moveTo(X(lo), Y(la))); x.closePath(); x.fillStyle = 'rgba(214,196,152,.55)'; x.fill(); x.strokeStyle = '#4e3b27'; x.lineWidth = 1.1; x.stroke(); });
+  const P = [
+    { lon: 78.78, lat: 30.15, n: 1, t: 'Garhwal', s: 'born 1945', side: 'r' },
+    { lon: 73.86, lat: 18.52, n: 2, t: 'Pune', s: 'early years', side: 'l' },
+    { lon: 74.64, lat: 26.45, n: 3, t: 'Ajmer', s: 'military school', side: 'l' },
+    { lon: 78.01, lat: 27.18, n: 4, t: 'Agra', s: 'MA, topped 1967', side: 'r' },
+    { lon: 76.52, lat: 9.59, n: 5, t: 'Kerala', s: 'IPS officer, 1968', side: 'r' }
+  ].map(p => Object.assign(p, { x: X(p.lon), y: Y(p.lat) }));
+  let svg = '';
+  for (let i = 0; i < P.length - 1; i++) {
+    const a = P[i], b = P[i + 1], mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2, dx = b.x - a.x, dy = b.y - a.y, bend = (i % 2 ? 1 : -1) * .22;
+    svg += `<path class="draw" d="M${a.x.toFixed(1)} ${a.y.toFixed(1)} Q${(mx - dy * bend).toFixed(1)} ${(my + dx * bend).toFixed(1)} ${b.x.toFixed(1)} ${b.y.toFixed(1)}"/>`;
+  }
+  svg += P.map((p, i) => `<g class="pt" style="transition-delay:${REDUCE ? 0 : 700 + i * 260}ms"><circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="9"/><text x="${p.x.toFixed(1)}" y="${(p.y + .5).toFixed(1)}">${p.n}</text></g>`).join('');
+  $('#route-ink').innerHTML = svg;
+  const lab = { 1: [16, -16], 2: [-16, -4], 3: [-16, -10], 4: [16, 2], 5: [16, -8] };
+  $('#route-labels').innerHTML = P.map(p => `<span class="rl ${p.side === 'l' ? 'l' : ''}" style="left:${(p.x + lab[p.n][0]).toFixed(0)}px;top:${(p.y + 30 + lab[p.n][1]).toFixed(0)}px">${p.t}<small>${p.s}</small></span>`).join('');
 }
 const G = MAPDATA.grid, GRAW = atob(G.b64);
 function inIndia(lon, lat) { const gx = Math.floor((lon - G.lon0) / G.step), gy = Math.floor((G.lat1 - lat) / G.step); if (gx < 0 || gy < 0 || gx >= G.w || gy >= G.h) return false; const i = gy * G.w + gx; return ((GRAW.charCodeAt(i >> 2) >> ((i & 3) * 2)) & 3) === 2; }
@@ -923,23 +1028,30 @@ function enterPage(i) {
   $$('.hw', pg).forEach((h, k) => { h.style.transitionDelay = (REDUCE ? 0 : 1300 + k * 160) + 'ms'; });
   $$('.draw', pg).forEach((d, k) => { d.style.transitionDelay = (REDUCE ? 0 : 2300 + k * 350) + 'ms'; });
   requestAnimationFrame(() => pg.classList.add('play'));
-  const ex = $('.exhibits[data-for="1"]');
-  if (i === 1) { syncExhibitSketch(); measureDraws(ex); $$('.draw', ex).forEach((d, k) => { d.style.transitionDelay = (REDUCE ? 0 : 600 + k * 180) + 'ms'; }); requestAnimationFrame(() => ex.classList.add('play')); }
+  if (i === 1) syncExhibitSketch();
+  const ex = $(`.exhibits[data-for="${i}"]`);
+  if (ex) {
+    measureDraws(ex);
+    $$('.draw', ex).forEach((d, k) => { d.style.transitionDelay = (REDUCE ? 0 : 600 + k * 260) + 'ms'; });
+    $$('.rl', ex).forEach((l, k) => { l.style.transitionDelay = (REDUCE ? 0 : 900 + k * 260) + 'ms'; });
+    requestAnimationFrame(() => ex.classList.add('play'));
+  }
 }
 function leavePage(i) {
   typeTimers.forEach(clearTimeout); typeTimers = [];
   const pg = pageFor(i); if (pg) pg.classList.remove('play');
-  $('.exhibits[data-for="1"]').classList.remove('play');
+  $$('.exhibits').forEach(e => e.classList.remove('play'));
 }
 function showExhibits(i) {
-  $$('.exhibits').forEach(e => e.classList.toggle('on', i === 1 ? e.dataset.for === '1' : e.dataset.for === 'index'));
+  const has = !!$(`.exhibits[data-for="${i}"]`);
+  $$('.exhibits').forEach(e => e.classList.toggle('on', has ? e.dataset.for === String(i) : e.dataset.for === 'index'));
   $$('#index-list li').forEach(li => li.classList.toggle('cur', +li.dataset.i === i));
 }
 function setPages(i, instant) {
   if (instant) pagesEl.classList.add('notrans');
   pageEls.forEach(p => {
-    const k = +p.dataset.i, gone = k < i;
-    p.style.transitionDelay = instant ? '0ms' : (Math.abs(k - cur) * 70) + 'ms';
+    const k = +p.dataset.i, gone = k < i, d = instant ? 0 : Math.abs(k - cur) * 70;
+    p.style.transitionDelay = gone ? `${d}ms,${d + 780}ms` : `${d}ms,${d}ms`;
     p.classList.toggle('gone', gone);
   });
   if (instant) { void pagesEl.offsetWidth; pagesEl.classList.remove('notrans'); }
@@ -1042,6 +1154,8 @@ buildStrings();
 const fontsReady = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
 fontsReady.then(() => Promise.all(['700 17px Kalam', '400 16px Kalam', '11px "Special Elite"'].map(f => document.fonts && document.fonts.load ? document.fonts.load(f).catch(() => {}) : 0))).then(() => {
   drawMapScrap();
+  drawHills();
+  drawRouteMap();
   const stored = savedPhoto();
   if (EMBED_PHOTO) loadPhoto(EMBED_PHOTO, EMBED_CREDIT, true);
   else if (stored) setTimeout(() => loadPhoto(stored, '', true), REDUCE ? 0 : 1300);

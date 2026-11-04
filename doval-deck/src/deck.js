@@ -13,8 +13,8 @@ const EMBED_CREDIT = '';
 /* =================== content =================== */
 const PAGES = [
   { t: 'Introduction', h: 'The Quiet Guardian of India', m: 1, done: true },
-  { t: 'Who He Is Today', h: 'The man India turns to in a crisis', m: 1 },
-  { t: 'Roots', h: 'A soldier’s son from the hills', m: 1 },
+  { t: 'Who He Is Today', h: 'The man India turns to in a crisis', m: 1, done: true },
+  { t: 'Roots', h: 'A soldier’s son from the hills', m: 1, done: true },
   { t: 'The Young Officer', h: 'A riot ended in one week', m: 1 },
   { t: 'Into the Shadows', h: 'The spy who talked rebels into peace', m: 1 },
   { t: 'Behind Enemy Lines', h: 'Seven years in Pakistan', m: 2 },
@@ -79,7 +79,20 @@ const SHEETS = {
       <div class="cell"><small>Age</small><b class="hw">81</b><em class="hw">and still on duty</em></div>
     </div>
     <svg class="redpen" viewBox="0 0 646 700" aria-hidden="true"><path class="draw" d="M50 592 C 46 564, 92 553, 122 555 C 160 557, 174 574, 168 594 C 162 616, 112 622, 84 618 C 58 614, 42 604, 58 576"/><path class="draw" d="M60 631 C 110 636, 170 635, 232 629"/></svg>
-    <p class="also"><b>3. Also:</b> chairs the Strategic Policy Group, and is India’s Special Representative for border talks with China (24th round: August 2025).</p>`
+    <p class="also"><b>3. Also:</b> chairs the Strategic Policy Group, and is India’s Special Representative for border talks with China (24th round: August 2025).</p>`,
+  2: `${SHEET_HEAD(2)}
+    <p class="subj">Subject: Ajit Kumar Doval · chapter 1, roots</p>
+    <h2 class="big" data-type>A soldier’s son|from the hills</h2>
+    <h3 class="sec" style="top:210px">Chronology</h3>
+    <ol class="chrono">
+      <li><span class="yr">1945</span><p>Born 20 January in Ghiri Banelsyun village, Pauri Garhwal, Uttarakhand.</p></li>
+      <li><span class="yr w">Early years</span><p>Father: Major G. N. Doval, 36 years in the Army. The family moved with his postings, including about 1.5 years in Pune.</p></li>
+      <li><span class="yr w">School</span><p>Ajmer Military School, Rajasthan, where discipline came first.</p></li>
+      <li><span class="yr">1967</span><p>MA in Economics, Agra University.<span class="ann hw">finished first!</span></p></li>
+      <li><span class="yr">1968</span><p>Cleared the UPSC exam and joined the Indian Police Service at 23.</p></li>
+    </ol>
+    <div class="sticky"><i class="tape"></i><h4 class="hw">Full circle · 1950 → 2026</h4><p class="hw">At 5, a teacher in Pune told him about Lokmanya Tilak. 76 years later, on 1 Aug 2026, he came back to Pune to receive the Lokmanya Tilak National Award.</p></div>
+    <div class="lesson"><span class="st">Lesson</span><p class="hw">Discipline built early becomes strength later.</p></div>`
 };
 const pagesEl = $('#pages');
 pagesEl.innerHTML = PAGES.map((p, i) => i === 0 ? '' :
@@ -89,7 +102,7 @@ pagesEl.innerHTML = PAGES.map((p, i) => i === 0 ? '' :
     <p class="ph-note">This sheet is next in our design review.<small>Content is approved; the page design comes after your OK on the sheet before it.</small></p>`}</div><div class="pb"></div></div>`).join('');
 const pageEls = $$('.page', pagesEl);
 const pageFor = i => pageEls.find(p => +p.dataset.i === i);
-$('#index-list').innerHTML = PAGES.map((p, i) => `<li data-i="${i}"><span>${two(i + 1)} · ${p.t}</span><i>${p.done || i === 1 ? '✓' : ''}</i></li>`).join('');
+$('#index-list').innerHTML = PAGES.map((p, i) => `<li data-i="${i}"><span>${two(i + 1)} · ${p.t}</span><i>${p.done ? '✓' : ''}</i></li>`).join('');
 $('#menu-grid').innerHTML = PAGES.map((p, i) =>
   `<button data-to="${i}" class="${p.done ? 'done' : ''}"><span class="n">Page ${String(i + 1).padStart(2, '0')} · Part ${['I', 'II', 'III'][p.m - 1]}</span><span class="t">${p.t}</span><span class="st">${p.done ? 'designed' : 'in review'}</span></button>`).join('');
 
@@ -272,6 +285,53 @@ function drawMapScrap() {
   x.fillStyle = cg; x.fillRect(W * .5 - 6, 0, 12, H);
   x.restore();
   torn(); x.strokeStyle = 'rgba(255,255,255,.55)'; x.lineWidth = .8; x.stroke();
+}
+/* exhibit B: a pencil study of layered Himalayan ridges (generic landscape, not a specific photo) */
+function drawHills() {
+  const cv = $('#hills'), x = cv.getContext('2d'), W = cv.width, H = cv.height;
+  seed = 30; x.clearRect(0, 0, W, H);
+  const ridge = (base, rough, n) => { let pts = [[0, base], [W, base + (rnd() - .5) * 40]]; for (let d = 0; d < n; d++) { const nx = []; for (let i = 0; i < pts.length - 1; i++) { const a = pts[i], b = pts[i + 1]; nx.push(a, [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2 + (rnd() - .5) * rough / (d + 1)]); } nx.push(pts[pts.length - 1]); pts = nx; } return pts; };
+  const layers = [[120, 200, .10], [175, 150, .16], [235, 120, .24], [300, 90, .34]];
+  layers.forEach(([base, rough, tone], li) => {
+    const pts = ridge(base, rough, 7);
+    x.save(); x.beginPath(); x.moveTo(0, H); pts.forEach(p => x.lineTo(p[0], p[1])); x.lineTo(W, H); x.closePath(); x.clip();
+    x.fillStyle = `rgba(52,54,59,${tone * .55})`; x.fillRect(0, 0, W, H);
+    x.strokeStyle = `rgba(40,42,48,${.18 + tone * .6})`; x.lineWidth = .7;
+    for (let i = 0; i < 260 + li * 140; i++) { const px = rnd() * W, py = base - 60 + rnd() * (H - base + 80), l = 6 + rnd() * 12, a = -0.9 + (rnd() - .5) * .3; x.beginPath(); x.moveTo(px, py); x.lineTo(px + Math.cos(a) * l, py + Math.sin(a) * l); x.stroke(); }
+    if (li === 3) { x.fillStyle = 'rgba(30,32,36,.55)'; for (let i = 0; i < 70; i++) { const tx = rnd() * W, ty = base + 30 + rnd() * 60, s = 5 + rnd() * 9; x.beginPath(); x.moveTo(tx, ty - s * 1.8); x.lineTo(tx - s * .55, ty); x.lineTo(tx + s * .55, ty); x.closePath(); x.fill(); } }
+    x.restore();
+    x.strokeStyle = `rgba(30,32,36,${.45 + li * .12})`; x.lineWidth = 1.3 + li * .3; x.beginPath(); pts.forEach((p, i) => i ? x.lineTo(p[0], p[1]) : x.moveTo(p[0], p[1])); x.stroke();
+  });
+  const fadeG = x.createLinearGradient(0, 0, 0, H); fadeG.addColorStop(0, 'rgba(244,239,226,1)'); fadeG.addColorStop(.18, 'rgba(244,239,226,0)');
+  x.globalCompositeOperation = 'destination-out'; x.fillStyle = fadeG; x.fillRect(0, 0, W, H * .2); x.globalCompositeOperation = 'source-over';
+}
+/* route map: where he grew up (official India outline) */
+function drawRouteMap() {
+  const cv = $('#routemap'), x = cv.getContext('2d'), k = cv.width / 420;
+  x.setTransform(k, 0, 0, k, 0, 0); x.clearRect(0, 0, 420, 440);
+  const merc = lat => Math.log(Math.tan(Math.PI / 4 + lat * Math.PI / 360)) * 180 / Math.PI;
+  const sc = 12.4, X = lon => 92 + (lon - 66) * sc, Y = lat => 12 + (merc(37.3) - merc(lat)) * sc;
+  x.setLineDash([2, 3]); x.strokeStyle = 'rgba(90,70,48,.22)'; x.lineWidth = .6;
+  for (let lo = 70; lo <= 95; lo += 5) { x.beginPath(); x.moveTo(X(lo), Y(37)); x.lineTo(X(lo), Y(6)); x.stroke(); }
+  for (let la = 10; la <= 35; la += 5) { x.beginPath(); x.moveTo(X(60), Y(la)); x.lineTo(X(98), Y(la)); x.stroke(); }
+  x.setLineDash([]);
+  MAPDATA.rings.forEach(r => { x.beginPath(); r.forEach(([lo, la], i) => i ? x.lineTo(X(lo), Y(la)) : x.moveTo(X(lo), Y(la))); x.closePath(); x.fillStyle = 'rgba(214,196,152,.55)'; x.fill(); x.strokeStyle = '#4e3b27'; x.lineWidth = 1.1; x.stroke(); });
+  const P = [
+    { lon: 78.78, lat: 30.15, n: 1, t: 'Garhwal', s: 'born 1945', side: 'r' },
+    { lon: 73.86, lat: 18.52, n: 2, t: 'Pune', s: 'early years', side: 'l' },
+    { lon: 74.64, lat: 26.45, n: 3, t: 'Ajmer', s: 'military school', side: 'l' },
+    { lon: 78.01, lat: 27.18, n: 4, t: 'Agra', s: 'MA, topped 1967', side: 'r' },
+    { lon: 76.52, lat: 9.59, n: 5, t: 'Kerala', s: 'IPS officer, 1968', side: 'r' }
+  ].map(p => Object.assign(p, { x: X(p.lon), y: Y(p.lat) }));
+  let svg = '';
+  for (let i = 0; i < P.length - 1; i++) {
+    const a = P[i], b = P[i + 1], mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2, dx = b.x - a.x, dy = b.y - a.y, bend = (i % 2 ? 1 : -1) * .22;
+    svg += `<path class="draw" d="M${a.x.toFixed(1)} ${a.y.toFixed(1)} Q${(mx - dy * bend).toFixed(1)} ${(my + dx * bend).toFixed(1)} ${b.x.toFixed(1)} ${b.y.toFixed(1)}"/>`;
+  }
+  svg += P.map((p, i) => `<g class="pt" style="transition-delay:${REDUCE ? 0 : 700 + i * 260}ms"><circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="9"/><text x="${p.x.toFixed(1)}" y="${(p.y + .5).toFixed(1)}">${p.n}</text></g>`).join('');
+  $('#route-ink').innerHTML = svg;
+  const lab = { 1: [16, -16], 2: [-16, -4], 3: [-16, -10], 4: [16, 2], 5: [16, -8] };
+  $('#route-labels').innerHTML = P.map(p => `<span class="rl ${p.side === 'l' ? 'l' : ''}" style="left:${(p.x + lab[p.n][0]).toFixed(0)}px;top:${(p.y + 30 + lab[p.n][1]).toFixed(0)}px">${p.t}<small>${p.s}</small></span>`).join('');
 }
 const G = MAPDATA.grid, GRAW = atob(G.b64);
 function inIndia(lon, lat) { const gx = Math.floor((lon - G.lon0) / G.step), gy = Math.floor((G.lat1 - lat) / G.step); if (gx < 0 || gy < 0 || gx >= G.w || gy >= G.h) return false; const i = gy * G.w + gx; return ((GRAW.charCodeAt(i >> 2) >> ((i & 3) * 2)) & 3) === 2; }
@@ -483,23 +543,30 @@ function enterPage(i) {
   $$('.hw', pg).forEach((h, k) => { h.style.transitionDelay = (REDUCE ? 0 : 1300 + k * 160) + 'ms'; });
   $$('.draw', pg).forEach((d, k) => { d.style.transitionDelay = (REDUCE ? 0 : 2300 + k * 350) + 'ms'; });
   requestAnimationFrame(() => pg.classList.add('play'));
-  const ex = $('.exhibits[data-for="1"]');
-  if (i === 1) { syncExhibitSketch(); measureDraws(ex); $$('.draw', ex).forEach((d, k) => { d.style.transitionDelay = (REDUCE ? 0 : 600 + k * 180) + 'ms'; }); requestAnimationFrame(() => ex.classList.add('play')); }
+  if (i === 1) syncExhibitSketch();
+  const ex = $(`.exhibits[data-for="${i}"]`);
+  if (ex) {
+    measureDraws(ex);
+    $$('.draw', ex).forEach((d, k) => { d.style.transitionDelay = (REDUCE ? 0 : 600 + k * 260) + 'ms'; });
+    $$('.rl', ex).forEach((l, k) => { l.style.transitionDelay = (REDUCE ? 0 : 900 + k * 260) + 'ms'; });
+    requestAnimationFrame(() => ex.classList.add('play'));
+  }
 }
 function leavePage(i) {
   typeTimers.forEach(clearTimeout); typeTimers = [];
   const pg = pageFor(i); if (pg) pg.classList.remove('play');
-  $('.exhibits[data-for="1"]').classList.remove('play');
+  $$('.exhibits').forEach(e => e.classList.remove('play'));
 }
 function showExhibits(i) {
-  $$('.exhibits').forEach(e => e.classList.toggle('on', i === 1 ? e.dataset.for === '1' : e.dataset.for === 'index'));
+  const has = !!$(`.exhibits[data-for="${i}"]`);
+  $$('.exhibits').forEach(e => e.classList.toggle('on', has ? e.dataset.for === String(i) : e.dataset.for === 'index'));
   $$('#index-list li').forEach(li => li.classList.toggle('cur', +li.dataset.i === i));
 }
 function setPages(i, instant) {
   if (instant) pagesEl.classList.add('notrans');
   pageEls.forEach(p => {
-    const k = +p.dataset.i, gone = k < i;
-    p.style.transitionDelay = instant ? '0ms' : (Math.abs(k - cur) * 70) + 'ms';
+    const k = +p.dataset.i, gone = k < i, d = instant ? 0 : Math.abs(k - cur) * 70;
+    p.style.transitionDelay = gone ? `${d}ms,${d + 780}ms` : `${d}ms,${d}ms`;
     p.classList.toggle('gone', gone);
   });
   if (instant) { void pagesEl.offsetWidth; pagesEl.classList.remove('notrans'); }
@@ -602,6 +669,8 @@ buildStrings();
 const fontsReady = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
 fontsReady.then(() => Promise.all(['700 17px Kalam', '400 16px Kalam', '11px "Special Elite"'].map(f => document.fonts && document.fonts.load ? document.fonts.load(f).catch(() => {}) : 0))).then(() => {
   drawMapScrap();
+  drawHills();
+  drawRouteMap();
   const stored = savedPhoto();
   if (EMBED_PHOTO) loadPhoto(EMBED_PHOTO, EMBED_CREDIT, true);
   else if (stored) setTimeout(() => loadPhoto(stored, '', true), REDUCE ? 0 : 1300);

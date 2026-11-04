@@ -202,8 +202,8 @@ button{font:inherit;color:inherit}
 .stack i:nth-child(2){transform:translate(4px,6px) rotate(-.4deg);background:#ede6d4}
 .stack i:nth-child(3){transform:translate(2px,3px) rotate(.25deg);background:#efe8d7}
 #pages{position:absolute;left:22px;top:24px;width:646px;height:700px;transform-style:preserve-3d}
-.page{position:absolute;inset:0;transform-origin:50% 30px;transform-style:preserve-3d;transform:translateZ(calc(var(--z) * 1px)) rotateX(0deg);transition:transform 1s cubic-bezier(.42,.05,.2,1)}
-.page.gone{transform:translateZ(calc(var(--z) * 1px)) rotateX(176deg)}
+.page{position:absolute;inset:0;transform-origin:50% 30px;transform-style:preserve-3d;transform:translateZ(calc(var(--z) * 1px)) rotateX(0deg);transition:transform 1s cubic-bezier(.42,.05,.2,1),opacity .25s}
+.page.gone{transform:translateZ(calc(var(--z) * 1px)) rotateX(176deg);opacity:0}
 .notrans,.notrans *{transition:none !important}
 .pf,.pb{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;background-color:#f2ebda;background-blend-mode:multiply;border-radius:1px;box-shadow:0 1px 1px rgba(0,0,0,.3),0 4px 10px rgba(0,0,0,.18)}
 .pb{transform:rotateX(180deg);background-color:#e8dfcb}
@@ -288,3 +288,37 @@ button{font:inherit;color:inherit}
 .ph-note{position:absolute;left:48px;right:48px;top:300px;font:700 26px/1.3 var(--f-hand);color:var(--red);transform:rotate(-2deg)}
 .ph-note small{display:block;margin-top:10px;font:400 19px/1.4 var(--f-hand);color:#1d2a6b}
 @media (prefers-reduced-motion:reduce){#folder-wrap,#cover,.page,.exhibits{transition:none}}
+
+/* =================== sheet 03 · roots =================== */
+.chrono{position:absolute;left:48px;right:46px;top:240px;margin:0;padding:0;list-style:none}
+.chrono::before{content:"";position:absolute;left:107px;top:9px;bottom:18px;border-left:1.5px dashed rgba(43,38,31,.5)}
+.chrono li{position:relative;display:grid;grid-template-columns:92px 1fr;column-gap:26px;padding:0 0 11px}
+.chrono li::before{content:"";position:absolute;left:102px;top:5px;width:9px;height:9px;border-radius:50%;border:1.5px solid #1b1813;background:#f2ebda}
+.chrono .yr{text-align:right;font:400 21px/1 var(--f-type);color:#1b1813;text-shadow:.45px 0 0 currentColor}
+.chrono .yr.w{font-size:13px;letter-spacing:.1em;text-transform:uppercase;padding-top:4px}
+.chrono p{margin:0;font:400 15.5px/1.4 var(--f-type);color:#221d16}
+.chrono .ann{display:inline-block;margin-left:8px;font:700 18px/1 var(--f-hand);color:#1d2a6b;transform:rotate(-3deg)}
+.sticky{position:absolute;left:46px;top:512px;width:336px;padding:12px 16px 14px;background:#f5df7a;background-image:linear-gradient(180deg,rgba(255,255,255,.18),transparent 30%,rgba(0,0,0,.05));
+  box-shadow:0 1px 1px rgba(0,0,0,.25),0 10px 14px -6px rgba(0,0,0,.45);transform:rotate(-1.8deg)}
+.sticky h4{margin:0;font:700 21px/1 var(--f-hand);color:var(--red)}
+.sticky p{margin:6px 0 0;font:400 16.5px/1.28 var(--f-hand);color:#1d2a6b}
+.sticky .tape{left:120px;top:-14px;transform:rotate(-3deg)}
+.lesson{position:absolute;left:412px;top:540px;width:196px;transform:rotate(1.5deg)}
+.lesson .st{display:inline-block;padding:5px 10px 3px;border:3px solid var(--red);border-radius:4px;font:400 17px/1 var(--f-type);letter-spacing:.24em;text-transform:uppercase;color:var(--red);opacity:.8;transform:rotate(-4deg);mix-blend-mode:multiply}
+.lesson p{margin:10px 0 0;font:700 21px/1.22 var(--f-hand);color:var(--red)}
+.ex-land{left:40px;top:40px;width:310px;height:252px;padding:14px 14px 44px}
+.ex-land canvas{width:282px;height:192px;background:#f4efe2;cursor:default}
+.ex-route{left:258px;top:248px;width:420px;height:470px;transform:rotate(1.5deg)}
+.ex-route canvas{position:absolute;left:0;top:30px;width:420px;height:440px}
+.ex-route .ink{top:30px;height:440px}
+.ex-route .ink path{stroke:var(--red);stroke-width:2.4;stroke-dasharray:7 6}
+.ex-route .ink path.draw{stroke-dasharray:var(--len)}
+.ex-route .ink circle{fill:#fbf8ef;stroke:var(--red);stroke-width:2}
+.ex-route .ink text{font:700 14px var(--f-hand);fill:var(--red);text-anchor:middle;dominant-baseline:central}
+.rl{position:absolute;font:700 16px/1.05 var(--f-hand);color:#1d2a6b;white-space:nowrap}
+.rl small{display:block;font:400 13.5px/1.1 var(--f-hand);color:#3b3f5c}
+.rl.l{text-align:right;transform:translateX(-100%)}
+.rl{opacity:0;transition:opacity .6s}
+.exhibits.play .rl{opacity:1}
+.ex-route .ink g.pt{opacity:0;transition:opacity .5s}
+.exhibits.play .ink g.pt{opacity:1}

@@ -4,7 +4,7 @@ import type { SceneFactory } from "../core/stage";
 export const SHOTS = {
   hero: "apron", journey: "apron", jets: "apron", corporate: "apron", bespoke: "apron", vip: "apron", group: "apron", apron: "apron",
   about: "aloft", cta: "aloft", helicopter: "scenic", wedding: "palace", interior: "cabin", private: "cabin",
-  globe: "globe", viewer: "viewer",
+  globe: "globe", viewer: "viewer", flyer: "flyer",
 } as const satisfies Record<string, string>;
 
 export type ShotName = keyof typeof SHOTS;
@@ -35,6 +35,10 @@ export async function loadShot(shot: string): Promise<SceneFactory> {
     case "globe": {
       const m = await import("./globe");
       return (ctx) => m.createGlobeScene(ctx);
+    }
+    case "flyer": {
+      const m = await import("./flyer");
+      return (ctx) => m.createFlyerScene(ctx);
     }
     case "viewer": {
       const m = await import("./viewer");

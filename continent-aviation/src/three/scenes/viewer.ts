@@ -22,7 +22,7 @@ export function createViewerScene(ctx: SceneContext): SceneSetup {
   key.shadow.mapSize.set(1024, 1024);
   Object.assign(key.shadow.camera, { left: -22, right: 22, top: 22, bottom: -22, near: 1, far: 90 });
   scene.add(key);
-  const rim = new THREE.DirectionalLight("#c8a96b", 1.6);
+  const rim = new THREE.DirectionalLight("#7cc9f2", 1.6);
   rim.position.set(-20, 8, -18);
   scene.add(rim);
   scene.add(new THREE.HemisphereLight("#6c7fa3", "#0b0f18", 0.6));

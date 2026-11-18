@@ -36,7 +36,7 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-export const viewport: Viewport = { themeColor: "#080B10", colorScheme: "dark" };
+export const viewport: Viewport = { themeColor: "#060D16", colorScheme: "dark" };
 
 const orgJsonLd = {
   "@context": "https://schema.org",

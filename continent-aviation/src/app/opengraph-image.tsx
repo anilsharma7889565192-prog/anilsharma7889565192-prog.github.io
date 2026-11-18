@@ -18,8 +18,8 @@ export default function Image() {
         {bg && <img src={bg} width={1200} height={675} style={{ position: "absolute", top: -20, left: 0, width: 1200, height: 675, objectFit: "cover" }} alt="" />}
         <div style={{ position: "absolute", inset: 0, display: "flex", background: "linear-gradient(90deg, rgba(8,11,16,0.92) 0%, rgba(8,11,16,0.55) 55%, rgba(8,11,16,0.1) 100%)" }} />
         <div style={{ position: "relative", display: "flex", flexDirection: "column", justifyContent: "center", padding: "0 80px", width: 760 }}>
-          <div style={{ display: "flex", fontSize: 22, letterSpacing: 9, color: "#C8A96B" }}>CONTINENT AVIATION</div>
-          <div style={{ display: "flex", width: 64, height: 2, background: "#C8A96B", margin: "30px 0" }} />
+          <div style={{ display: "flex", fontSize: 22, letterSpacing: 9, color: "#2AA7E8" }}>CONTINENT AVIATION</div>
+          <div style={{ display: "flex", width: 64, height: 2, background: "#2AA7E8", margin: "30px 0" }} />
           <div style={{ display: "flex", fontSize: 70, lineHeight: 1.05 }}>Private Aviation, Arranged Around You.</div>
           <div style={{ display: "flex", fontSize: 24, marginTop: 28, color: "rgba(245,242,234,0.75)", fontFamily: "Arial, sans-serif" }}>Private jet and helicopter charter arrangements in India</div>
         </div>

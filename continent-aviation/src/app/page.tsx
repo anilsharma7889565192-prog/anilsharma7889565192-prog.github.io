@@ -1,10 +1,9 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { Photo } from "@/components/Photo";
 import { Steps } from "@/components/Steps";
 import { Disclaimer, GlobeCta, SectionHead } from "@/components/ui";
-import { LiveScene } from "@/components/three/LiveScene";
 import { EnquiryBar } from "@/components/EnquiryBar";
+import { HeroFlyby } from "@/components/HeroFlyby";
 import { FleetSection } from "@/components/fleet/FleetSection";
 import Image from "next/image";
 import { ScrollJourney } from "@/components/ScrollJourney";
@@ -35,12 +34,9 @@ export default function Home() {
   return (
     <>
       {/* A — Hero */}
-      <section className="relative isolate flex min-h-[100svh] items-end overflow-hidden pb-12 pt-36 md:pb-16">
-        <Photo slot="hero" priority sizes="100vw" />
-        <LiveScene shot="hero" />
-        <div className="overlay-hero" aria-hidden="true" />
+      <HeroFlyby>
         <div className="wrap relative z-10">
-          <p className="eyebrow rise">Private Aviation <span className="mx-2 text-gold/60" aria-hidden="true">|</span> India</p>
+          <p className="eyebrow rise !text-white">Private Aviation <span className="mx-2 text-white/60" aria-hidden="true">|</span> India</p>
           <h1 className="display mt-5 max-w-5xl rise rise-2">
             Private Aviation,<br />Arranged Around You.
           </h1>
@@ -48,11 +44,11 @@ export default function Home() {
             Tell us the route, date and passengers. We check with the operator and send you a private quote, valid for 48 hours.
           </p>
           <div className="mt-8 rise rise-4 md:mt-10"><EnquiryBar /></div>
-          <p className="mt-6 text-[0.8rem] tracking-[0.08em] text-ivory/70 rise rise-4">
+          <p className="mt-6 text-[0.8rem] tracking-[0.08em] text-white/90 rise rise-4">
             No payment is taken on this website. <Link href="/how-we-quote" className="underline decoration-gold/60 underline-offset-4 hover:text-gold">See how a quote works</Link>
           </p>
         </div>
-      </section>
+      </HeroFlyby>
 
       {/* A1 — Fleet */}
       <section id="fleet" className="bg-[#f4f8fb] py-16 text-midnight md:py-24" aria-labelledby="fleet-h">

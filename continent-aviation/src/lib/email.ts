@@ -15,7 +15,7 @@ export const abs = (p: string) => `${site.url}${p}`;
 function layout(title: string, body: string, footer?: string) {
   return `<!doctype html><html><body style="margin:0;background:#f5f2ea;font-family:Arial,Helvetica,sans-serif;color:#10151f">
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f2ea;padding:28px 12px"><tr><td align="center">
-<table width="560" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border-top:3px solid #c8a96b">
+<table width="560" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border-top:3px solid #2aa7e8">
 <tr><td style="padding:28px 32px 8px;font-family:Georgia,serif;font-size:13px;letter-spacing:4px;color:#9c8247">CONTINENT AVIATION</td></tr>
 <tr><td style="padding:4px 32px 0;font-family:Georgia,serif;font-size:26px;line-height:1.2">${esc(title)}</td></tr>
 <tr><td style="padding:16px 32px 28px;font-size:15px;line-height:1.65;color:#2a303b">${body}</td></tr>
@@ -23,7 +23,7 @@ function layout(title: string, body: string, footer?: string) {
 </table></td></tr></table></body></html>`;
 }
 const p = (t: string) => `<p style="margin:0 0 14px">${t}</p>`;
-const btn = (href: string, label: string) => `<p style="margin:20px 0"><a href="${href}" style="display:inline-block;background:#c8a96b;color:#080b10;padding:13px 26px;text-decoration:none;font-size:13px;letter-spacing:1.5px;text-transform:uppercase">${esc(label)}</a></p>`;
+const btn = (href: string, label: string) => `<p style="margin:20px 0"><a href="${href}" style="display:inline-block;background:#2aa7e8;color:#080b10;padding:13px 26px;text-decoration:none;font-size:13px;letter-spacing:1.5px;text-transform:uppercase">${esc(label)}</a></p>`;
 const kv = (rows: [string, string | null | undefined][]) =>
   `<table cellpadding="0" cellspacing="0" style="margin:6px 0 16px;font-size:14px">${rows.filter(([, v]) => v).map(([k, v]) => `<tr><td style="padding:4px 18px 4px 0;color:#6b7280;vertical-align:top">${esc(k)}</td><td style="padding:4px 0">${esc(String(v))}</td></tr>`).join("")}</table>`;
 const fmt = (d: Date) => d.toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kolkata" }) + " IST";

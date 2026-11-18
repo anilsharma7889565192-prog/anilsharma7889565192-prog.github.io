@@ -46,21 +46,21 @@ export function EnquiryBar({ initialAircraft = "Not Sure", className = "" }: { i
     router.push(`/request-a-charter?${q.toString()}`);
   }
 
-  const lab = "mb-1.5 block text-[0.68rem] font-medium uppercase tracking-[0.14em] text-grey-deep";
+  const lab = "mb-1.5 block text-[0.68rem] font-medium uppercase tracking-[0.14em] text-white/85";
   const inp = "input-light";
-  const err = (k: string) => (errs[k] ? <p id={`${id(k)}-e`} role="alert" className="mt-1 text-[0.78rem] text-[#b23b30]">{errs[k]}</p> : null);
+  const err = (k: string) => (errs[k] ? <p id={`${id(k)}-e`} role="alert" className="mt-1 text-[0.78rem] text-[#ffd0cb]">{errs[k]}</p> : null);
   const aria = (k: string) => ({ "aria-invalid": errs[k] ? (true as const) : undefined, "aria-describedby": errs[k] ? `${id(k)}-e` : undefined });
 
   return (
-    <form onSubmit={submit} noValidate aria-label="Start a charter enquiry" className={`bg-ivory text-midnight shadow-[0_30px_80px_-30px_rgba(0,0,0,0.7)] ${className}`}>
-      <div className="h-[2px] w-full bg-gradient-to-r from-gold via-gold/60 to-transparent" />
+    <form onSubmit={submit} noValidate aria-label="Start a charter enquiry" className={`overflow-hidden rounded-3xl border border-white/45 bg-[rgb(7_66_118/0.52)] text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.5),0_30px_80px_-30px_rgba(0,20,50,0.7)] backdrop-blur-xl ${className}`}>
+      <div className="h-[2px] w-full bg-gradient-to-r from-white/70 via-white/30 to-transparent" />
       <div className="p-5 md:p-7">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <fieldset className="flex gap-1.5" aria-label="Trip type">
             {TRIPS.map((t) => (
               <label key={t} className="relative cursor-pointer">
                 <input type="radio" name={`${uid}-trip`} className="peer sr-only" checked={trip === t} onChange={() => setTrip(t)} />
-                <span className="block border border-midnight/20 px-3.5 py-1.5 text-[0.72rem] uppercase tracking-[0.12em] text-grey-deep transition-colors peer-checked:border-midnight peer-checked:bg-midnight peer-checked:text-ivory peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-gold">{t}</span>
+                <span className="block rounded-full border border-white/45 bg-white/10 px-3.5 py-1.5 text-[0.72rem] uppercase tracking-[0.12em] text-white/90 transition-colors peer-checked:border-white peer-checked:bg-white peer-checked:text-[#0b6fb3] peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-white">{t}</span>
               </label>
             ))}
           </fieldset>
@@ -68,7 +68,7 @@ export function EnquiryBar({ initialAircraft = "Not Sure", className = "" }: { i
             {AIRCRAFT.map((t) => (
               <label key={t} className="relative cursor-pointer">
                 <input type="radio" name={`${uid}-ac`} className="peer sr-only" checked={aircraft === t} onChange={() => setAircraft(t)} />
-                <span className="block border border-midnight/20 px-3.5 py-1.5 text-[0.72rem] uppercase tracking-[0.12em] text-grey-deep transition-colors peer-checked:border-gold-deep peer-checked:bg-gold/20 peer-checked:text-midnight peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-gold">{t}</span>
+                <span className="block rounded-full border border-white/45 bg-white/10 px-3.5 py-1.5 text-[0.72rem] uppercase tracking-[0.12em] text-white/90 transition-colors peer-checked:border-white peer-checked:bg-white peer-checked:text-[#0b6fb3] peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-white">{t}</span>
               </label>
             ))}
           </fieldset>
@@ -81,7 +81,7 @@ export function EnquiryBar({ initialAircraft = "Not Sure", className = "" }: { i
             <PlaceInput id={id("to")} name="to" className={inp} placeholder="City, airport or venue" onValueChange={setTo} {...aria("to")} />{err("to")}</div>
           <div className="md:col-span-2"><label htmlFor={id("date")} className={lab}>Departure</label>
             <input id={id("date")} type="date" min={today || undefined} value={date} onChange={(e) => setDate(e.target.value)} className={inp} {...aria("date")} />{err("date")}</div>
-          <div className="md:col-span-2"><label htmlFor={id("time")} className={lab}>Time <span className="normal-case tracking-normal text-grey">(optional)</span></label>
+          <div className="md:col-span-2"><label htmlFor={id("time")} className={lab}>Time <span className="normal-case tracking-normal text-white/70">(optional)</span></label>
             <input id={id("time")} type="time" value={time} onChange={(e) => setTime(e.target.value)} className={inp} /></div>
           <div className="md:col-span-2"><label htmlFor={id("pax")} className={lab}>Passengers</label>
             <input id={id("pax")} type="number" inputMode="numeric" min={1} max={500} value={pax} onChange={(e) => setPax(e.target.value)} className={inp} {...aria("pax")} />{err("pax")}</div>
@@ -90,7 +90,7 @@ export function EnquiryBar({ initialAircraft = "Not Sure", className = "" }: { i
             <>
               <div className="md:col-span-3 md:col-start-7"><label htmlFor={id("rdate")} className={lab}>Return</label>
                 <input id={id("rdate")} type="date" min={date || today || undefined} value={rdate} onChange={(e) => setRdate(e.target.value)} className={inp} {...aria("rdate")} />{err("rdate")}</div>
-              <div className="md:col-span-3"><label htmlFor={id("rtime")} className={lab}>Return time <span className="normal-case tracking-normal text-grey">(optional)</span></label>
+              <div className="md:col-span-3"><label htmlFor={id("rtime")} className={lab}>Return time <span className="normal-case tracking-normal text-white/70">(optional)</span></label>
                 <input id={id("rtime")} type="time" value={rtime} onChange={(e) => setRtime(e.target.value)} className={inp} /></div>
             </>
           )}
@@ -103,18 +103,18 @@ export function EnquiryBar({ initialAircraft = "Not Sure", className = "" }: { i
                 <div className="md:col-span-4"><label htmlFor={id(`lf${i}`)} className={lab}>Leg {i + 2}: from</label><PlaceInput id={id(`lf${i}`)} name={`leg${i}from`} className={inp} placeholder="City or airport" onValueChange={(v) => setLegs((a) => a.map((x, j) => (j === i ? { ...x, from: v } : x)))} /></div>
                 <div className="md:col-span-4"><label htmlFor={id(`lt${i}`)} className={lab}>To</label><PlaceInput id={id(`lt${i}`)} name={`leg${i}to`} className={inp} placeholder="City or airport" onValueChange={(v) => setLegs((a) => a.map((x, j) => (j === i ? { ...x, to: v } : x)))} /></div>
                 <div className="md:col-span-3"><label htmlFor={id(`ld${i}`)} className={lab}>Date</label><input id={id(`ld${i}`)} type="date" min={date || today || undefined} value={l.date} onChange={(e) => setLegs((a) => a.map((x, j) => (j === i ? { ...x, date: e.target.value } : x)))} className={inp} /></div>
-                <div className="flex items-end md:col-span-1"><button type="button" onClick={() => setLegs((a) => a.filter((_, j) => j !== i))} aria-label={`Remove leg ${i + 2}`} className="flex h-[3.1rem] w-full items-center justify-center border border-midnight/20 text-grey-deep hover:border-midnight"><X size={18} aria-hidden="true" /></button></div>
+                <div className="flex items-end md:col-span-1"><button type="button" onClick={() => setLegs((a) => a.filter((_, j) => j !== i))} aria-label={`Remove leg ${i + 2}`} className="flex h-[3.1rem] w-full items-center justify-center rounded-xl border border-white/45 text-white/90 hover:border-white"><X size={18} aria-hidden="true" /></button></div>
               </div>
             ))}
-            {legs.length < 4 && <button type="button" onClick={() => setLegs((a) => [...a, { from: "", to: "", date: "" }])} className="inline-flex items-center gap-2 text-[0.78rem] uppercase tracking-[0.12em] text-gold-deep hover:text-midnight"><Plus size={15} aria-hidden="true" />Add another leg</button>}
+            {legs.length < 4 && <button type="button" onClick={() => setLegs((a) => [...a, { from: "", to: "", date: "" }])} className="inline-flex items-center gap-2 text-[0.78rem] uppercase tracking-[0.12em] text-white hover:underline"><Plus size={15} aria-hidden="true" />Add another leg</button>}
           </div>
         )}
 
-        <div className="mt-6 flex flex-col items-start gap-4 border-t border-midnight/10 pt-5 md:flex-row md:items-center md:justify-between">
-          <p className="max-w-2xl text-[0.82rem] leading-relaxed text-grey-deep">This starts an enquiry. Availability and pricing are confirmed by the operator and sent as a quote valid for 48 hours. Nothing is booked until confirmed.</p>
-          <button type="submit" className="btn btn-dark shrink-0">Request a Quote<ArrowRight size={16} aria-hidden="true" /></button>
+        <div className="mt-6 flex flex-col items-start gap-4 border-t border-white/25 pt-5 md:flex-row md:items-center md:justify-between">
+          <p className="max-w-2xl text-[0.82rem] leading-relaxed text-white/90">This starts an enquiry. Availability and pricing are confirmed by the operator and sent as a quote valid for 48 hours. Nothing is booked until confirmed.</p>
+          <button type="submit" className="btn btn-sun shrink-0">Request a Quote<ArrowRight size={16} aria-hidden="true" /></button>
         </div>
-        {aircraft === "Helicopter" && <p className="mt-4 border-l border-gold-deep pl-4 text-[0.82rem] text-grey-deep">Helicopter landings depend on permissions, site suitability, operator approval and operational feasibility.</p>}
+        {aircraft === "Helicopter" && <p className="mt-4 border-l border-white/70 pl-4 text-[0.82rem] text-white/90">Helicopter landings depend on permissions, site suitability, operator approval and operational feasibility.</p>}
       </div>
     </form>
   );

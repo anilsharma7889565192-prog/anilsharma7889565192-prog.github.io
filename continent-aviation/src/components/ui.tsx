@@ -35,10 +35,10 @@ type PageHeroProps = {
 
 export function PageHero({ title, description, eyebrow, slot, crumbs, actions, live }: PageHeroProps) {
   return (
-    <section className="relative isolate flex min-h-[26rem] items-end overflow-hidden pb-14 pt-36 md:min-h-[38rem] md:pb-20">
-      <Photo slot={slot} priority sizes="100vw" />
-      {live && <LiveScene shot={live} />}
-      <div className="overlay-hero" aria-hidden="true" />
+    <section className="relative isolate flex min-h-[26rem] items-end overflow-hidden bg-[#0b6fb3] pb-14 pt-36 md:min-h-[34rem] md:pb-20">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/images/sky.jpg" alt="" aria-hidden="true" className="absolute inset-0 -z-10 h-full w-full object-cover" fetchPriority="high" />
+      <div className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(4,40,80,.6),rgba(4,40,80,.12)_55%,rgba(4,40,80,.45))]" aria-hidden="true" />
       <div className="wrap relative z-10">
         <Breadcrumbs trail={crumbs} />
         {eyebrow && <p className="eyebrow mt-8 rise">{eyebrow}</p>}
@@ -88,9 +88,10 @@ export function CtaBand({
   slot?: ImageSlot;
 }) {
   return (
-    <section className="relative isolate overflow-hidden py-24 md:py-36">
-      <Photo slot={slot} />
-      <div className="overlay-band" aria-hidden="true" />
+    <section className="relative isolate overflow-hidden bg-[#0b6fb3] py-24 md:py-36">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/images/sky.jpg" alt="" aria-hidden="true" className="absolute inset-0 -z-10 h-full w-full object-cover" loading="lazy" />
+      <div className="absolute inset-0 -z-10 bg-[radial-gradient(80%_90%_at_50%_50%,rgba(4,40,80,.35),rgba(4,40,80,.7))]" aria-hidden="true" />
       <div className="wrap relative z-10 text-center">
         <span className="rule mx-auto" />
         <h2 className="h2 mx-auto mt-8 max-w-3xl !text-[clamp(2.2rem,5.5vw,4.2rem)]">{title}</h2>

@@ -277,7 +277,7 @@ export function EnquiryForm({ deliveryReady, isProduction, fallback, defaults }:
         <div className="field">
           <label className="!mb-0 flex cursor-pointer items-start gap-4 !normal-case !tracking-normal !text-[0.98rem] !font-normal">
             <input id="f-consent" name="consent" type="checkbox" required aria-invalid={errors.consent ? true : undefined} aria-describedby={errors.consent ? "f-consent-err" : undefined}
-              className="mt-1 h-5 w-5 shrink-0 accent-[#c8a96b]" />
+              className="mt-1 h-5 w-5 shrink-0 accent-[#2aa7e8]" />
             <span>I consent to Continent Aviation using these details to process my enquiry and contact me about it, and to share the relevant journey details with aviation operators for quotations. See the <Link href="/privacy-policy" className="text-gold underline underline-offset-4">Privacy Policy</Link>.</span>
           </label>
           {errors.consent && <p id="f-consent-err" className="field-error" role="alert">{errors.consent}</p>}

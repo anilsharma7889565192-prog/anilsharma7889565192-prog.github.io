@@ -1,8 +1,8 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, ChevronRight } from "lucide-react";
 import type { ReactNode } from "react";
 import { Photo } from "./Photo";
-import { LiveScene } from "./three/LiveScene";
 import type { ImageSlot } from "@/config/images";
 import { site } from "@/config/site";
 
@@ -108,15 +108,14 @@ export function CtaBand({
 /** Closing call to action with a photoreal night-time Earth that bleeds into the page (home page). */
 export function GlobeCta() {
   return (
-    <section className="relative isolate overflow-hidden bg-[#020305]">
-      {/* The Earth is part of the scene, not a picture on it: oversized, bleeding off the right edge, edges feathered to the page colour. */}
-      <div className="pointer-events-none absolute -right-[22%] top-[58%] -z-10 aspect-square w-[min(150vw,64rem)] -translate-y-1/2 [mask-image:radial-gradient(circle_closest-side,#000_74%,transparent_100%)] max-lg:-right-[38%] max-lg:top-[78%] max-lg:w-[150vw] lg:-right-[8%] lg:top-1/2" aria-hidden="true">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/images/earth-poster.jpg" alt="" className="absolute inset-0 h-full w-full object-cover" loading="lazy" />
-        <LiveScene shot="globe" params={{ bg: "#000000" }} />
+    <section className="relative isolate overflow-hidden bg-midnight">
+      {/* A real astronaut photograph of Earth at night (NASA, public domain). Every edge is feathered into the page colour so it has no visible border. */}
+      <div className="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
+        <Image src="/images/earth-night.jpg" alt="" fill sizes="100vw" className="object-cover object-[60%_100%] max-lg:object-[70%_100%]" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,#060d16_0%,rgba(6,13,22,.85)_14%,rgba(6,13,22,0)_42%,rgba(6,13,22,0)_72%,#060d16_100%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,#060d16_0%,rgba(6,13,22,.9)_28%,rgba(6,13,22,.2)_58%,rgba(6,13,22,0)_75%)] max-lg:bg-[linear-gradient(180deg,rgba(6,13,22,.5),rgba(6,13,22,.2))]" />
       </div>
-      <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,#020305_0%,rgba(2,3,5,.88)_30%,rgba(2,3,5,0)_62%)] max-lg:bg-[linear-gradient(180deg,#020305_0%,rgba(2,3,5,.8)_38%,rgba(2,3,5,0)_70%)]" aria-hidden="true" />
-      <div className="wrap relative py-24 md:py-36 max-lg:pb-[26rem]">
+      <div className="wrap relative py-28 md:py-44 max-lg:pb-72">
         <div className="max-w-xl">
           <span className="rule" />
           <h2 className="h2 mt-8 !text-[clamp(2.2rem,5vw,4rem)]">Tell Us Where You Need to Be.</h2>

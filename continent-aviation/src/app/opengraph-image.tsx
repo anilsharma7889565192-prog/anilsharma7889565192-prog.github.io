@@ -10,7 +10,7 @@ export const runtime = "nodejs";
 export default function Image() {
   let bg = "";
   try {
-    bg = `data:image/jpeg;base64,${fs.readFileSync(path.join(process.cwd(), "public/images/hero-jet-dusk.jpg")).toString("base64")}`;
+    bg = `data:image/jpeg;base64,${fs.readFileSync(path.join(process.cwd(), "public/images/sky.jpg")).toString("base64")}`;
   } catch {}
   return new ImageResponse(
     (

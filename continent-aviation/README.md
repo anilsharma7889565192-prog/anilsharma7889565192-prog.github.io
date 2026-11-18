@@ -7,7 +7,7 @@ Next.js 16 (App Router), TypeScript, Tailwind CSS 4, Zod, Lucide icons, Three.js
 `src/three/` is a small real-time engine built on Three.js: procedural generic aircraft (`models/`), scenes (`scenes/`), a dusk sky shader, a wet-apron reflective ground, bloom and a filmic finish (`core/`).
 
 - **Live scenes**: home hero (jet on a dusk apron, drifting with pointer and scroll), Private Jets hero, Helicopter hero, an interactive aircraft-category explorer (drag to rotate) and a globe of India in the home closing section.
-- **Rendered stills**: the same engine renders every site image (see `IMAGES.md`), which also serve as posters under the live scenes.
+- **Imagery**: all site images are real photographs with licences listed in `IMAGES.md`.
 - **Performance and accessibility**: three.js is code-split and loaded only after the page is idle, never before the form or text. Scenes pause off-screen and in background tabs, cap pixel ratio, drop resolution if frames are slow, and give up gracefully (the poster image stays). Reduced-motion users, data-saver users and devices without WebGL2 just see the still. Canvases are `aria-hidden`; all meaning is in the text.
 
 Pages: Home, Private Jets, Helicopter Charters, Charter Solutions, How It Works, About, Request a Charter, Contact, Privacy Policy, Terms and Conditions, plus Partnerships (B2B enquiry form).
@@ -74,11 +74,11 @@ Route alerts (`/airports`) store only an email, an optional route and the consen
 
 - The Fleet table, size selector, aircraft cards and cabin plans all read `src/config/fleet.ts`, which is built from `src/config/operators.ts`. Add or change aircraft there. Cabin plans are indicative and drawn from the operator-stated "up to" passenger count only.
 - Services (home section and `/services`) read `src/config/services.ts`. Photographs are real destinations and venues, never identifiable people. Licences and credits are in `IMAGES.md`.
-- The globe is a real-time render from NASA public-domain maps (`public/images/earth/`) with a still fallback (`public/images/earth-poster.jpg`).
+- The closing call-to-action uses a real NASA astronaut photograph of Earth at night (`public/images/earth-night.jpg`).
 
 ## Home-page scroll journey
 
-The film on the home page is pre-rendered from the project's own 3D engine (`npm run dev`, then `node scripts/render-journey.mjs`, which needs playwright-core, Chromium and ffmpeg). It is purely visual: the four steps are real text, and phones, reduced-motion users and data-saver connections get the static steps instead.
+The "How we work" section scrolls through real photographs (one per step). It is purely visual: the four steps are real text, and phones and reduced-motion users get the static steps instead.
 
 ## Deployment
 

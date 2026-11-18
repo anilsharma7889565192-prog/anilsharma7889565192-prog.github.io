@@ -42,7 +42,7 @@ export function whatsappLink(message = "Hello Continent Aviation, I would like t
 
 export const nav = [
   { href: "/fleet", label: "Fleet" },
-  { href: "/charter-solutions", label: "Solutions" },
+  { href: "/services", label: "Services" },
   { href: "/how-we-quote", label: "How We Quote" },
   { href: "/about", label: "About" },
   { href: "/account", label: "Account" },
@@ -58,7 +58,7 @@ export const menuExtra = [
 
 export const footerNav = [
   { href: "/fleet", label: "Fleet" },
-  { href: "/charter-solutions", label: "Charter Solutions" },
+  { href: "/services", label: "Services" },
   { href: "/operators", label: "Operators and Aircraft" },
   { href: "/how-we-quote", label: "How We Quote" },
   { href: "/pricing-explained", label: "Pricing Explained" },

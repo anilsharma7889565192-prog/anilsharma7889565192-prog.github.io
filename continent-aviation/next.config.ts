@@ -17,6 +17,7 @@ const nextConfig: NextConfig = {
     return [
       { source: "/private-jets", destination: "/fleet", permanent: true },
       { source: "/helicopter-charters", destination: "/fleet", permanent: true },
+      { source: "/charter-solutions", destination: "/services", permanent: true },
     ];
   },
   async headers() {

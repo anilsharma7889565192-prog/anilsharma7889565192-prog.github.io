@@ -2,34 +2,20 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Photo } from "@/components/Photo";
 import { Steps } from "@/components/Steps";
-import { Bullets, Disclaimer, GlobeCta, SectionHead, enquiryHref } from "@/components/ui";
+import { Disclaimer, GlobeCta, SectionHead } from "@/components/ui";
 import { LiveScene } from "@/components/three/LiveScene";
-import { TiltLink } from "@/components/Tilt";
 import { EnquiryBar } from "@/components/EnquiryBar";
 import { FleetSection } from "@/components/fleet/FleetSection";
 import Image from "next/image";
 import { ScrollJourney } from "@/components/ScrollJourney";
 import { operators } from "@/config/operators";
-import type { ImageSlot } from "@/config/images";
+import { services } from "@/config/services";
 import { pageMeta } from "@/lib/metadata";
 
 export const metadata = {
   ...pageMeta("/", "Private Jet & Helicopter Charter Arrangements in India", "Private jet and helicopter charter solutions for business, private travel, weddings and special requirements, arranged with independent aviation operators across India."),
   title: { absolute: "Continent Aviation | Private Jet & Helicopter Charter Arrangements in India" },
 };
-
-const services: { slot: ImageSlot; title: string; text: string; href: string; cta: string }[] = [
-  { slot: "jets", title: "Private Jets and Helicopters", text: "Explore jets, turboprops and helicopters for executive journeys, private travel, multi-city itineraries, destination transfers and special requirements, subject to permissions and operational feasibility.", href: "/fleet", cta: "Explore the Fleet" },
-  { slot: "bespoke", title: "Bespoke Charter Solutions", text: "From destination weddings and VIP movements to corporate itineraries, we coordinate charter enquiries around the specific needs of each client.", href: "/charter-solutions", cta: "Explore Solutions" },
-];
-
-const audiences: { slot: ImageSlot; title: string; text: string; href: string }[] = [
-  { slot: "corporate", title: "Corporate & Executive Travel", text: "Charter enquiries for executives, entrepreneurs and businesses requiring tailored travel arrangements.", href: "/charter-solutions#corporate" },
-  { slot: "private", title: "Private Journeys", text: "Private aviation options for individuals, families and personal itineraries.", href: "/charter-solutions#family" },
-  { slot: "wedding", title: "Destination Weddings", text: "Charter coordination for wedding families, special guests and destination celebrations.", href: "/charter-solutions#weddings" },
-  { slot: "vip", title: "VIP & Event Movements", text: "Private aviation enquiries for premium events and special movements.", href: "/charter-solutions#vip-events" },
-  { slot: "group", title: "Bespoke Group Travel", text: "Explore suitable aircraft options for groups, subject to passenger capacity and availability.", href: "/charter-solutions#multi-city" },
-];
 
 const trust = [
   { t: "You tell us the journey", d: "Route, date, passengers and any special requirements. An enquiry is free and carries no obligation." },
@@ -108,6 +94,33 @@ export default function Home() {
         </div>
       </section>
 
+      {/* A4 — Services */}
+      <section id="services" className="bg-[#f4f8fb] py-16 text-midnight md:py-24" aria-labelledby="services-h">
+        <div className="wrap">
+          <div className="max-w-3xl">
+            <p className="eyebrow !text-[#0b6fb3]">Our Services</p>
+            <h2 id="services-h" className="h2 mt-3 !text-midnight">Services we offer.</h2>
+            <p className="mt-4 text-grey-deep">From a single executive journey to a wedding with guests arriving from several cities, we coordinate the aircraft options around the way you need to travel.</p>
+          </div>
+          <ul className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {services.map((s) => (
+              <li key={s.id}>
+                <Link href={`/services#${s.id}`} className="group flex h-full flex-col overflow-hidden rounded-3xl border border-[#0b6fb3]/15 bg-white shadow-[0_18px_40px_-30px_rgba(11,111,179,.6)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_26px_50px_-28px_rgba(11,111,179,.7)]">
+                  <div className="relative aspect-[4/3] overflow-hidden bg-[#e6f4fd]">
+                    <Image src={s.image} alt={s.imageAlt} fill sizes="(min-width:1024px) 360px, (min-width:640px) 50vw, 100vw" className="object-cover transition-transform duration-700 group-hover:scale-105" />
+                  </div>
+                  <div className="flex flex-1 flex-col p-6">
+                    <h3 className="font-serif text-[1.65rem] font-semibold leading-tight">{s.title}</h3>
+                    <p className="mt-2 flex-1 text-[0.92rem] text-grey-deep">{s.summary}</p>
+                    <span className="mt-5 inline-flex items-center gap-2 text-[0.76rem] font-semibold uppercase tracking-[0.12em] text-[#0b6fb3]">Learn more<ArrowRight size={14} aria-hidden="true" className="transition-transform group-hover:translate-x-1" /></span>
+                  </div>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
       {/* A3 — Trust: cinematic scroll journey on desktop, static steps elsewhere */}
       <ScrollJourney steps={trust}>
         <section className="section section-ivory" aria-labelledby="trust-h">
@@ -151,49 +164,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* C — Services */}
-      <section className="section section-black">
-        <div className="wrap">
-          <SectionHead eyebrow="Our Services" title="Charter Solutions, Considered." />
-          <div className="mt-16 grid gap-px md:grid-cols-2 md:gap-8">
-            {services.map((s, i) => (
-              <TiltLink key={s.title} href={s.href} className={`tile group ${i === 1 ? "md:mt-14" : ""}`}>
-                <div className="relative aspect-[4/5] w-full">
-                  <Photo slot={s.slot} shade="bottom" sizes="(min-width:768px) 33vw, 100vw" />
-                </div>
-                <div className="relative z-10 -mt-px pb-2 pt-7">
-                  <h3 className="h3">{s.title}</h3>
-                  <p className="mt-4 text-[0.95rem] text-ivory/70">{s.text}</p>
-                  <span className="link-arrow mt-6">{s.cta}<ArrowRight size={14} aria-hidden="true" /></span>
-                </div>
-              </TiltLink>
-            ))}
-          </div>
-          <p className="mt-14 max-w-2xl text-sm text-grey">Routes, landing locations, aircraft and services are confirmed only once the relevant operator has confirmed them.</p>
-        </div>
-      </section>
-
-      {/* D — Who we serve */}
-      <section className="section section-navy">
-        <div className="wrap">
-          <SectionHead eyebrow="Who We Serve" title="Designed Around Distinct Travel Needs." />
-          <div className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-6">
-            {audiences.map((a, i) => (
-              <TiltLink key={a.title} href={a.href} max={2.5} className={`tile group ${i < 2 ? "lg:col-span-3" : "lg:col-span-2"}`}>
-                <div className={`relative w-full ${i < 2 ? "aspect-[16/10]" : "aspect-[4/5] lg:aspect-[3/4]"}`}>
-                  <Photo slot={a.slot} shade="bottom" sizes="(min-width:1024px) 40vw, 100vw" />
-                  <div className="absolute inset-x-0 bottom-0 z-10 p-6 md:p-7">
-                    <h3 className="h3">{a.title}</h3>
-                    <span className="rule mt-4 transition-all duration-500 group-hover:w-16" />
-                    <p className="mt-4 text-[0.92rem] text-ivory/80">{a.text}</p>
-                  </div>
-                </div>
-              </TiltLink>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* E — How it works */}
       <section className="section section-ivory">
         <div className="wrap">
@@ -216,47 +186,6 @@ export default function Home() {
               </div>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* G — Weddings */}
-      <section className="relative isolate overflow-hidden section-navy">
-        <div className="grid lg:grid-cols-2">
-          <div className="relative min-h-[22rem] lg:min-h-[44rem]"><Photo slot="wedding" shade="none" sizes="(min-width:1024px) 50vw, 100vw" /></div>
-          <div className="px-[max(1.25rem,4vw)] py-20 lg:px-20 lg:py-28 xl:px-28">
-            <p className="eyebrow">Destination Weddings</p>
-            <h2 className="h2 mt-4">An Elevated Arrival for Exceptional Occasions.</h2>
-            <span className="rule mt-7" />
-            <p className="mt-7 text-ivory/80">
-              Destination weddings bring together families and guests from multiple cities and countries. Continent Aviation helps wedding planners, hospitality teams and families explore private jet and helicopter charter options for suitable travel requirements.
-            </p>
-            <div className="mt-8 text-[0.95rem] text-ivory/85">
-              <Bullets items={[
-                "Wedding family and VIP travel enquiries.",
-                "Private jet charter quotations.",
-                "Helicopter transfer enquiries, subject to permissions and landing feasibility.",
-                "Coordination with planners and event teams.",
-                "Multi-city travel requirements.",
-              ]} />
-            </div>
-            <Link href={enquiryHref({ purpose: "Destination Wedding" })} className="btn btn-gold mt-10">Discuss Wedding Travel<ArrowRight size={16} aria-hidden="true" /></Link>
-          </div>
-        </div>
-      </section>
-
-      {/* H — Corporate */}
-      <section className="section section-ivory">
-        <div className="wrap grid items-center gap-12 lg:grid-cols-12 lg:gap-20">
-          <div className="lg:col-span-7">
-            <p className="eyebrow">Corporate Travel</p>
-            <h2 className="h2 mt-4">Private Aviation for Business on the Move.</h2>
-            <span className="rule mt-7" />
-            <p className="mt-7 max-w-2xl text-[1.1rem] text-grey-deep">
-              Business itineraries can involve multiple destinations, tight schedules and specific passenger requirements. We coordinate charter enquiries with relevant operators to help businesses evaluate suitable private aviation options.
-            </p>
-            <Link href={enquiryHref({ purpose: "Corporate Travel" })} className="btn btn-dark mt-10">Discuss Corporate Travel<ArrowRight size={16} aria-hidden="true" /></Link>
-          </div>
-          <div className="relative aspect-[4/3] lg:col-span-5"><Photo slot="corporate" sizes="(min-width:1024px) 40vw, 100vw" /></div>
         </div>
       </section>
 

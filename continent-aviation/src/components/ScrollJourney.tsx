@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { ArrowRight } from "lucide-react";
+import { GlassLink } from "@/components/ui/glass-link";
 
 export type JourneyStep = { t: string; d: string };
 
@@ -93,7 +93,7 @@ export function ScrollJourney({ steps, children }: { steps: JourneyStep[]; child
                     <span className="font-serif text-6xl text-gold">{String(i + 1).padStart(2, "0")}</span>
                     <h2 className="h2 mt-4 !text-[clamp(2rem,4vw,3.4rem)]">{s.t}</h2>
                     <p className="lead mt-5">{s.d}</p>
-                    {i === steps.length - 1 && <Link href="/request-a-charter" className="btn btn-gold mt-8">Request a Charter<ArrowRight size={16} aria-hidden="true" /></Link>}
+                    {i === steps.length - 1 && <GlassLink href="/request-a-charter" className="mt-8">Request a Charter<ArrowRight size={16} aria-hidden="true" /></GlassLink>}
                   </li>
                 ))}
               </ol>

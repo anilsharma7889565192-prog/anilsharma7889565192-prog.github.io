@@ -35,7 +35,7 @@ export function AlertSignup() {
         <div className="field"><label htmlFor="alert-email">Email</label><input id="alert-email" name="email" type="email" autoComplete="email" required className="input" /></div>
       </div>
       <div aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 overflow-hidden"><label>Leave empty<input type="text" name="website" tabIndex={-1} autoComplete="off" /></label></div>
-      <label className="flex cursor-pointer items-start gap-3 text-[0.92rem]"><input type="checkbox" name="consent" className="mt-1 h-5 w-5 shrink-0 accent-[#c8a96b]" /><span>I agree that Continent Aviation may email me about this route. I can unsubscribe at any time.</span></label>
+      <label className="flex cursor-pointer items-start gap-3 text-[0.92rem]"><input type="checkbox" name="consent" className="mt-1 h-5 w-5 shrink-0 accent-[#2aa7e8]" /><span>I agree that Continent Aviation may email me about this route. I can unsubscribe at any time.</span></label>
       {state === "error" && <p role="alert" className="field-error">{msg}</p>}
       <button type="submit" disabled={state === "sending"} className="btn btn-gold">{state === "sending" ? "Saving" : "Sign up for alerts"}</button>
     </form>

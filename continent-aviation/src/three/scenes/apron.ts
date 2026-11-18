@@ -28,6 +28,12 @@ export const APRON_SHOTS: Record<string, ApronShotDef> = {
     camPortrait: { pos: [30, 2.2, 22], target: [-3, 2.4, -1.5], fov: 44 },
     floods: [[-90, -70], [60, -120], [-140, 10]], fog: 0.0045, key: 1.2, fill: 0.5, liveShift: -8,
   },
+  journeyDay: {
+    sky: "day", exposure: 1.0,
+    jets: [{ cat: "supermid", livery: "sky", pos: [0, 0], rot: -0.2, glow: 0 }],
+    cam: { pos: [21, 1.55, 15.5], target: [-1.5, 2.9, -1.0], fov: 30 },
+    floods: [], fog: 0.0012, key: 3.4, fill: 1.1, bloom: 0.25, ground: "#7d8794", feature: 0,
+  },
   journey: {
     sky: "dusk", sky2: { sunDir: [-0.35, 0.015, -0.94], cloudCover: 0.52 }, exposure: 1.0,
     jets: [{ cat: "supermid", livery: "navy", pos: [0, 0], rot: -0.2, glow: 1.6 }],
@@ -206,7 +212,7 @@ export function createApronScene(ctx: SceneContext, shotName: string): SceneSetu
   const tmp = new THREE.Vector3();
   let journeyP = 0;
   // Scroll-journey camera path (offline renders only): p in [0,1] moves along a smooth spline.
-  const path = shotName === "journey" ? JOURNEY : null;
+  const path = shotName.startsWith("journey") ? JOURNEY : null;
   const goTo = (p: number) => {
     if (!path) return;
     const n = path.length - 1, x = Math.min(Math.max(p, 0), 1) * n, i = Math.min(Math.floor(x), n - 1), f = x - i;

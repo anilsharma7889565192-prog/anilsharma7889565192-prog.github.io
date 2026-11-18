@@ -12,6 +12,14 @@ const nextConfig: NextConfig = {
   agentRules: false,
   serverExternalPackages: ["@electric-sql/pglite", "postgres"],
   images: { formats: ["image/avif", "image/webp"], qualities: [75, 82] },
+  async redirects() {
+    // The separate jet and helicopter pages are now one Fleet page.
+    return [
+      { source: "/private-jets", destination: "/fleet", permanent: true },
+      { source: "/helicopter-charters", destination: "/fleet", permanent: true },
+      { source: "/charter-solutions", destination: "/services", permanent: true },
+    ];
+  },
   async headers() {
     return [{ source: "/(.*)", headers: securityHeaders }];
   },

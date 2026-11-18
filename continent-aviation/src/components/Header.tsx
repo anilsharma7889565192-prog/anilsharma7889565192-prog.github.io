@@ -50,8 +50,8 @@ export function Header() {
 
   return (
     <>
-    <header className={`fixed inset-x-0 top-0 z-50 transition-[background-color,border-color,backdrop-filter] duration-500 ${scrolled || open ? "border-b border-gold/20 bg-midnight/92 backdrop-blur-md" : "border-b border-transparent bg-gradient-to-b from-midnight/70 to-transparent"}`}>
-      <div className="wrap flex h-[4.5rem] items-center justify-between gap-6 lg:h-20">
+    <header className="fixed inset-x-0 top-0 z-50 px-3 pt-3 sm:px-4 sm:pt-4">
+      <div className={`mx-auto flex h-16 max-w-[80rem] items-center justify-between gap-6 rounded-full border px-5 transition-[background-color,border-color,box-shadow] duration-500 lg:h-[4.5rem] lg:px-7 ${scrolled || open ? "border-white/35 bg-[rgb(6_37_64/0.72)] shadow-[inset_0_1px_0_rgb(255_255_255/0.35),0_16px_40px_-18px_rgba(0,15,40,0.7)]" : "border-white/30 bg-white/10 shadow-[inset_0_1px_0_rgb(255_255_255/0.4)]"} backdrop-blur-xl backdrop-saturate-150`}>
         <Link href="/" aria-label="Continent Aviation, home" className="relative z-10 shrink-0">
           <Logo />
         </Link>
@@ -63,7 +63,7 @@ export function Header() {
               {l.label}
             </Link>
           ))}
-          <Link href="/request-a-charter" className="btn btn-gold !min-h-[2.6rem] !px-5 !py-2">Request a Charter</Link>
+          <Link href="/request-a-charter" className="btn btn-gold !min-h-[2.5rem] !px-5 !py-2">Request a Charter</Link>
         </nav>
 
         <button ref={toggleRef} type="button" className="relative z-10 -mr-2 flex h-11 w-11 items-center justify-center text-ivory lg:hidden"
@@ -73,7 +73,7 @@ export function Header() {
       </div>
 
     </header>
-      <div id="mobile-menu" ref={panelRef} hidden={!open} className="fixed inset-x-0 bottom-0 top-[4.5rem] z-40 overflow-y-auto bg-midnight lg:hidden">
+      <div id="mobile-menu" ref={panelRef} hidden={!open} className="fixed inset-x-0 bottom-0 top-[5.5rem] z-40 overflow-y-auto bg-midnight lg:hidden">
         <nav aria-label="Mobile" className="wrap flex min-h-full flex-col py-8">
           <ul>
             {[...nav, ...menuExtra].map((l) => (

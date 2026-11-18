@@ -41,11 +41,11 @@ export function whatsappLink(message = "Hello Continent Aviation, I would like t
 }
 
 export const nav = [
-  { href: "/private-jets", label: "Private Jets" },
-  { href: "/helicopter-charters", label: "Helicopters" },
-  { href: "/charter-solutions", label: "Solutions" },
+  { href: "/fleet", label: "Fleet" },
+  { href: "/services", label: "Services" },
   { href: "/how-we-quote", label: "How We Quote" },
   { href: "/about", label: "About" },
+  { href: "/account", label: "Account" },
 ] as const;
 
 export const menuExtra = [
@@ -57,9 +57,8 @@ export const menuExtra = [
 ] as const;
 
 export const footerNav = [
-  { href: "/private-jets", label: "Private Jets" },
-  { href: "/helicopter-charters", label: "Helicopter Charters" },
-  { href: "/charter-solutions", label: "Charter Solutions" },
+  { href: "/fleet", label: "Fleet" },
+  { href: "/services", label: "Services" },
   { href: "/operators", label: "Operators and Aircraft" },
   { href: "/how-we-quote", label: "How We Quote" },
   { href: "/pricing-explained", label: "Pricing Explained" },

@@ -15,6 +15,9 @@ export default function Page() {
       <p>When you submit a charter or partnership enquiry, we collect the details you provide: your name, organisation, email address, phone number, preferred contact method, journey details (such as locations, dates, passenger numbers, baggage and notes), purpose of travel, and any optional budget information.</p>
       <p>We do not ask for passport numbers, identity documents or payment card details through the enquiry forms. Please do not include them in free-text fields. If these are needed later, we will explain how they are to be provided securely.</p>
 
+      <h2>Your client account</h2>
+      <p>If you send an enquiry or sign in at <Link href="/account">My account</Link>, we keep a client record with your name, email address, phone number and organisation (if given), the enquiries you have made and their status, and your sign-in activity. We use it to remember your details for your next enquiry, to show you the progress of your enquiries, and to contact you about them. Our team may also add private notes about your requirements and preferences. Sign-in uses a one-time link sent to your email; we do not store a password. You can ask us to correct or delete your client record at any time by writing to us.</p>
+
       <h2>How we use it</h2>
       <ul>
         <li>To review your requirement and contact you about it.</li>

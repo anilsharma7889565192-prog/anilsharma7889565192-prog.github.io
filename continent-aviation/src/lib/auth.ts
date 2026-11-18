@@ -36,7 +36,8 @@ export function readSession(value: string | undefined | null): { email: string }
   const a = Buffer.from(sig), b = Buffer.from(expected);
   if (a.length !== b.length || !timingSafeEqual(a, b)) return null;
   try {
-    const { email, exp } = JSON.parse(Buffer.from(payload, "base64url").toString());
+    const { email, exp, role } = JSON.parse(Buffer.from(payload, "base64url").toString());
+    if (role) return null; // client sessions carry a role and are never admin sessions
     if (typeof email !== "string" || typeof exp !== "number" || exp < Date.now() / 1000) return null;
     if (email !== adminEmail()) return null;
     return { email };
@@ -62,3 +63,34 @@ export async function requireAdmin() {
   if (!a) redirect("/admin/login");
   return a;
 }
+
+// ---- client (customer) sessions: separate cookie and payload from the admin session
+export const CLIENT_COOKIE = "ca_client";
+const CLIENT_MAX_AGE_S = 60 * 60 * 24 * 30;
+
+export function makeClientSession(email: string) {
+  const key = secret();
+  if (!key) throw new Error("SESSION_SECRET is not configured");
+  const payload = b64(JSON.stringify({ role: "client", email, exp: Math.floor(Date.now() / 1000) + CLIENT_MAX_AGE_S }));
+  return `${payload}.${sign(payload, key)}`;
+}
+export function readClientSession(value: string | undefined | null): { email: string } | null {
+  const key = secret();
+  if (!key || !value) return null;
+  const [payload, sig] = value.split(".");
+  if (!payload || !sig) return null;
+  const a = Buffer.from(sig), b = Buffer.from(sign(payload, key));
+  if (a.length !== b.length || !timingSafeEqual(a, b)) return null;
+  try {
+    const { role, email, exp } = JSON.parse(Buffer.from(payload, "base64url").toString());
+    if (role !== "client" || typeof email !== "string" || typeof exp !== "number" || exp < Date.now() / 1000) return null;
+    return { email };
+  } catch {
+    return null;
+  }
+}
+export const clientCookieOptions = { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax" as const, path: "/", maxAge: CLIENT_MAX_AGE_S };
+export async function getClientSession() {
+  return readClientSession((await cookies()).get(CLIENT_COOKIE)?.value);
+}
+export const clientAuthConfigured = () => Boolean(secret());

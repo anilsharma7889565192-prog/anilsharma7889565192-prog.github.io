@@ -1,8 +1,8 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, ChevronRight } from "lucide-react";
 import type { ReactNode } from "react";
 import { Photo } from "./Photo";
-import { LiveScene } from "./three/LiveScene";
 import type { ImageSlot } from "@/config/images";
 import { site } from "@/config/site";
 
@@ -35,10 +35,10 @@ type PageHeroProps = {
 
 export function PageHero({ title, description, eyebrow, slot, crumbs, actions, live }: PageHeroProps) {
   return (
-    <section className="relative isolate flex min-h-[26rem] items-end overflow-hidden pb-14 pt-36 md:min-h-[38rem] md:pb-20">
-      <Photo slot={slot} priority sizes="100vw" />
-      {live && <LiveScene shot={live} />}
-      <div className="overlay-hero" aria-hidden="true" />
+    <section className="relative isolate flex min-h-[26rem] items-end overflow-hidden bg-[#0b6fb3] pb-14 pt-36 md:min-h-[34rem] md:pb-20">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/images/sky.jpg" alt="" aria-hidden="true" className="absolute inset-0 -z-10 h-full w-full object-cover" fetchPriority="high" />
+      <div className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(4,40,80,.6),rgba(4,40,80,.12)_55%,rgba(4,40,80,.45))]" aria-hidden="true" />
       <div className="wrap relative z-10">
         <Breadcrumbs trail={crumbs} />
         {eyebrow && <p className="eyebrow mt-8 rise">{eyebrow}</p>}
@@ -88,9 +88,10 @@ export function CtaBand({
   slot?: ImageSlot;
 }) {
   return (
-    <section className="relative isolate overflow-hidden py-24 md:py-36">
-      <Photo slot={slot} />
-      <div className="overlay-band" aria-hidden="true" />
+    <section className="relative isolate overflow-hidden bg-[#0b6fb3] py-24 md:py-36">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/images/sky.jpg" alt="" aria-hidden="true" className="absolute inset-0 -z-10 h-full w-full object-cover" loading="lazy" />
+      <div className="absolute inset-0 -z-10 bg-[radial-gradient(80%_90%_at_50%_50%,rgba(4,40,80,.35),rgba(4,40,80,.7))]" aria-hidden="true" />
       <div className="wrap relative z-10 text-center">
         <span className="rule mx-auto" />
         <h2 className="h2 mx-auto mt-8 max-w-3xl !text-[clamp(2.2rem,5.5vw,4.2rem)]">{title}</h2>
@@ -104,23 +105,25 @@ export function CtaBand({
   );
 }
 
-/** Closing call to action with a live globe of India (home page). */
+/** Closing call to action with a photoreal night-time Earth that bleeds into the page (home page). */
 export function GlobeCta() {
   return (
-    <section className="relative isolate overflow-hidden bg-navy">
-      <div className="wrap grid items-center gap-6 py-20 md:py-28 lg:grid-cols-12 lg:gap-10">
-        <div className="relative z-10 lg:col-span-6">
+    <section className="relative isolate overflow-hidden bg-midnight">
+      {/* A real astronaut photograph of Earth at night (NASA, public domain). Every edge is feathered into the page colour so it has no visible border. */}
+      <div className="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
+        <Image src="/images/earth-night.jpg" alt="" fill sizes="100vw" className="object-cover object-[60%_100%] max-lg:object-[70%_100%]" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,#060d16_0%,rgba(6,13,22,.85)_14%,rgba(6,13,22,0)_42%,rgba(6,13,22,0)_72%,#060d16_100%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,#060d16_0%,rgba(6,13,22,.9)_28%,rgba(6,13,22,.2)_58%,rgba(6,13,22,0)_75%)] max-lg:bg-[linear-gradient(180deg,rgba(6,13,22,.5),rgba(6,13,22,.2))]" />
+      </div>
+      <div className="wrap relative py-28 md:py-44 max-lg:pb-72">
+        <div className="max-w-xl">
           <span className="rule" />
-          <h2 className="h2 mt-8 max-w-xl !text-[clamp(2.2rem,5vw,4rem)]">Tell Us Where You Need to Be.</h2>
+          <h2 className="h2 mt-8 !text-[clamp(2.2rem,5vw,4rem)]">Tell Us Where You Need to Be.</h2>
           <p className="lead mt-6">Share your travel requirements and let us coordinate suitable charter options with relevant aviation operators.</p>
           <div className="mt-10 flex flex-wrap gap-4">
             <Link href="/request-a-charter" className="btn btn-gold">Request a Charter<ArrowRight size={16} aria-hidden="true" /></Link>
             <Link href="/contact" className="btn btn-ghost">Contact Continent Aviation</Link>
           </div>
-        </div>
-        <div className="relative -mx-[max(1.25rem,4vw)] aspect-square max-h-[38rem] lg:col-span-6 lg:mx-0" aria-hidden="true">
-          <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_50%_50%,rgb(200_169_107/.08),transparent_62%)]" />
-          <LiveScene shot="globe" params={{ bg: "#101a2a" }} />
         </div>
       </div>
     </section>

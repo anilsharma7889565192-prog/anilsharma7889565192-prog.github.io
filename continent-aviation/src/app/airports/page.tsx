@@ -29,6 +29,7 @@ export default function Page() {
           </ul>
         </div>
       </section>
+      <section className="section-ivory pb-10"><div className="wrap"><p className="text-[0.7rem] text-grey-deep">Photographs from Wikimedia Commons: Taj Mahal Palace, Mumbai (Joe Ravi, CC BY-SA 3.0); City Palace, Udaipur (Jakub Hałun, CC BY-SA 4.0); Palolem Beach (Vachary, CC BY-SA 4.0); Amber Fort (PRITAMDUTTA20, CC BY-SA 4.0); light helicopter (Thomas C. Gray, public domain). Aircraft images are illustrative of the type. Full list in the repository's IMAGES.md.</p></div></section>
       <section className="section section-navy"><div className="wrap wrap-narrow"><AlertSignup /></div></section>
       <CtaBand />
       <Disclaimer />

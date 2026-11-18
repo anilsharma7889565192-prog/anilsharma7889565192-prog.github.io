@@ -14,6 +14,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           {admin && (
             <nav className="flex items-center gap-6 text-[0.8rem] uppercase tracking-[0.14em]">
               <Link href="/admin" className="hover:text-gold">Enquiries</Link>
+              <Link href="/admin/clients" className="hover:text-gold">Clients</Link>
               <Link href="/admin/alerts" className="hover:text-gold">Alerts</Link>
               <form action="/api/admin/logout" method="post"><button className="uppercase tracking-[0.14em] text-grey hover:text-gold" type="submit">Sign out</button></form>
             </nav>

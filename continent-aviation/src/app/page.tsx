@@ -5,6 +5,9 @@ import { Steps } from "@/components/Steps";
 import { Bullets, Disclaimer, GlobeCta, SectionHead, enquiryHref } from "@/components/ui";
 import { LiveScene } from "@/components/three/LiveScene";
 import { TiltLink } from "@/components/Tilt";
+import { EnquiryBar } from "@/components/EnquiryBar";
+import { ScrollJourney } from "@/components/ScrollJourney";
+import { operators } from "@/config/operators";
 import type { ImageSlot } from "@/config/images";
 import { pageMeta } from "@/lib/metadata";
 
@@ -27,6 +30,13 @@ const audiences: { slot: ImageSlot; title: string; text: string; href: string }[
   { slot: "group", title: "Bespoke Group Travel", text: "Explore suitable aircraft options for groups, subject to passenger capacity and availability.", href: "/charter-solutions#multi-city" },
 ];
 
+const trust = [
+  { t: "You tell us the journey", d: "Route, date, passengers and any special requirements. An enquiry is free and carries no obligation." },
+  { t: "We check with the operator", d: "We ask the operator whether the aircraft is available and whether the journey is feasible." },
+  { t: "You get a private quote", d: "A quote that names the operator and the aircraft, valid for 48 hours, on a link only you hold." },
+  { t: "Booked only when confirmed", d: "You pay the operator directly. Nothing is booked until the operator confirms it to you." },
+];
+
 const benefits = [
   { t: "Personal Coordination", d: "Requirements are reviewed individually, with attention to route, timing, passengers and preferences." },
   { t: "Operator-Based Sourcing", d: "We source potential aircraft options through aviation operators and confirm details directly with the relevant provider." },
@@ -38,24 +48,71 @@ export default function Home() {
   return (
     <>
       {/* A — Hero */}
-      <section className="relative isolate flex min-h-[100svh] items-end overflow-hidden pb-20 pt-40 md:items-center md:pb-24">
+      <section className="relative isolate flex min-h-[100svh] items-end overflow-hidden pb-12 pt-36 md:pb-16">
         <Photo slot="hero" priority sizes="100vw" />
         <LiveScene shot="hero" />
         <div className="overlay-hero" aria-hidden="true" />
         <div className="wrap relative z-10">
           <p className="eyebrow rise">Private Aviation <span className="mx-2 text-gold/60" aria-hidden="true">|</span> India</p>
-          <h1 className="display mt-6 max-w-5xl rise rise-2">
+          <h1 className="display mt-5 max-w-5xl rise rise-2">
             Private Aviation,<br />Arranged Around You.
           </h1>
-          <span className="rule mt-9 rise rise-3" />
-          <p className="lead mt-8 rise rise-3">
-            Private jet and helicopter charter solutions for business travel, private journeys, destination weddings and special requirements.
+          <p className="lead mt-6 rise rise-3">
+            Tell us the route, date and passengers. We check with the operator and send you a private quote, valid for 48 hours.
           </p>
-          <div className="mt-10 flex flex-wrap gap-4 rise rise-4">
-            <Link href="/request-a-charter" className="btn btn-gold">Request a Charter<ArrowRight size={16} aria-hidden="true" /></Link>
-            <Link href="/charter-solutions" className="btn btn-ghost">Explore Our Services</Link>
+          <div className="mt-8 rise rise-4 md:mt-10"><EnquiryBar /></div>
+          <p className="mt-6 text-[0.8rem] tracking-[0.08em] text-ivory/70 rise rise-4">
+            No payment is taken on this website. <Link href="/how-we-quote" className="underline decoration-gold/60 underline-offset-4 hover:text-gold">See how a quote works</Link>
+          </p>
+        </div>
+      </section>
+
+      {/* A2 — Trust: cinematic scroll journey on desktop, static steps elsewhere */}
+      <ScrollJourney steps={trust}>
+        <section className="section section-ivory" aria-labelledby="trust-h">
+          <div className="wrap">
+            <SectionHead eyebrow="How we work" title="Clear at every step, before you pay anything." />
+            <ol id="trust-h" className="mt-14 grid gap-x-10 gap-y-12 md:grid-cols-2 lg:grid-cols-4">
+              {trust.map((t, i) => (
+                <li key={t.t} className="hairline-top pt-6">
+                  <span className="font-serif text-4xl text-gold-deep" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
+                  <h3 className="mt-4 font-serif text-2xl leading-snug">{t.t}</h3>
+                  <p className="mt-3 text-[0.95rem] text-grey-deep">{t.d}</p>
+                </li>
+              ))}
+            </ol>
           </div>
-          <p className="mt-12 text-[0.8rem] tracking-[0.08em] text-ivory/65 rise rise-4">Tailored charter enquiries. Carefully sourced aircraft options.</p>
+        </section>
+      </ScrollJourney>
+      <section className="section-ivory py-10" aria-label="Learn how quotes work">
+        <div className="wrap flex flex-wrap gap-x-8 gap-y-3">
+          <Link href="/how-we-quote" className="link-arrow">How we quote<ArrowRight size={14} aria-hidden="true" /></Link>
+          <Link href="/example-quote" className="link-arrow">See an example quote<ArrowRight size={14} aria-hidden="true" /></Link>
+          <Link href="/pricing-explained" className="link-arrow">What affects the price<ArrowRight size={14} aria-hidden="true" /></Link>
+        </div>
+      </section>
+
+      {/* A3 — Operators */}
+      <section className="section section-navy" aria-labelledby="ops-h">
+        <div className="wrap grid gap-12 lg:grid-cols-12 lg:gap-20">
+          <div className="lg:col-span-5">
+            <p className="eyebrow">Who flies you</p>
+            <h2 id="ops-h" className="h2 mt-4">Independent operators, named in every quote.</h2>
+            <span className="rule mt-7" />
+            <p className="mt-7 text-ivory/80">Continent Aviation does not own or operate aircraft. We arrange your charter with operators who do, and each quote names the operator and the aircraft.</p>
+            <Link href="/operators" className="link-arrow mt-8">Operators and aircraft<ArrowRight size={14} aria-hidden="true" /></Link>
+          </div>
+          <ul className="grid gap-px bg-gold/20 lg:col-span-7 sm:grid-cols-2">
+            {operators.map((o) => (
+              <li key={o.id} className="bg-navy p-7">
+                <h3 className="font-serif text-3xl">{o.name}</h3>
+                <p className="mt-3 text-[0.92rem] text-ivory/75">{o.aircraft.length} aircraft types, from {o.aircraft.some((a) => a.category === "Helicopter") ? "helicopters to " : ""}{o.aircraft.some((a) => a.category === "Large jet") ? "large-cabin jets" : "turboprops"}.</p>
+                <ul className="mt-5 space-y-1.5 text-[0.9rem] text-ivory/85">
+                  {o.aircraft.map((a) => <li key={a.model} className="flex gap-3"><span aria-hidden="true" className="mt-[0.7em] h-px w-4 shrink-0 bg-gold" />{a.model}</li>)}
+                </ul>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 

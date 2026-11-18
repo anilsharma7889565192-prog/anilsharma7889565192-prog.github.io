@@ -12,9 +12,9 @@ export const site = {
   tagline: "Private Aviation, Arranged Around You.",
   supporting:
     "Private jet and helicopter charter solutions for business, private travel, weddings and special requirements.",
-  url: (env(process.env.NEXT_PUBLIC_SITE_URL) ?? "http://localhost:3000").replace(/\/$/, ""),
+  url: (env(process.env.NEXT_PUBLIC_SITE_URL) ?? (process.env.NODE_ENV === "production" ? "https://continentaviation.in" : "http://localhost:3000")).replace(/\/$/, ""),
   contact: {
-    email: env(process.env.NEXT_PUBLIC_CONTACT_EMAIL),
+    email: env(process.env.NEXT_PUBLIC_CONTACT_EMAIL) ?? "charters@continentaviation.in",
     phone: env(process.env.NEXT_PUBLIC_CONTACT_PHONE),
     whatsapp: whatsappDigits,
     hours: env(process.env.NEXT_PUBLIC_BUSINESS_HOURS),
@@ -44,11 +44,15 @@ export const nav = [
   { href: "/private-jets", label: "Private Jets" },
   { href: "/helicopter-charters", label: "Helicopters" },
   { href: "/charter-solutions", label: "Solutions" },
+  { href: "/how-we-quote", label: "How We Quote" },
   { href: "/about", label: "About" },
 ] as const;
 
 export const menuExtra = [
+  { href: "/operators", label: "Operators and Aircraft" },
   { href: "/how-it-works", label: "How It Works" },
+  { href: "/airports", label: "Airports and Routes" },
+  { href: "/insights", label: "Insights" },
   { href: "/contact", label: "Contact" },
 ] as const;
 
@@ -56,8 +60,16 @@ export const footerNav = [
   { href: "/private-jets", label: "Private Jets" },
   { href: "/helicopter-charters", label: "Helicopter Charters" },
   { href: "/charter-solutions", label: "Charter Solutions" },
+  { href: "/operators", label: "Operators and Aircraft" },
+  { href: "/how-we-quote", label: "How We Quote" },
+  { href: "/pricing-explained", label: "Pricing Explained" },
+  { href: "/airports", label: "Airports and Routes" },
+  { href: "/insights", label: "Insights" },
   { href: "/how-it-works", label: "How It Works" },
   { href: "/about", label: "About" },
   { href: "/partnerships", label: "Partnerships" },
   { href: "/contact", label: "Contact" },
 ] as const;
+
+/** Hours a quote stays valid after it is sent. */
+export const QUOTE_VALID_HOURS = Number(process.env.QUOTE_VALID_HOURS ?? 48);

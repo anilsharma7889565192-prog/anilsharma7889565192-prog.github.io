@@ -28,6 +28,12 @@ export const APRON_SHOTS: Record<string, ApronShotDef> = {
     camPortrait: { pos: [30, 2.2, 22], target: [-3, 2.4, -1.5], fov: 44 },
     floods: [[-90, -70], [60, -120], [-140, 10]], fog: 0.0045, key: 1.2, fill: 0.5, liveShift: -8,
   },
+  journey: {
+    sky: "dusk", sky2: { sunDir: [-0.35, 0.015, -0.94], cloudCover: 0.52 }, exposure: 1.0,
+    jets: [{ cat: "supermid", livery: "navy", pos: [0, 0], rot: -0.2, glow: 1.6 }],
+    cam: { pos: [21, 1.55, 15.5], target: [-1.5, 2.9, -1.0], fov: 30 },
+    floods: [[-90, -70], [60, -120], [-140, 10]], fog: 0.0045, key: 1.2, fill: 0.5,
+  },
   jets: {
     sky: "blue", sky2: { sunDir: [0.25, -0.01, -0.97], stars: 0.12, glowStrength: 0.85 }, exposure: 1.1,
     jets: [{ cat: "supermid", livery: "pearl", pos: [0, 0], rot: -2.27, glow: 0.9 }],
@@ -71,6 +77,17 @@ export const APRON_SHOTS: Record<string, ApronShotDef> = {
     floods: [[-30, -26], [44, -44], [-80, -40]], fog: 0.004, key: 0.2, fill: 0.35, bloom: 0.7,
   },
 };
+
+type JourneyKey = { pos: V3; target: V3; fov: number };
+/** Camera keyframes for the home-page scroll journey: approach, hero, along the fuselage, cabin windows, rest. */
+const JOURNEY: JourneyKey[] = [
+  { pos: [62, 4.5, 74], target: [0, 3.0, 0], fov: 27 },
+  { pos: [26, 1.7, 18], target: [-1.5, 2.9, -1.0], fov: 30 },
+  { pos: [9, 1.3, 11], target: [-3.5, 2.3, 0.5], fov: 36 },
+  { pos: [4.2, 2.2, 6.2], target: [0.5, 2.6, 0.2], fov: 34 },
+  { pos: [-3, 3.4, 13], target: [-6, 5.5, -6], fov: 32 },
+  { pos: [16, 3.2, 42], target: [-4, 16, -28], fov: 32 },
+];
 
 export function createApronScene(ctx: SceneContext, shotName: string): SceneSetup {
   const def = APRON_SHOTS[shotName] ?? APRON_SHOTS.hero;
@@ -187,13 +204,32 @@ export function createApronScene(ctx: SceneContext, shotName: string): SceneSetu
   frame(ctx.aspect);
 
   const tmp = new THREE.Vector3();
+  let journeyP = 0;
+  // Scroll-journey camera path (offline renders only): p in [0,1] moves along a smooth spline.
+  const path = shotName === "journey" ? JOURNEY : null;
+  const goTo = (p: number) => {
+    if (!path) return;
+    const n = path.length - 1, x = Math.min(Math.max(p, 0), 1) * n, i = Math.min(Math.floor(x), n - 1), f = x - i;
+    const k = (a: number, b: number, c: number, d: number) => 0.5 * ((2 * b) + (-a + c) * f + (2 * a - 5 * b + 4 * c - d) * f * f + (-a + 3 * b - 3 * c + d) * f * f * f);
+    const at = (j: number) => path[Math.min(Math.max(j, 0), n)];
+    const [a, b, c, d] = [at(i - 1), at(i), at(i + 1), at(i + 2)];
+    const ch = (g: (q: JourneyKey) => number) => k(g(a), g(b), g(c), g(d));
+    camera.position.set(ch((q) => q.pos[0]), ch((q) => q.pos[1]), ch((q) => q.pos[2]));
+    tmp.set(ch((q) => q.target[0]), ch((q) => q.target[1]), ch((q) => q.target[2]));
+    camera.fov = ch((q) => q.fov);
+    camera.updateProjectionMatrix();
+    camera.lookAt(tmp);
+  };
   return {
     scene, camera, exposure: preset.exposure * def.exposure, toneMapping: THREE.ACESFilmicToneMapping,
     post: { bloom: def.bloom ?? 0.55, bloomRadius: 0.6, threshold: 0.95, vignette: 0.34 },
     resize: (w, h) => frame(w / h),
+    warmup: path ? 1 : undefined,
+    api: path ? { setProgress: (v: string) => { journeyP = Number(v); } } : undefined,
     update: (t, _dt, input) => {
       (sky.material as THREE.ShaderMaterial).uniforms.time.value = t;
       jets.forEach((j) => animateJetLights(j, t + j.group.position.x * 0.01));
+      if (path) { goTo(journeyP); return; }
       // Slow cinematic drift, pointer parallax and scroll dolly (live only)
       const orbit = live ? Math.sin(t * 0.05) * 0.035 + input.pointer.x * 0.03 : 0;
       const dolly = live ? input.scroll * 0.22 : 0;

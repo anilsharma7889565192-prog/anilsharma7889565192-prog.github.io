@@ -2,6 +2,9 @@ import "server-only";
 import { NextResponse } from "next/server";
 import type { ZodType } from "zod";
 import { deliver, deliveryConfigured, type DeliveryKind } from "./delivery";
+import { dbConfigured } from "./db/client";
+import { createEnquiry, getEnquiry } from "./db/repo";
+import { mail } from "./email";
 import { rateLimit } from "./ratelimit";
 import { toFieldErrors } from "./validation";
 
@@ -53,21 +56,41 @@ export async function handleSubmission(req: Request, kind: DeliveryKind, schema:
 
   const reference = `CA-${Date.now().toString(36).toUpperCase()}${Math.random().toString(36).slice(2, 5).toUpperCase()}`;
 
-  if (!deliveryConfigured()) {
+  const stored = kind === "charter-enquiry" && dbConfigured() && (process.env.NODE_ENV !== "production" || Boolean(process.env.DATABASE_URL));
+  let storedId: string | null = null;
+  if (stored) {
+    try {
+      storedId = await createEnquiry({ reference, data });
+    } catch (e) {
+      console.error("[enquiry] could not store enquiry:", (e as Error).message);
+    }
+  }
+
+  if (!storedId && !deliveryConfigured()) {
     if (process.env.NODE_ENV !== "production") {
-      console.info(`[enquiry:${kind}] DEVELOPMENT MODE — not delivered. Reference ${reference}`, { ...data, email: "***", phone: "***" });
+      console.info(`[enquiry:${kind}] DEVELOPMENT MODE: not delivered. Reference ${reference}`, { ...data, email: "***", phone: "***" });
       return json({ ok: true, reference, mode: "development" });
     }
-    console.error("[enquiry] No delivery provider configured; rejecting submission instead of discarding it.");
+    console.error("[enquiry] No intake configured; rejecting submission instead of discarding it.");
     return json({ ok: false, error: "not_configured", message: "Online enquiries are temporarily unavailable." }, 503);
   }
 
+  let delivered = false;
   try {
-    const delivered = await deliver(kind, data, reference);
-    if (!delivered) return json({ ok: false, error: "delivery_failed", message: "We could not send your enquiry just now. Please try again shortly." }, 502);
+    // When stored, the team email is sent by the admin notification below; the webhook (if any) still fires.
+    delivered = await deliver(kind, data, reference, { skipEmail: Boolean(storedId) });
   } catch (e) {
     console.error("[enquiry] unexpected delivery error:", (e as Error).message);
-    return json({ ok: false, error: "delivery_failed", message: "We could not send your enquiry just now. Please try again shortly." }, 502);
   }
-  return json({ ok: true, reference, mode: "live" });
+
+  if (storedId) {
+    const e = await getEnquiry(storedId);
+    if (e) {
+      await Promise.allSettled([mail.ack(e), mail.adminNew(e)]);
+    }
+    delivered = true;
+  }
+  if (!delivered) return json({ ok: false, error: "delivery_failed", message: "We could not send your enquiry just now. Please try again shortly." }, 502);
+  const mode = storedId && !process.env.DATABASE_URL && process.env.NODE_ENV !== "production" ? "development" : "live";
+  return json({ ok: true, reference, mode });
 }

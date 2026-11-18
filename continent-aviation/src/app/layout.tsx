@@ -5,6 +5,7 @@ import "./globals.css";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { MobileCta } from "@/components/MobileCta";
+import { HideOn } from "@/components/HideOn";
 import { site } from "@/config/site";
 
 const cormorant = localFont({
@@ -55,7 +56,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <a href="#main" className="skip-link">Skip to content</a>
         <Header />
         <main id="main" className="page-in">{children}</main>
-        <div className="pb-[4.5rem] lg:pb-0 bg-midnight"><Footer /></div>
+        <HideOn paths={["/admin"]}><div className="pb-[4.5rem] lg:pb-0 bg-midnight"><Footer /></div></HideOn>
         <MobileCta />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }} />
         {site.analytics.plausibleDomain && (

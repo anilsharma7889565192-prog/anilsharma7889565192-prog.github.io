@@ -48,7 +48,7 @@ export function Footer() {
         <div className="wrap flex flex-col gap-4 py-8 text-[0.8rem] text-grey md:flex-row md:items-start md:justify-between">
           <div className="max-w-2xl space-y-2 leading-relaxed">
             <p>{site.disclaimerShort} Continent Aviation is not an aircraft operator unless separately and explicitly stated. All flights are subject to operator confirmation.</p>
-            <p>Imagery and 3D scenes are computer-generated illustrations of generic aircraft and places. They do not depict specific operator aircraft or a Continent Aviation fleet.</p>
+            <p>Aircraft photographs show the aircraft type and are illustrations, not specific aircraft offered. 3D scenes are computer-generated illustrations of generic aircraft and places. Continent Aviation owns no aircraft.</p>
           </div>
           <div className="flex shrink-0 flex-col gap-2 md:items-end">
             <p className="flex gap-5">

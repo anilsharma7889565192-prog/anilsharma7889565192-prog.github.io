@@ -6,6 +6,8 @@ import { Bullets, Disclaimer, GlobeCta, SectionHead, enquiryHref } from "@/compo
 import { LiveScene } from "@/components/three/LiveScene";
 import { TiltLink } from "@/components/Tilt";
 import { EnquiryBar } from "@/components/EnquiryBar";
+import { FleetSection } from "@/components/fleet/FleetSection";
+import Image from "next/image";
 import { ScrollJourney } from "@/components/ScrollJourney";
 import { operators } from "@/config/operators";
 import type { ImageSlot } from "@/config/images";
@@ -17,8 +19,7 @@ export const metadata = {
 };
 
 const services: { slot: ImageSlot; title: string; text: string; href: string; cta: string }[] = [
-  { slot: "jets", title: "Private Jet Charters", text: "Explore private jet charter options for executive journeys, private travel, multi-city itineraries and time-sensitive requirements.", href: "/private-jets", cta: "Explore Private Jets" },
-  { slot: "helicopter", title: "Helicopter Charters", text: "Explore helicopter charter possibilities for suitable regional journeys, destination transfers, event movements and special travel requirements, subject to permissions and operational feasibility.", href: "/helicopter-charters", cta: "Explore Helicopters" },
+  { slot: "jets", title: "Private Jets and Helicopters", text: "Explore jets, turboprops and helicopters for executive journeys, private travel, multi-city itineraries, destination transfers and special requirements, subject to permissions and operational feasibility.", href: "/fleet", cta: "Explore the Fleet" },
   { slot: "bespoke", title: "Bespoke Charter Solutions", text: "From destination weddings and VIP movements to corporate itineraries, we coordinate charter enquiries around the specific needs of each client.", href: "/charter-solutions", cta: "Explore Solutions" },
 ];
 
@@ -67,7 +68,47 @@ export default function Home() {
         </div>
       </section>
 
-      {/* A2 — Trust: cinematic scroll journey on desktop, static steps elsewhere */}
+      {/* A1 — Fleet */}
+      <section id="fleet" className="bg-[#f4f8fb] py-16 text-midnight md:py-24" aria-labelledby="fleet-h">
+        <div className="wrap">
+          <div className="mb-10 max-w-3xl">
+            <p className="eyebrow !text-[#0b6fb3]">Our Fleet</p>
+            <h2 id="fleet-h" className="h2 mt-3 !text-midnight">Aircraft available through our operators.</h2>
+            <p className="mt-4 text-grey-deep">Search the jets, turboprops and helicopters we arrange, filter by size or operator, and preview the cabin. Each aircraft is owned and operated by the named operator.</p>
+          </div>
+          <FleetSection />
+        </div>
+      </section>
+
+      {/* A2 — Partners */}
+      <section className="bg-white py-16 text-midnight md:py-24" aria-labelledby="partners-h">
+        <div className="wrap">
+          <div className="max-w-3xl">
+            <p className="eyebrow !text-[#0b6fb3]">Our Partners</p>
+            <h2 id="partners-h" className="h2 mt-3 !text-midnight">The operators who fly you.</h2>
+            <p className="mt-4 text-grey-deep">We arrange your charter with independent aviation operators. Each quote names the operator and the aircraft, and the operator confirms availability, price and terms.</p>
+          </div>
+          <ul className="mt-12 grid gap-6 md:grid-cols-2">
+            {operators.map((o) => (
+              <li key={o.id} className="flex flex-col rounded-3xl border border-[#0b6fb3]/15 bg-[#f4f8fb] p-7 shadow-[0_18px_40px_-30px_rgba(11,111,179,.6)] md:p-9">
+                <div className="flex h-20 items-center rounded-2xl bg-white px-6">
+                  <Image src={o.id === "arrow" ? "/images/partners/arrow-aircraft.png" : "/images/partners/gmr-aviation.png"} alt={`${o.name} logo`} width={o.id === "arrow" ? 127 : 204} height={o.id === "arrow" ? 78 : 43} className="h-auto max-h-14 w-auto" />
+                </div>
+                <h3 className="mt-6 font-serif text-[2rem] font-semibold leading-tight">{o.name}</h3>
+                <p className="mt-3 text-[0.95rem] text-grey-deep">{o.summary}</p>
+                <p className="mt-3 text-[0.88rem]"><strong className="font-medium">Base:</strong> <span className="text-grey-deep">{o.base}</span></p>
+                <ul className="mt-5 flex flex-wrap gap-2" aria-label={`Aircraft operated by ${o.name}`}>
+                  {o.aircraft.map((a) => <li key={a.model} className="rounded-full border border-[#0b6fb3]/25 bg-white px-3 py-1 text-[0.76rem] text-[#0b6fb3]">{a.model}</li>)}
+                </ul>
+                <Link href={`/operators#${o.id}`} className="link-arrow mt-7 !text-[#0b6fb3]">Operator details<ArrowRight size={14} aria-hidden="true" /></Link>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-8 max-w-3xl text-[0.78rem] text-grey-deep">Logos and names belong to their respective owners. Continent Aviation is an independent charter arranger and is not owned by, or an agent of, either operator.</p>
+        </div>
+      </section>
+
+      {/* A3 — Trust: cinematic scroll journey on desktop, static steps elsewhere */}
       <ScrollJourney steps={trust}>
         <section className="section section-ivory" aria-labelledby="trust-h">
           <div className="wrap">
@@ -89,30 +130,6 @@ export default function Home() {
           <Link href="/how-we-quote" className="link-arrow">How we quote<ArrowRight size={14} aria-hidden="true" /></Link>
           <Link href="/example-quote" className="link-arrow">See an example quote<ArrowRight size={14} aria-hidden="true" /></Link>
           <Link href="/pricing-explained" className="link-arrow">What affects the price<ArrowRight size={14} aria-hidden="true" /></Link>
-        </div>
-      </section>
-
-      {/* A3 — Operators */}
-      <section className="section section-navy" aria-labelledby="ops-h">
-        <div className="wrap grid gap-12 lg:grid-cols-12 lg:gap-20">
-          <div className="lg:col-span-5">
-            <p className="eyebrow">Who flies you</p>
-            <h2 id="ops-h" className="h2 mt-4">Independent operators, named in every quote.</h2>
-            <span className="rule mt-7" />
-            <p className="mt-7 text-ivory/80">Continent Aviation does not own or operate aircraft. We arrange your charter with operators who do, and each quote names the operator and the aircraft.</p>
-            <Link href="/operators" className="link-arrow mt-8">Operators and aircraft<ArrowRight size={14} aria-hidden="true" /></Link>
-          </div>
-          <ul className="grid gap-px bg-gold/20 lg:col-span-7 sm:grid-cols-2">
-            {operators.map((o) => (
-              <li key={o.id} className="bg-navy p-7">
-                <h3 className="font-serif text-3xl">{o.name}</h3>
-                <p className="mt-3 text-[0.92rem] text-ivory/75">{o.aircraft.length} aircraft types, from {o.aircraft.some((a) => a.category === "Helicopter") ? "helicopters to " : ""}{o.aircraft.some((a) => a.category === "Large jet") ? "large-cabin jets" : "turboprops"}.</p>
-                <ul className="mt-5 space-y-1.5 text-[0.9rem] text-ivory/85">
-                  {o.aircraft.map((a) => <li key={a.model} className="flex gap-3"><span aria-hidden="true" className="mt-[0.7em] h-px w-4 shrink-0 bg-gold" />{a.model}</li>)}
-                </ul>
-              </li>
-            ))}
-          </ul>
         </div>
       </section>
 
@@ -138,7 +155,7 @@ export default function Home() {
       <section className="section section-black">
         <div className="wrap">
           <SectionHead eyebrow="Our Services" title="Charter Solutions, Considered." />
-          <div className="mt-16 grid gap-px md:grid-cols-3 md:gap-8">
+          <div className="mt-16 grid gap-px md:grid-cols-2 md:gap-8">
             {services.map((s, i) => (
               <TiltLink key={s.title} href={s.href} className={`tile group ${i === 1 ? "md:mt-14" : ""}`}>
                 <div className="relative aspect-[4/5] w-full">

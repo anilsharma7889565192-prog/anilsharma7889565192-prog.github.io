@@ -104,10 +104,10 @@ export function CtaBand({
   );
 }
 
-/** Closing call to action with a live globe of India (home page). */
+/** Closing call to action with a photoreal night-time Earth (home page). */
 export function GlobeCta() {
   return (
-    <section className="relative isolate overflow-hidden bg-navy">
+    <section className="relative isolate overflow-hidden bg-[#02040a]">
       <div className="wrap grid items-center gap-6 py-20 md:py-28 lg:grid-cols-12 lg:gap-10">
         <div className="relative z-10 lg:col-span-6">
           <span className="rule" />
@@ -118,9 +118,10 @@ export function GlobeCta() {
             <Link href="/contact" className="btn btn-ghost">Contact Continent Aviation</Link>
           </div>
         </div>
-        <div className="relative -mx-[max(1.25rem,4vw)] aspect-square max-h-[38rem] lg:col-span-6 lg:mx-0" aria-hidden="true">
-          <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_50%_50%,rgb(200_169_107/.08),transparent_62%)]" />
-          <LiveScene shot="globe" params={{ bg: "#101a2a" }} />
+        <div className="relative -mx-[max(1.25rem,4vw)] aspect-square max-h-[40rem] [mask-image:radial-gradient(circle_closest-side,#000_80%,transparent_100%)] lg:col-span-6 lg:mx-0" aria-hidden="true">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/images/earth-poster.jpg" alt="" className="absolute inset-0 h-full w-full object-cover" loading="lazy" />
+          <LiveScene shot="globe" params={{ bg: "#02040a" }} />
         </div>
       </div>
     </section>

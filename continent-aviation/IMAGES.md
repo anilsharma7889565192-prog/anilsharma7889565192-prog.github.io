@@ -39,3 +39,23 @@ because the site must not imply that partner aircraft are your own fleet. Update
 | `cabin-interior.jpg` | Private Jets sourcing section |
 | `apron-night.jpg` | How It Works, Contact hero |
 | `about-skyline.jpg` | About hero |
+
+## Real photographs and satellite imagery (added 2026-11-18)
+
+All sourced from Wikimedia Commons. Aircraft photos show the aircraft TYPE and are labelled "Illustrative photo of the type" on the site; they are never presented as a specific aircraft offered.
+
+| File | Subject | Licence | Credit shown on site |
+|---|---|---|---|
+| `public/images/fleet/legacy650.jpg` | Embraer Legacy 650 (ERJ-135BJ) | CC0 | none needed |
+| `public/images/fleet/legacy600.jpg` | Embraer Legacy 600 | CC0 | none needed |
+| `public/images/fleet/falcon2000lx.jpg` | Dassault Falcon 2000 | CC0 | none needed |
+| `public/images/fleet/bell407.jpg` | Bell 407 | CC0 | none needed |
+| `public/images/fleet/h125.jpg` | Airbus H125 (Ecureuil) | CC0 | none needed |
+| `public/images/fleet/aw169.jpg` | Leonardo/AgustaWestland AW169 | CC BY 4.0, Julian Herzog | yes (Fleet section footnote) |
+| `public/images/fleet/kingair.jpg` | Beechcraft King Air 350i | CC BY-SA 2.0, Elen Schurova | yes (Fleet section footnote) |
+| `public/images/sky.jpg` | Sky with cirrus (cropped) | CC0 | none needed |
+| `public/images/earth/night.jpg` | NASA "City Lights 2012" flat map | Public domain (NASA) | none needed |
+| `public/images/earth/day.jpg` | NASA "Blue Marble Next Generation + topography + bathymetry" | Public domain (NASA) | none needed |
+| `public/images/earth-poster.jpg` | Still render of the globe scene from the two NASA maps | Derived, public domain inputs | none needed |
+
+Operator logos (`public/images/partners/`) are the operators' own marks, taken from their public websites and shown on the home page "Our Partners" section. Get each operator's written permission before relying on them.

@@ -192,3 +192,9 @@ input[type="date"].input-light, input[type="time"].input-light { color-scheme: l
   *, *::before, *::after { animation: none !important; transition-duration: .01ms !important; }
   .reveal { opacity: 1 !important; transform: none !important; }
 }
+
+/* ---- Sky theme tokens and glass motion (fleet explorer, partner strip) ---- */
+:root { --sky: #2aa7e8; --sky-deep: #0b6fb3; --sky-pale: #e6f4fd; --sun: #ffc400; }
+@keyframes glass-float { 0%, 100% { transform: translateY(0) rotate(-1.4deg); } 50% { transform: translateY(-9px) rotate(1.4deg); } }
+.glass-float { animation: glass-float 6.5s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .glass-float { animation: none; } }

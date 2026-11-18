@@ -10,6 +10,7 @@ import { mats } from "./materials";
 export type Livery = { base: string; belly: string; stripe: string; accent?: string };
 
 export const LIVERIES: Record<string, Livery> = {
+  sky: { base: "#ffffff", belly: "#79b8e6", stripe: "#0b6fb3" },
   graphite: { base: "#f2f1ed", belly: "#3b3f46", stripe: "#a9adb3" },
   navy: { base: "#f2f1ed", belly: "#1a2538", stripe: "#9aa3b1" },
   pearl: { base: "#f4f3ef", belly: "#d7d8da", stripe: "#8f949b" },

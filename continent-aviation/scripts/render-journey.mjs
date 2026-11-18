@@ -16,7 +16,7 @@ fs.mkdirSync(OUT, { recursive: true });
 const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH, args: ["--no-sandbox", "--ignore-gpu-blocklist"] });
 const page = await browser.newPage({ viewport: { width: W, height: H } });
 page.on("pageerror", (e) => console.error("pageerror", e.message));
-await page.goto(`${BASE}/studio?shot=journey&w=${W}&h=${H}`, { waitUntil: "load" });
+await page.goto(`${BASE}/studio?shot=${process.env.SHOT ?? "journey"}&w=${W}&h=${H}`, { waitUntil: "load" });
 await page.waitForFunction(() => window.__ready || window.__error, null, { timeout: 600000 });
 const err = await page.evaluate(() => window.__error);
 if (err) throw new Error(err);

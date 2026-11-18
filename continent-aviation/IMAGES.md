@@ -57,5 +57,11 @@ All sourced from Wikimedia Commons. Aircraft photos show the aircraft TYPE and a
 | `public/images/earth/night.jpg` | NASA "City Lights 2012" flat map | Public domain (NASA) | none needed |
 | `public/images/earth/day.jpg` | NASA "Blue Marble Next Generation + topography + bathymetry" | Public domain (NASA) | none needed |
 | `public/images/earth-poster.jpg` | Still render of the globe scene from the two NASA maps | Derived, public domain inputs | none needed |
+| `public/images/services/corporate.jpg` | Mumbai skyline and Bandra-Worli Sea Link ("Worli skyline with BSWL") | CC BY 2.0, Woodysworldtv | yes (Services page) |
+| `public/images/services/weddings.jpg` | City Palace, Udaipur | CC BY-SA 4.0, Jakub Hałun | yes (Services page) |
+| `public/images/services/vip-events.jpg` | Taj Mahal Palace Hotel, Mumbai | CC BY-SA 3.0, Joe Ravi | yes (Services page) |
+| `public/images/services/family.jpg` | Rocks on Palolem Beach, South Goa | CC BY-SA 4.0, Vachary | yes (Services page) |
+| `public/images/services/multi-city.jpg` | Amber Fort through a window | CC BY-SA 4.0, PRITAMDUTTA20 | yes (Services page) |
+| `public/images/services/helicopter.jpg` | Light helicopter over open countryside | Public domain, Thomas C. Gray | no (credited anyway) |
 
 Operator logos (`public/images/partners/`) are the operators' own marks, taken from their public websites and shown on the home page "Our Partners" section. Get each operator's written permission before relying on them.

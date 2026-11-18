@@ -10,6 +10,11 @@ export type SkyPreset = {
 };
 
 export const SKY: Record<string, SkyPreset> = {
+  day: {
+    zenith: "#2a79cf", mid: "#6fb6ee", horizon: "#e3f3ff", below: "#8da3b5",
+    glow: "#fff4dc", sun: "#ffffff", sunDir: [-0.4, 0.5, -0.76], sunSize: 0.0015, glowStrength: 0.25,
+    cloudLit: "#ffffff", cloudShade: "#a9c3dd", cloudCover: 0.5, cloudOpacity: 0.9, stars: 0.0, exposure: 1.0, band: 0.2,
+  },
   dusk: {
     zenith: "#050b18", mid: "#121d35", horizon: "#b8683e", below: "#1d1a1d",
     glow: "#ff8a45", sun: "#ffd2a0", sunDir: [-0.82, 0.02, -0.57], sunSize: 0.0012, glowStrength: 0.7,

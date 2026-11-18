@@ -19,7 +19,7 @@ async function create(): Promise<Db> {
   let db: Db;
   if (url) {
     const { default: postgres } = await import("postgres");
-    const sql = postgres(url, { max: 5, idle_timeout: 20, connect_timeout: 10, onnotice: () => {} });
+    const sql = postgres(url, { max: 5, idle_timeout: 20, connect_timeout: 10, prepare: false, onnotice: () => {} });
     db = { query: async (q, p = []) => (await sql.unsafe(q, p as never[])) as unknown as Row[] };
   } else {
     const { PGlite } = await import("@electric-sql/pglite");

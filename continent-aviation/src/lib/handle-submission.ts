@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import type { ZodType } from "zod";
 import { deliver, deliveryConfigured, type DeliveryKind } from "./delivery";
 import { dbConfigured } from "./db/client";
-import { createEnquiry, getEnquiry } from "./db/repo";
+import { createEnquiry, getEnquiry, upsertClientFromEnquiry } from "./db/repo";
 import { mail } from "./email";
 import { rateLimit } from "./ratelimit";
 import { toFieldErrors } from "./validation";
@@ -61,6 +61,8 @@ export async function handleSubmission(req: Request, kind: DeliveryKind, schema:
   if (stored) {
     try {
       storedId = await createEnquiry({ reference, data });
+      const d = data as Record<string, unknown>;
+      await upsertClientFromEnquiry({ email: String(d.email ?? ""), name: String(d.fullName ?? ""), phone: String(d.phone ?? ""), company: String(d.company ?? "") }).catch((e) => console.error("[client] could not save client:", (e as Error).message));
     } catch (e) {
       console.error("[enquiry] could not store enquiry:", (e as Error).message);
     }

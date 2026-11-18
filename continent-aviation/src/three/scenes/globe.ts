@@ -41,7 +41,7 @@ function flareTexture() {
 
 export async function createGlobeScene(ctx: SceneContext): Promise<SceneSetup> {
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(ctx.params?.bg ?? "#02040a");
+  scene.background = new THREE.Color(ctx.params?.bg ?? "#000000");
   const [day, night] = await Promise.all([load("/images/earth/day.jpg", ctx.renderer), load("/images/earth/night.jpg", ctx.renderer)]);
 
   const sunDir = new THREE.Vector3(0.74, 0.5, -0.46).normalize();

@@ -104,24 +104,26 @@ export function CtaBand({
   );
 }
 
-/** Closing call to action with a photoreal night-time Earth (home page). */
+/** Closing call to action with a photoreal night-time Earth that bleeds into the page (home page). */
 export function GlobeCta() {
   return (
-    <section className="relative isolate overflow-hidden bg-[#02040a]">
-      <div className="wrap grid items-center gap-6 py-20 md:py-28 lg:grid-cols-12 lg:gap-10">
-        <div className="relative z-10 lg:col-span-6">
+    <section className="relative isolate overflow-hidden bg-[#020305]">
+      {/* The Earth is part of the scene, not a picture on it: oversized, bleeding off the right edge, edges feathered to the page colour. */}
+      <div className="pointer-events-none absolute -right-[22%] top-[58%] -z-10 aspect-square w-[min(150vw,64rem)] -translate-y-1/2 [mask-image:radial-gradient(circle_closest-side,#000_74%,transparent_100%)] max-lg:-right-[38%] max-lg:top-[78%] max-lg:w-[150vw] lg:-right-[8%] lg:top-1/2" aria-hidden="true">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/images/earth-poster.jpg" alt="" className="absolute inset-0 h-full w-full object-cover" loading="lazy" />
+        <LiveScene shot="globe" params={{ bg: "#000000" }} />
+      </div>
+      <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,#020305_0%,rgba(2,3,5,.88)_30%,rgba(2,3,5,0)_62%)] max-lg:bg-[linear-gradient(180deg,#020305_0%,rgba(2,3,5,.8)_38%,rgba(2,3,5,0)_70%)]" aria-hidden="true" />
+      <div className="wrap relative py-24 md:py-36 max-lg:pb-[26rem]">
+        <div className="max-w-xl">
           <span className="rule" />
-          <h2 className="h2 mt-8 max-w-xl !text-[clamp(2.2rem,5vw,4rem)]">Tell Us Where You Need to Be.</h2>
+          <h2 className="h2 mt-8 !text-[clamp(2.2rem,5vw,4rem)]">Tell Us Where You Need to Be.</h2>
           <p className="lead mt-6">Share your travel requirements and let us coordinate suitable charter options with relevant aviation operators.</p>
           <div className="mt-10 flex flex-wrap gap-4">
             <Link href="/request-a-charter" className="btn btn-gold">Request a Charter<ArrowRight size={16} aria-hidden="true" /></Link>
             <Link href="/contact" className="btn btn-ghost">Contact Continent Aviation</Link>
           </div>
-        </div>
-        <div className="relative -mx-[max(1.25rem,4vw)] aspect-square max-h-[40rem] [mask-image:radial-gradient(circle_closest-side,#000_80%,transparent_100%)] lg:col-span-6 lg:mx-0" aria-hidden="true">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/images/earth-poster.jpg" alt="" className="absolute inset-0 h-full w-full object-cover" loading="lazy" />
-          <LiveScene shot="globe" params={{ bg: "#02040a" }} />
         </div>
       </div>
     </section>

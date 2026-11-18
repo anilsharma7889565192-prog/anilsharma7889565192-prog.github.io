@@ -45,6 +45,7 @@ export const nav = [
   { href: "/charter-solutions", label: "Solutions" },
   { href: "/how-we-quote", label: "How We Quote" },
   { href: "/about", label: "About" },
+  { href: "/account", label: "Account" },
 ] as const;
 
 export const menuExtra = [

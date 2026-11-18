@@ -133,6 +133,38 @@ export function FleetSection() {
         <p className="border-t border-[#0b6fb3]/10 bg-[#f4f8fb] px-4 py-2.5 text-[0.74rem] text-grey-deep" aria-live="polite">Showing {rows.length} of {fleet.length} aircraft. Passenger numbers are the operator&apos;s &quot;up to&quot; capacity.</p>
       </div>
 
+      {/* ---------- Aircraft cards ---------- */}
+      <div className="mt-16">
+        <p className="eyebrow !text-[#0b6fb3]">Aircraft in detail</p>
+        <h3 className="mt-2 font-serif text-[clamp(1.8rem,3.4vw,2.6rem)] leading-tight">Every aircraft, one card.</h3>
+        <ul className="mt-7 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {rows.map((a) => (
+            <li key={a.id} className={cn("group flex flex-col overflow-hidden rounded-3xl border bg-white shadow-[0_18px_40px_-30px_rgba(11,111,179,.6)] transition-all duration-300 hover:-translate-y-1", a.id === selected.id ? "border-[#0b6fb3]" : "border-[#0b6fb3]/15")}>
+              <div className="relative aspect-[16/10] overflow-hidden bg-[#e6f4fd]">
+                <Image src={a.image} alt={a.imageAlt} fill sizes="(min-width:1024px) 360px, (min-width:640px) 50vw, 100vw" className="object-cover transition-transform duration-700 group-hover:scale-105" />
+                <span className="absolute left-3 top-3 rounded-full bg-white/85 px-3 py-1 text-[0.64rem] font-semibold uppercase tracking-[0.12em] text-[#0b6fb3] backdrop-blur">{a.kind}</span>
+              </div>
+              <div className="flex flex-1 flex-col p-5">
+                <h4 className="font-serif text-[1.55rem] font-semibold leading-tight">{a.model}{a.count && a.count > 1 ? <span className="ml-1.5 font-sans text-[0.8rem] font-normal text-grey-deep">x {a.count}</span> : null}</h4>
+                <p className="mt-0.5 text-[0.8rem] text-grey-deep">{a.maker} · operated by {a.operator}</p>
+                <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 border-t border-[#0b6fb3]/10 pt-4 text-[0.84rem]">
+                  <div><dt className="text-[0.64rem] uppercase tracking-[0.14em] text-grey-deep">Passengers</dt><dd className="mt-0.5 font-medium">up to {a.seats}</dd></div>
+                  <div><dt className="text-[0.64rem] uppercase tracking-[0.14em] text-grey-deep">Engines</dt><dd className="mt-0.5 font-medium">{a.engines}</dd></div>
+                  {a.perf?.map((f) => <div key={f.label}><dt className="text-[0.64rem] uppercase tracking-[0.14em] text-grey-deep">{f.label}</dt><dd className="mt-0.5 font-medium">{f.value}</dd></div>)}
+                </dl>
+                <p className="mt-3 flex-1 text-[0.82rem] text-grey-deep">{a.note ?? KIND_INFO[a.kind].blurb}{!a.perf ? " Range and cruise are given in your quote." : ""}</p>
+                <div className="mt-4 flex items-center justify-between gap-3">
+                  <button type="button" onClick={() => pick(a.id, true)} className="text-[0.74rem] font-semibold uppercase tracking-[0.1em] text-[#0b6fb3] underline-offset-4 hover:underline">Preview cabin</button>
+                  <Link href={`/request-a-charter?${new URLSearchParams({ aircraft: enquiryAircraft(a.kind) }).toString()}`} className="inline-flex min-h-10 items-center gap-1.5 rounded-full border border-[#0b6fb3]/30 px-4 text-[0.72rem] font-semibold uppercase tracking-[0.1em] text-[#0b6fb3] transition-colors hover:bg-[#e6f4fd]">Request<ArrowRight size={14} aria-hidden="true" /></Link>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+        {rows.length === 0 && <p className="mt-4 text-grey-deep">No aircraft match those filters.</p>}
+        <p className="mt-4 text-[0.74rem] text-grey-deep">Speed and range are published reference figures for the aircraft type. The operator confirms the actual figures for your flight.</p>
+      </div>
+
       {/* ---------- Size selector ---------- */}
       <div className="mt-16">
         <p className="eyebrow !text-[#0b6fb3]">Choose by size</p>

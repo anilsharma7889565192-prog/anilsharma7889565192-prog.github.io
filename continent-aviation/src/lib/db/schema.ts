@@ -76,4 +76,24 @@ CREATE TABLE IF NOT EXISTS alerts (
   unsubscribed_at TIMESTAMPTZ
 );
 CREATE INDEX IF NOT EXISTS alerts_email_idx ON alerts (email);
+
+CREATE TABLE IF NOT EXISTS clients (
+  email TEXT PRIMARY KEY,
+  name TEXT,
+  phone TEXT,
+  company TEXT,
+  notes TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  last_login_at TIMESTAMPTZ,
+  last_enquiry_at TIMESTAMPTZ
+);
+
+CREATE TABLE IF NOT EXISTS client_login_tokens (
+  token_hash TEXT PRIMARY KEY,
+  email TEXT NOT NULL,
+  expires_at TIMESTAMPTZ NOT NULL,
+  used_at TIMESTAMPTZ
+);
+
+CREATE INDEX IF NOT EXISTS enquiries_email_idx ON enquiries (lower(client_email));
 `;

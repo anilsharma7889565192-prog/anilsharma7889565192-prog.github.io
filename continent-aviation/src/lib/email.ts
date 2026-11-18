@@ -70,6 +70,14 @@ const first = (n: string) => n.split(" ")[0] || "there";
 const contactLine = () => (site.contact.email ? `You can reply to this email or write to ${esc(site.contact.email)}.` : "You can reply to this email.");
 
 export const mail = {
+  clientLogin: (to: string, link: string) => sendMail({
+    type: "client_login", to, replyTo: site.contact.email,
+    subject: "Your Continent Aviation sign-in link",
+    html: layout("Sign in to your account",
+      p("Use the button below to sign in. The link works once and expires in 15 minutes.") + btn(link, "Sign in") +
+      p("If you did not ask for this, you can ignore this email. Nobody can sign in without access to your inbox.") + p(contactLine())),
+    text: `Sign in to Continent Aviation: ${link}\n\nThe link works once and expires in 15 minutes. If you did not request it, ignore this email.`,
+  }),
   ack: (e: E) => sendMail({
     type: "client_ack", enquiryId: e.id, to: e.clientEmail, replyTo: site.contact.email,
     subject: `We have your charter enquiry (${e.reference})`,

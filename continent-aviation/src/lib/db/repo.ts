@@ -186,3 +186,59 @@ export async function listAlerts() {
   const rows = await (await getDb()).query("SELECT email, route, created_at, unsubscribed_at FROM alerts ORDER BY created_at DESC LIMIT 500");
   return rows.map((r) => ({ email: String(r.email), route: (r.route as string) ?? null, createdAt: d(r.created_at), unsubscribedAt: r.unsubscribed_at ? d(r.unsubscribed_at) : null }));
 }
+
+// ---- clients (people who enquired or signed in)
+export type ClientRow = { email: string; name: string | null; phone: string | null; company: string | null; notes: string | null; createdAt: Date; lastLoginAt: Date | null; lastEnquiryAt: Date | null; enquiryCount?: number };
+const asClient = (r: Row): ClientRow => ({
+  email: String(r.email), name: (r.name as string) ?? null, phone: (r.phone as string) ?? null, company: (r.company as string) ?? null, notes: (r.notes as string) ?? null,
+  createdAt: d(r.created_at), lastLoginAt: r.last_login_at ? d(r.last_login_at) : null, lastEnquiryAt: r.last_enquiry_at ? d(r.last_enquiry_at) : null,
+  enquiryCount: r.enquiry_count == null ? undefined : Number(r.enquiry_count),
+});
+
+/** Create or refresh a client from an enquiry. Blank fields never overwrite what we already know. */
+export async function upsertClientFromEnquiry(input: { email: string; name?: string | null; phone?: string | null; company?: string | null }) {
+  const email = input.email.trim().toLowerCase();
+  if (!email) return;
+  await (await getDb()).query(
+    `INSERT INTO clients (email, name, phone, company, last_enquiry_at) VALUES ($1,$2,$3,$4, now())
+     ON CONFLICT (email) DO UPDATE SET name = coalesce(nullif($2,''), clients.name), phone = coalesce(nullif($3,''), clients.phone),
+       company = coalesce(nullif($4,''), clients.company), last_enquiry_at = now()`,
+    [email, input.name ?? null, input.phone ?? null, input.company ?? null],
+  );
+}
+export async function getClientByEmail(email: string) {
+  const rows = await (await getDb()).query("SELECT * FROM clients WHERE email = $1", [email.toLowerCase()]);
+  return rows[0] ? asClient(rows[0]) : null;
+}
+export async function updateClientProfile(email: string, f: { name: string; phone: string; company: string }) {
+  await (await getDb()).query("UPDATE clients SET name = $2, phone = $3, company = $4 WHERE email = $1", [email.toLowerCase(), f.name.slice(0, 120), f.phone.slice(0, 40), f.company.slice(0, 120)]);
+}
+export async function updateClientNotes(email: string, notes: string) {
+  await (await getDb()).query("UPDATE clients SET notes = $2 WHERE email = $1", [email.toLowerCase(), notes.slice(0, 4000)]);
+}
+export async function listClients(search?: string) {
+  const q = (search ?? "").trim().toLowerCase();
+  const rows = await (await getDb()).query(
+    `SELECT c.*, (SELECT count(*) FROM enquiries e WHERE lower(e.client_email) = c.email) AS enquiry_count FROM clients c
+     WHERE ($1 = '' OR c.email LIKE '%'||$1||'%' OR lower(coalesce(c.name,'')) LIKE '%'||$1||'%' OR lower(coalesce(c.company,'')) LIKE '%'||$1||'%' OR coalesce(c.phone,'') LIKE '%'||$1||'%')
+     ORDER BY coalesce(c.last_enquiry_at, c.last_login_at, c.created_at) DESC LIMIT 500`, [q]);
+  return rows.map(asClient);
+}
+export async function enquiriesForEmail(email: string) {
+  const rows = await (await getDb()).query("SELECT * FROM enquiries WHERE lower(client_email) = $1 ORDER BY created_at DESC LIMIT 100", [email.toLowerCase()]);
+  return rows.map(asEnquiry);
+}
+export async function createClientLoginToken(email: string, ttlMinutes = 15) {
+  const token = newToken();
+  await (await getDb()).query("INSERT INTO client_login_tokens (token_hash, email, expires_at) VALUES ($1,$2,$3)", [sha256(token), email.toLowerCase(), new Date(Date.now() + ttlMinutes * 60_000).toISOString()]);
+  return token;
+}
+/** Single use. Returns the email on success and makes sure a client record exists. */
+export async function consumeClientLoginToken(token: string) {
+  const db = await getDb();
+  const rows = await db.query("UPDATE client_login_tokens SET used_at = now() WHERE token_hash = $1 AND used_at IS NULL AND expires_at > now() RETURNING email", [sha256(token)]);
+  if (!rows.length) return null;
+  const email = String(rows[0].email);
+  await db.query("INSERT INTO clients (email, last_login_at) VALUES ($1, now()) ON CONFLICT (email) DO UPDATE SET last_login_at = now()", [email]);
+  return email;
+}

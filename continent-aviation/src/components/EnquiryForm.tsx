@@ -21,7 +21,7 @@ const CONTACT = ["Phone", "WhatsApp", "Email"] as const;
 
 type Status = "idle" | "submitting" | "success" | "error";
 
-export function EnquiryForm({ deliveryReady, isProduction, fallback }: { deliveryReady: boolean; isProduction: boolean; fallback: Fallback }) {
+export function EnquiryForm({ deliveryReady, isProduction, fallback, defaults }: { deliveryReady: boolean; isProduction: boolean; fallback: Fallback; defaults?: { email: string; fullName: string; phone: string; company: string } }) {
   const params = useSearchParams();
   const pick = <T extends readonly string[]>(key: string, list: T): T[number] | undefined => {
     const v = params.get(key);
@@ -181,16 +181,16 @@ export function EnquiryForm({ deliveryReady, isProduction, fallback }: { deliver
         <h3 id="s1" className="sr-only">Contact details</h3>
         <div className="grid gap-x-8 gap-y-7 md:grid-cols-2">
           <Field name="fullName" label="Full name" error={errors.fullName}>
-            {(p) => <input {...p} name="fullName" type="text" autoComplete="name" required className="input" />}
+            {(p) => <input {...p} name="fullName" type="text" autoComplete="name" required defaultValue={defaults?.fullName} className="input" />}
           </Field>
           <Field name="company" label="Company / organisation" optional error={errors.company}>
-            {(p) => <input {...p} name="company" type="text" autoComplete="organization" className="input" />}
+            {(p) => <input {...p} name="company" type="text" autoComplete="organization" defaultValue={defaults?.company} className="input" />}
           </Field>
           <Field name="email" label="Email address" error={errors.email}>
-            {(p) => <input {...p} name="email" type="email" autoComplete="email" inputMode="email" required className="input" />}
+            {(p) => <input {...p} name="email" type="email" autoComplete="email" inputMode="email" required defaultValue={defaults?.email} className="input" />}
           </Field>
           <Field name="phone" label="Phone number with country code" error={errors.phone} hint="For example +91 98765 43210">
-            {(p) => <input {...p} name="phone" type="tel" autoComplete="tel" inputMode="tel" required placeholder="+91" className="input" />}
+            {(p) => <input {...p} name="phone" type="tel" autoComplete="tel" inputMode="tel" required placeholder="+91" defaultValue={defaults?.phone} className="input" />}
           </Field>
           <div className="md:col-span-2">
             <Choice name="contactMethod" legend="Preferred contact method" options={CONTACT} defaultValue="Phone" error={errors.contactMethod} />

@@ -2,13 +2,19 @@ import { Suspense } from "react";
 import { EnquiryForm } from "@/components/EnquiryForm";
 import { Breadcrumbs, Disclaimer } from "@/components/ui";
 import { intakeReady } from "@/lib/delivery";
+import { getClientSession } from "@/lib/auth";
+import { dbConfigured } from "@/lib/db/client";
+import { getClientByEmail } from "@/lib/db/repo";
 import { pageMeta } from "@/lib/metadata";
 import { site, whatsappLink } from "@/config/site";
 
 export const metadata = pageMeta("/request-a-charter", "Request a Charter", "Share your route, dates and passenger details to request private jet or helicopter charter options from Continent Aviation. An enquiry is not a booking.");
 export const dynamic = "force-dynamic";
 
-export default function Page() {
+export default async function Page() {
+  const session = await getClientSession();
+  const known = session && dbConfigured() ? await getClientByEmail(session.email).catch(() => null) : null;
+  const defaults = session ? { email: session.email, fullName: known?.name ?? "", phone: known?.phone ?? "", company: known?.company ?? "" } : undefined;
   return (
     <>
       <section className="bg-midnight pb-12 pt-36 md:pb-16 md:pt-44">
@@ -24,6 +30,7 @@ export default function Page() {
           <Suspense fallback={<p className="text-grey" role="status">Loading form…</p>}>
             <EnquiryForm
               deliveryReady={intakeReady()}
+              defaults={defaults}
               isProduction={process.env.NODE_ENV === "production"}
               fallback={{ email: site.contact.email, phone: site.contact.phone, whatsappUrl: whatsappLink() }}
             />

@@ -36,6 +36,19 @@ export default function Page() {
         </div>
       </section>
 
+      <section className="section section-ivory" aria-labelledby="founder-h">
+        <div className="wrap grid gap-14 lg:grid-cols-12 lg:gap-20">
+          <div className="lg:col-span-5">
+            <SectionHead eyebrow="Founder" title="Darsh Yadav, Founder." />
+          </div>
+          <div id="founder-h" className="space-y-6 text-[1.1rem] text-midnight/85 lg:col-span-7 lg:pt-3">
+            <p><strong className="font-semibold text-midnight">Darsh Yadav is the Founder of Continent Aviation</strong>, driven by a vision to make private aviation more accessible, seamless, and convenient. With a focus on simplifying private jet and helicopter charter arrangements, he is building Continent Aviation around a client-first approach, connecting travellers with suitable aviation solutions through a trusted network of operators.</p>
+            <p>His vision is to bring ease, transparency, and a more personalised experience to private aviation, making every journey effortless from enquiry to coordination.</p>
+            <p className="hairline-top pt-5 text-[0.8rem] tracking-wide text-grey-deep">Backend team head: <span className="text-midnight/80">Lavanya Sharma</span></p>
+          </div>
+        </div>
+      </section>
+
       <CtaBand title="Start a Charter Enquiry." text="Tell us about your journey and we will take it from there." primary={{ href: "/request-a-charter", label: "Start a Charter Enquiry" }} />
       <Disclaimer />
     </>
